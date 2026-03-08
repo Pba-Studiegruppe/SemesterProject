@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/backend/">
+    <Project Path="src/backend/AppHost/AppHost.csproj" />
+  </Folder>
+  <Folder Name="/src/backend/modules/">
+    <Project Path="src/backend/Modules/Signup/Signup-Application/Signup-Application.csproj" Id="570f16ab-7c06-4f63-a378-b4ec7c7502e2" />
+    <Project Path="src/backend/Modules/Signup/Signup-Domain/Signup-Domain.csproj" Id="f801a1d8-469b-4e1a-9a6f-219d4accadfe" />
+    <Project Path="src/backend/Modules/Signup/Signup-Infrastructure/Signup-Infrastructure.csproj" Id="3873d4fa-d2a5-48fc-819e-1129af2a9b71" />
+  </Folder>
+  <Folder Name="/src/webui/">
+    <Project Path="src/webui/WebUI/WebUI.csproj" />
+  </Folder>
+</Solution>
