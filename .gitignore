@@ -11,3 +11,6 @@
 /src/backend/Modules/Signup/Signup-Domain/obj/Debug/net10.0
 /src/backend/Modules/Signup/Signup-Domain/obj
 /src/backend/Modules/Signup/Signup-Application/obj
+/src/webui/WebUI/obj
+/src/webui/WebUI/wwwroot/lib/bootstrap/dist
+/src/webui/WebUI/wwwroot/sample-data
