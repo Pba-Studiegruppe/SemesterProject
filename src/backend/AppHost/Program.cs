@@ -2,16 +2,17 @@ using AppHost;
 using Signup_Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddEndpointsApiExplorer(); // Needed for minimal APIs
+
+builder.Services.AddEndpointsApiExplorer(); 
 builder.Services.AddSwaggerGen();
-builder.Services.AddSignupInfrastructure();
+builder.Services.AddSignupInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();             // Generate Swagger JSON
-    app.UseSwaggerUI();           // Serve Swagger UI
+    app.UseSwagger();             
+    app.UseSwaggerUI();           
 }
 app.MapRoutes();
 app.Run();

@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/backend/">
+    <Project Path="Shared.Kernel/Shared.Kernel.csproj" Id="7753e408-1119-4526-90a3-2b4af3117892" />
     <Project Path="src/backend/AppHost/AppHost.csproj" />
   </Folder>
   <Folder Name="/src/backend/modules/">
@@ -10,5 +11,8 @@
   </Folder>
   <Folder Name="/src/webui/">
     <Project Path="src/webui/WebUI/WebUI.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="SignupModule.Tests/SignupModule.Tests.csproj" Id="5dd5b0f8-a6e9-4b3b-bc9a-6cc495dd7cb9" />
   </Folder>
 </Solution>
