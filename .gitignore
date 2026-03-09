@@ -1,0 +1,21 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/GruppeProject.slnx/DesignTimeBuild/.dtbcache.v2
+/.vs/GruppeProject.slnx/FileContentIndex
+/.vs/GruppeProject.slnx/v18
+/src/backend/AppHost/obj
+/.vs
+/src/backend/Modules/Signup/Signup-Application/obj
+/src/backend/Modules/Signup/Signup-Domain/obj
+/src/backend/Modules/Signup/Signup-Infrastructure/obj/Debug/net10.0
+/src/backend/Modules/Signup/Signup-Infrastructure/obj/project.assets.json
+/src/backend/Modules/Signup/Signup-Infrastructure/obj/Signup-Infrastructure.csproj.nuget.dgspec.json
+/src/backend/Modules/Signup/Signup-Infrastructure/obj/Signup-Infrastructure.csproj.nuget.g.props
+/src/backend/Modules/Signup/Signup-Infrastructure/obj/Signup-Infrastructure.csproj.nuget.g.targets
+/src/webui/WebUI/obj/Debug/net10.0
+/src/webui/WebUI/obj/project.assets.json
+/src/webui/WebUI/obj/WebUI.csproj.nuget.dgspec.json
+/src/webui/WebUI/obj/WebUI.csproj.nuget.g.props
+/src/webui/WebUI/obj/WebUI.csproj.nuget.g.targets
