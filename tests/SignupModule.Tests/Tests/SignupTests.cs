@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Signup_Infrastructure.Data;
 using static SignupModule.Tests.Constants;
 
-namespace SignupModule.Tests;
+namespace SignupModule.Tests.Tests;
 
 [Collection("Database collection")]
 
@@ -15,7 +15,7 @@ public class SignupTests
 
     public SignupTests(PostgresDbFixture dbFixture)
     {
-        // Create factory manually and inject connection string
+
         var factory = new SignupModuleWebApplicationFactory
         {
             ConnectionString = dbFixture.ConnectionString
@@ -44,7 +44,6 @@ public class SignupTests
         // Then
         Assert.Single(_dbContext.PendingUsers.Where(r => r.Email == request.Email));
     }
-
 
     [Fact]
     public async Task WhenUserSignsup_ThenSignupRequestIsSavedWithCorrectValues()
@@ -76,4 +75,6 @@ public class SignupTests
         var now = DateTime.UtcNow;
         Assert.InRange(entiity.CreatedAt, now.AddSeconds(-10), now.AddSeconds(10));
     }
+
+
 }

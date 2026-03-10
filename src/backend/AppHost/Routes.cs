@@ -7,11 +7,11 @@ namespace AppHost;
 
 public static class Routes
 {
-    public static WebApplication MapRoutes(this WebApplication app)
+    public static WebApplication MapSignupModuleRoutes(this WebApplication app)
     {
         app.MapGet("/", () => "Hello World!");
 
-        app.MapGet("/api/signup", async ([FromServices]ISignupService signupService, [FromBody]SignupRequest request) => 
+        app.MapPost("/api/signup", async ([FromServices]ISignupService signupService, [FromBody]SignupRequest request) => 
         {
             var result = await signupService.SignupAsync(request);
             if (result.Status == SignupRequestStatus.Success)

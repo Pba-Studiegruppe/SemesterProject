@@ -13,6 +13,6 @@
     <Project Path="src/webui/WebUI/WebUI.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="SignupModule.Tests/SignupModule.Tests.csproj" Id="5dd5b0f8-a6e9-4b3b-bc9a-6cc495dd7cb9" />
+    <Project Path="tests/SignupModule.Tests/SignupModule.Tests.csproj" />
   </Folder>
 </Solution>

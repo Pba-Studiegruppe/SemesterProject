@@ -14,5 +14,5 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();             
     app.UseSwaggerUI();           
 }
-app.MapRoutes();
+app.MapSignupModuleRoutes();
 app.Run();

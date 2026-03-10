@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\backend\AppHost\AppHost.csproj" />
-    <ProjectReference Include="..\src\backend\Modules\Signup\Signup-Infrastructure\Signup-Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\backend\AppHost\AppHost.csproj" />
+    <ProjectReference Include="..\..\src\backend\Modules\Signup\Signup-Infrastructure\Signup-Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
