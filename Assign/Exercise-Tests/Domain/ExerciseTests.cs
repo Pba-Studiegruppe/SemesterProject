@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Exercise_Tests
+namespace Exercise_Tests.Domain
 {
     public class ExerciseTests
     {
