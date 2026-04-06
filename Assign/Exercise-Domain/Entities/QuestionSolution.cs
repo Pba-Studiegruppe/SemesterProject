@@ -16,7 +16,7 @@ namespace Exercise_Domain.Entities
         public QuestionSolution(Guid questionId, string content)
         {
             Id = Guid.NewGuid();
-            questionId = QuestionId;
+            QuestionId = questionId;
             Content = content;
         }
     }

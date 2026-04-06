@@ -8,8 +8,14 @@ namespace Exercise_Application.DTO
 {
     public class QuestionSolutionDTO
     {
-        public int Id { get; set; }
-        public string SolutionText { get; set; }
-        public int QuestionId { get; set; }
+        public Guid Id { get; set; }
+        public Guid QuestionId { get; set; }
+        public string Content { get; set; } = string.Empty;
+    }
+
+    public class CreateQuestionSolutionDTO
+    {
+        public Guid QuestionId { get; set; }
+        public string Content { get; set; } = string.Empty;
     }
 }

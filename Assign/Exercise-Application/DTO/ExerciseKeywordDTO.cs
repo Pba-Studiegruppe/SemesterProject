@@ -8,7 +8,7 @@ namespace Exercise_Application.DTO
 {
     public class ExerciseKeywordDTO
     {
-        public int ExerciseId { get; set; }
-        public int KeywordId { get; set; }
+        public Guid ExerciseId { get; set; }
+        public Guid KeywordId { get; set; }
     }
 }

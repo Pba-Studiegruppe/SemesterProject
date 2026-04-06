@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Exercise_Application.DTO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,11 @@ namespace Exercise_Application.Interfaces.Services
 {
     public interface IExerciseService
     {
-        //skal ændres til at tage en dto
-        void CreateExercise(string title, string content, Guid teacherId);
+        Task<ExerciseDTO> CreateExerciseAsync(CreateExerciseRequest dto);
+        Task<IEnumerable<ExerciseDTO?>> GetExerciseByExerciseKeywords(List<Guid> keywordIds);
+        Task<IEnumerable<ExerciseDTO?>> GetExercisesByTeacherIdAsync(Guid teacherId);
+        Task<ExerciseDTO?> GetExerciseByIdAsync(Guid id);
+
+
     }
 }

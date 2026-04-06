@@ -37,4 +37,16 @@ public class Exercise
     {
         throw new NotImplementedException();
     }
+
+    public void AddKeyword(Guid keywordId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void SetSolution(string content, string? videoUrl)
+    {
+        throw new NotImplementedException();
+    }
+
+
 }

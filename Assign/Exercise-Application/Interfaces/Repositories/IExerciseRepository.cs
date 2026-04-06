@@ -8,8 +8,11 @@ namespace Exercise_Application.Interfaces.Repositories
 {
     public interface IExerciseRepository
     {
-        void AddExercise(Exercise exercise);
-        void GetExerciseById(Guid exerciseId);
-        void UpdateExercise(Exercise exercise, byte[] rowVersion);
+        Task<Exercise> AddExerciseAsync(Exercise exercise);
+        Task<IEnumerable<Exercise>> GetExercisesByKeywordsAsync(IEnumerable<Guid> keywordIds);
+        Task<IEnumerable<Exercise>> GetExercisesByTeacherIdAsync(Guid teacherId);
+
+        Task<Exercise?> GetExerciseByIdAsync(Guid exerciseId);
+        Task<Exercise> UpdateExerciseAsync(Exercise exercise, byte[] rowVersion);
     }
 }
