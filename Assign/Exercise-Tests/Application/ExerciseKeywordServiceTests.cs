@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Exercise_Tests.Domain
+namespace Exercise_Tests.Application
 {
-    public class QuestionsTest
+    internal class ExerciseKeywordServiceTests
     {
     }
 }

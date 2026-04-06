@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Exercise_Tests.Domain
+namespace Exercise_Application.DTO
 {
-    public class QuestionsTest
+    public class ExerciseSolutionDTO
     {
+
     }
 }

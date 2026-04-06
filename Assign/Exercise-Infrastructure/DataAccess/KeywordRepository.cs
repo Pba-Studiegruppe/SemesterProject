@@ -1,4 +1,5 @@
 ﻿using Exercise_Application.Interfaces.Repositories;
+using Exercise_Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,19 +8,19 @@ using System.Threading.Tasks;
 
 namespace Exercise_Infrastructure.DataAccess
 {
-    public class ExerciseRepository : IExerciseRepository
+    public class KeywordRepository : IKeywordRepository
     {
-        public void AddExercise(Exercise exercise)
+        public void AddKeyword(Keyword keyword)
         {
             throw new NotImplementedException();
         }
 
-        public void GetExerciseById(Guid exerciseId)
+        public void GetAllKeywords()
         {
             throw new NotImplementedException();
         }
 
-        public void UpdateExercise(Exercise exercise, byte[] rowVersion)
+        public void GetKeywordById(Guid keywordId)
         {
             throw new NotImplementedException();
         }

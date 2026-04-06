@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 
 namespace Exercise_Infrastructure.DataAccess
 {
-    public class ExerciseRepository : IExerciseRepository
+    public class ExerciseSolutionRepository : IExerciseSolutionRepository
     {
-        public void AddExercise(Exercise exercise)
+        public void AddExerciseSolution(ExerciseSolution exerciseSolution)
         {
             throw new NotImplementedException();
         }
 
-        public void GetExerciseById(Guid exerciseId)
+        public void DeleteExerciseSolution(Guid solutionId, byte[] rowVersion)
         {
             throw new NotImplementedException();
         }
 
-        public void UpdateExercise(Exercise exercise, byte[] rowVersion)
+        public void GetExerciseSolution(Guid solutionId)
         {
             throw new NotImplementedException();
         }

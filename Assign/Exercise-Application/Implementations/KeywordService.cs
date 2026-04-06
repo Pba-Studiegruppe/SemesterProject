@@ -1,25 +1,25 @@
-﻿using Exercise_Application.Interfaces.Repositories;
+﻿using Exercise_Application.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Exercise_Infrastructure.DataAccess
+namespace Exercise_Application.Implementations
 {
-    public class ExerciseRepository : IExerciseRepository
+    public class KeywordService : IKeywordService
     {
-        public void AddExercise(Exercise exercise)
+        public void CreateKeyword(string v, Guid guid)
         {
             throw new NotImplementedException();
         }
 
-        public void GetExerciseById(Guid exerciseId)
+        public void GetAllKeywords()
         {
             throw new NotImplementedException();
         }
 
-        public void UpdateExercise(Exercise exercise, byte[] rowVersion)
+        public void GetKeyword(Guid keywordId)
         {
             throw new NotImplementedException();
         }

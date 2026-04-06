@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Exercise_Tests.Domain
+namespace Exercise_Application.Interfaces.Repositories
 {
-    public class QuestionsTest
+    public interface IExerciseKeywordRepository
     {
     }
 }

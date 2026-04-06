@@ -25,5 +25,9 @@ namespace Exercise_Application.Implementations
             _repository.AddExercise(exercise);
         }
 
+        public IEnumerable<object> GetExerciseById(Guid exerciseId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

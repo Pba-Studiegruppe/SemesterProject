@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Exercise_Tests.Domain
 {
-    internal class ExerciseKeywordTests
+    public class ExerciseKeywordTests
     {
+
     }
 }
