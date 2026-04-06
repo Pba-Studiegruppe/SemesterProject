@@ -9,10 +9,10 @@ namespace Exercise_Application.Interfaces.Repositories
 {
     public interface IQuestionRepository
     {
-        void AddQuestion(Question question);
-        void DeleteQuestion(Guid questionId);
-        void GetQuestionById(Guid questionId);
-        void GetQuestionsByExerciseId(Guid exerciseId);
-        void UpdateQuestion(Question question, byte[] rowVersion);
+        Task<Question> AddQuestionAsync(Question question);
+        Task<Question> UpdateQuestionAsync(Guid questionId);
+        Task<Question> GetQuestionByIdAsync(Guid questionId);
+        Task<IEnumerable<Question>> GetQuestionsByExerciseIdAsync(Guid exerciseId);
+        Task<Question> UpdateQuestionAsync(Question question, byte[] rowVersion);
     }
 }

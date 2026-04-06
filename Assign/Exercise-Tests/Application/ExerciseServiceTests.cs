@@ -210,13 +210,5 @@ namespace Exercise_Tests.Application
                 Assert.Equal(repoResult.CreatedByTeacherId, result.CreatedByTeacherId);
             }
         }
+    }
 }
-
-
-
-
-
-
-
-
-

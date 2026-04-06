@@ -1,9 +1,11 @@
-﻿using Exercise_Domain.Entities;
+﻿using Exercise_Application.DTO;
 
 namespace Exercise_Application.Interfaces.Services
 {
     public interface IQuestionService
     {
-        void UpdateQuestion(Question question, byte[] rowVersion);
+        Task<QuestionDTO> CreateQuestionAsync(CreateQuestionRequest dto);
+        Task<QuestionDTO?> GetQuestionByIdAsync(Guid id);
+        Task<IEnumerable<QuestionDTO>> GetQuestionsByExerciseIdAsync(Guid exerciseId);
     }
 }

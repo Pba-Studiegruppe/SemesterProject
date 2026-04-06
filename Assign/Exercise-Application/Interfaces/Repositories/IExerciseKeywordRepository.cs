@@ -8,5 +8,7 @@ namespace Exercise_Application.Interfaces.Repositories
 {
     public interface IExerciseKeywordRepository
     {
+        Task<ExerciseKeyword> AddExerciseKeywordAsync(ExerciseKeyword exerciseKeyword);
+        Task<IEnumerable<ExerciseKeyword>> GetExerciseKeywordsByExerciseIdAsync(Guid exerciseId);
     }
 }

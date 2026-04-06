@@ -14,7 +14,7 @@ namespace Exercise_Application.DTO
         public string Content { get; set; } = string.Empty;
         public QuestionSolutionDTO? Solution { get; set; }
     }
-    public class CreateQuestionDTO
+    public class CreateQuestionRequest
     {
         public Guid ExerciseId { get; set; }
         public string Title { get; set; } = string.Empty;

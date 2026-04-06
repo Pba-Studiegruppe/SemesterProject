@@ -14,7 +14,7 @@ namespace Exercise_Application.DTO
         public string? VideoUrl { get; set; }
     }
 
-    public class CreateExerciseSolutionDTO
+    public class CreateExerciseSolutionRequest
     {
         public Guid ExerciseId { get; set; }
         public string Content { get; set; } = string.Empty;

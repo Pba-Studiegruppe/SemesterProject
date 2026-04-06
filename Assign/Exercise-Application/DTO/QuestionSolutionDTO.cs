@@ -13,7 +13,7 @@ namespace Exercise_Application.DTO
         public string Content { get; set; } = string.Empty;
     }
 
-    public class CreateQuestionSolutionDTO
+    public class CreateQuestionSolutionRequest
     {
         public Guid QuestionId { get; set; }
         public string Content { get; set; } = string.Empty;

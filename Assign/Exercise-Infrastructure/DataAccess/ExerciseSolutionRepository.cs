@@ -9,17 +9,17 @@ namespace Exercise_Infrastructure.DataAccess
 {
     public class ExerciseSolutionRepository : IExerciseSolutionRepository
     {
-        public void AddExerciseSolution(ExerciseSolution exerciseSolution)
+        public Task<ExerciseSolution> AddExerciseSolutionAsync(ExerciseSolution exerciseSolution)
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteExerciseSolution(Guid solutionId, byte[] rowVersion)
+        public Task<ExerciseSolution> GetExerciseSolution(Guid solutionId)
         {
             throw new NotImplementedException();
         }
 
-        public void GetExerciseSolution(Guid solutionId)
+        public Task<ExerciseSolution> UpdateExerciseSolutionAsync(Guid solutionId, byte[] rowVersion)
         {
             throw new NotImplementedException();
         }

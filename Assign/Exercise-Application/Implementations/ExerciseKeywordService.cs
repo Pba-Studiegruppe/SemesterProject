@@ -9,5 +9,6 @@ namespace Exercise_Application.Implementations
 {
     public class ExerciseKeywordService: IExerciseKeywordService
     {
+
     }
 }

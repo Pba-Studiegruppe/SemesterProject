@@ -9,8 +9,8 @@ namespace Exercise_Application.Interfaces.Repositories
 {
     public interface IKeywordRepository
     {
-        void AddKeyword(Keyword keyword);
-        void GetAllKeywords();
-        void GetKeywordById(Guid keywordId);
+        Task<Keyword> AddKeywordAsync(Keyword keyword);
+        Task<IEnumerable<Keyword>> GetAllKeywordsAsync();
+        Task<Keyword> GetKeywordByIdAsync(Guid keywordId);
     }
 }

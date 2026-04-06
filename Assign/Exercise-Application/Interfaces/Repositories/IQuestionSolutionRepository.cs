@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Exercise_Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,9 @@ namespace Exercise_Application.Interfaces.Repositories
 {
     public interface IQuestionSolutionRepository
     {
-        void AddQuestionSolution(QuestionSolution questionSolution);
-        void GetQuestionSolutionById(Guid solutionId);
-        void GetQuestionSolutionsByQuestionId(Guid questionId);
-        void UpdateQuestionSolution(QuestionSolution solution, byte[] rowVersion);
+        Task<QuestionSolution> AddQuestionSolutionAsync(QuestionSolution questionSolution);
+        Task<QuestionSolution> GetQuestionSolutionByIdAsync(Guid solutionId);
+        Task<QuestionSolution> GetQuestionSolutionsByQuestionIdAsync(Guid questionId);
+        Task<QuestionSolution> UpdateQuestionSolutionAsync(QuestionSolution solution, byte[] rowVersion);
     }
 }
