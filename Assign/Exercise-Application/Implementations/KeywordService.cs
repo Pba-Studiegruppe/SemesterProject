@@ -1,4 +1,5 @@
-﻿using Exercise_Application.Interfaces.Services;
+﻿using Exercise_Application.DTO;
+using Exercise_Application.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,17 +10,12 @@ namespace Exercise_Application.Implementations
 {
     public class KeywordService : IKeywordService
     {
-        public void CreateKeyword(string v, Guid guid)
+        public Task<KeywordDTO> AddKeywordAsync(KeywordDTO dto)
         {
             throw new NotImplementedException();
         }
 
-        public void GetAllKeywords()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void GetKeyword(Guid keywordId)
+        public Task<IEnumerable<KeywordDTO>> GetAllKeywordsAsync()
         {
             throw new NotImplementedException();
         }

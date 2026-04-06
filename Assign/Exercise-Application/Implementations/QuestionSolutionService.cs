@@ -1,4 +1,5 @@
-﻿using Exercise_Application.Interfaces.Repositories;
+﻿using Exercise_Application.DTO;
+using Exercise_Application.Interfaces.Repositories;
 using Exercise_Application.Interfaces.Services;
 using Exercise_Domain.Entities;
 using System;
@@ -11,29 +12,17 @@ namespace Exercise_Application.Implementations
 {
     public class QuestionSolutionService : IQuestionSolutionService
     {
-        private IQuestionSolutionRepository @object;
-
-        public QuestionSolutionService(IQuestionSolutionRepository @object)
-        {
-            this.@object = @object;
-        }
-
-        public void CreateQuestionSolution(string v, Guid guid1, Guid guid2)
+        public Task<QuestionSolutionDTO> CreateQuestionSolutionAsync(CreateQuestionSolutionRequest dto)
         {
             throw new NotImplementedException();
         }
 
-        public void GetQuestionSolution(Guid solutionId)
+        public Task<QuestionSolutionDTO?> GetQuestionSolutionByIdAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public void GetQuestionSolutionsByQuestionId(Guid questionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateQuestionSolution(QuestionSolution solution, byte[] rowVersion)
+        public Task<IEnumerable<QuestionSolutionDTO?>> GetQuestionSolutionsByQuestionIdAsync(Guid questionId)
         {
             throw new NotImplementedException();
         }

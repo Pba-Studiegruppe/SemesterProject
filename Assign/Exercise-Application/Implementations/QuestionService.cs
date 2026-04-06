@@ -1,4 +1,5 @@
-﻿using Exercise_Application.Interfaces.Services;
+﻿using Exercise_Application.DTO;
+using Exercise_Application.Interfaces.Services;
 using Exercise_Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,27 +11,17 @@ namespace Exercise_Application.Implementations
 {
     public class QuestionService : IQuestionService
     {
-        public void CreateQuestion(string v, Guid guid)
+        public Task<QuestionDTO> CreateQuestionAsync(CreateQuestionRequest dto)
         {
             throw new NotImplementedException();
         }
 
-        public void DeleteQuestion(Guid questionId)
+        public Task<QuestionDTO?> GetQuestionByIdAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public void GetQuestion(Guid questionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void GetQuestionsByExerciseId(Guid exerciseId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateQuestion(Question question, byte[] rowVersion)
+        public Task<IEnumerable<QuestionDTO>> GetQuestionsByExerciseIdAsync(Guid exerciseId)
         {
             throw new NotImplementedException();
         }
