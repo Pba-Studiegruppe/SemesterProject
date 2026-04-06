@@ -35,17 +35,19 @@ public class Exercise
 
     public void AddQuestion(string title, string content)
     {
-        throw new NotImplementedException();
+        var question = new Question(this.Id, title, content);
+        _questions.Add(question);
     }
 
     public void AddKeyword(Guid keywordId)
     {
-        throw new NotImplementedException();
+        var exerciseKeyword = new ExerciseKeyword(this.Id, keywordId);
+        _exerciseKeywords.Add(exerciseKeyword);
     }
 
     public void SetSolution(string content, string? videoUrl)
     {
-        throw new NotImplementedException();
+        Solution = new ExerciseSolution(this.Id, content, videoUrl);
     }
 
 

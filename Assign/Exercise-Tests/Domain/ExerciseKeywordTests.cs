@@ -8,6 +8,7 @@ namespace Exercise_Tests.Domain
 {
     public class ExerciseKeywordTests
     {
+        
 
     }
 }
