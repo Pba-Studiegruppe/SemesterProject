@@ -11,7 +11,7 @@ namespace Exercise_Application.Interfaces.Repositories
     {
         Task<QuestionSolution> AddQuestionSolutionAsync(QuestionSolution questionSolution);
         Task<QuestionSolution> GetQuestionSolutionByIdAsync(Guid solutionId);
-        Task<QuestionSolution> GetQuestionSolutionsByQuestionIdAsync(Guid questionId);
+        Task<QuestionSolution> GetQuestionSolutionByQuestionIdAsync(Guid questionId);
         Task<QuestionSolution> UpdateQuestionSolutionAsync(QuestionSolution solution, byte[] rowVersion);
     }
 }

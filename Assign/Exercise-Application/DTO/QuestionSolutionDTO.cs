@@ -18,4 +18,10 @@ namespace Exercise_Application.DTO
         public Guid QuestionId { get; set; }
         public string Content { get; set; } = string.Empty;
     }
+
+    public class UpdateQuestionSolutionRequest
+    {
+        public Guid QuestionId { get; set; }
+        public string Content { get; set; } = string.Empty;
+    }
 }

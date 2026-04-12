@@ -12,19 +12,112 @@ namespace Exercise_Application.Implementations
 {
     public class QuestionSolutionService : IQuestionSolutionService
     {
-        public Task<QuestionSolutionDTO> CreateQuestionSolutionAsync(CreateQuestionSolutionRequest dto)
+        private readonly IQuestionSolutionRepository _repository;
+
+        public QuestionSolutionService(IQuestionSolutionRepository repository)
         {
-            throw new NotImplementedException();
+            _repository = repository;
         }
 
-        public Task<QuestionSolutionDTO?> GetQuestionSolutionByIdAsync(Guid id)
+        public async Task<QuestionSolutionDTO> CreateQuestionSolutionAsync(CreateQuestionSolutionRequest dto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (dto == null) { throw new ArgumentNullException(nameof(dto), "The CreateQuestionSolutionRequest cannot be null."); }
+                if (dto.QuestionId == Guid.Empty) { throw new ArgumentException("The QuestionId cannot be empty.", nameof(dto.QuestionId)); }
+                if (string.IsNullOrWhiteSpace(dto.Content)) { throw new ArgumentException("The Content cannot be null or whitespace.", nameof(dto.Content)); }
+
+
+                var questionSolution = new QuestionSolution(dto.QuestionId, dto.Content);
+                var createdSolution = await _repository.AddQuestionSolutionAsync(questionSolution);
+
+                if (createdSolution == null) {throw new Exception("Failed to create the question solution."); }
+
+                return new QuestionSolutionDTO
+                {
+                    Id = createdSolution.Id,
+                    QuestionId = createdSolution.QuestionId,
+                    Content = createdSolution.Content
+                };
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while creating the question solution.", ex);
+            }
         }
 
-        public Task<IEnumerable<QuestionSolutionDTO?>> GetQuestionSolutionsByQuestionIdAsync(Guid questionId)
+        public async Task<QuestionSolutionDTO?> GetQuestionSolutionByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (id == Guid.Empty) { throw new ArgumentException("The Id cannot be empty.", nameof(id)); }
+
+                var solution = await _repository.GetQuestionSolutionByIdAsync(id);
+
+                if (solution == null) { return null; }
+                return new QuestionSolutionDTO
+                {
+                    Id = solution.Id,
+                    QuestionId = solution.QuestionId,
+                    Content = solution.Content
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving the question solution by Id.", ex);
+            }
+        }
+
+        public async Task<QuestionSolutionDTO?> GetQuestionSolutionByQuestionIdAsync(Guid questionId)
+        {
+            try
+            {
+                if (questionId == Guid.Empty) { throw new ArgumentException("The QuestionId cannot be empty.", nameof(questionId)); }
+
+                var solution = await _repository.GetQuestionSolutionByQuestionIdAsync(questionId);
+                if (solution == null) { return null; }
+
+                return new QuestionSolutionDTO
+                {
+                    Id = solution.Id,
+                    QuestionId = solution.QuestionId,
+                    Content = solution.Content
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving the question solution by QuestionId.", ex);
+            }
+        }
+
+        public async Task<QuestionSolutionDTO> UpdateQuestionSolutionAsync(Guid id, UpdateQuestionSolutionRequest dto, byte[] rowVersion)
+        {
+            try
+            {
+                if (id == Guid.Empty) { throw new ArgumentException("The Id cannot be empty.", nameof(id)); }
+                if (dto == null) { throw new ArgumentNullException(nameof(dto), "The UpdateQuestionSolutionRequest cannot be null."); }
+                if (string.IsNullOrWhiteSpace(dto.Content)) { throw new ArgumentException("The Content cannot be null or whitespace.", nameof(dto.Content)); }
+
+                var solutionToUpdate = await _repository.GetQuestionSolutionByIdAsync(id);
+
+                if (solutionToUpdate == null) { throw new Exception("The question solution to update was not found."); }
+
+                solutionToUpdate.Update(dto.Content);
+
+                var updatedSolution = await _repository.UpdateQuestionSolutionAsync(solutionToUpdate, solutionToUpdate.RowVersion);
+
+                return (new QuestionSolutionDTO
+                {
+                    Id = updatedSolution.Id,
+                    QuestionId = updatedSolution.QuestionId,
+                    Content = updatedSolution.Content
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while updating the question solution.", ex);
+            }
         }
     }
 }

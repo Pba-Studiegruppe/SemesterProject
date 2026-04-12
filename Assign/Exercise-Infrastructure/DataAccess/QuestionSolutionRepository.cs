@@ -10,22 +10,22 @@ namespace Exercise_Infrastructure.DataAccess
 {
     public class QuestionSolutionRepository : IQuestionSolutionRepository
     {
-        public Task<QuestionSolution> AddQuestionSolutionAsync(QuestionSolution questionSolution)
+        public async Task<QuestionSolution> AddQuestionSolutionAsync(QuestionSolution questionSolution)
         {
             throw new NotImplementedException();
         }
 
-        public Task<QuestionSolution> GetQuestionSolutionByIdAsync(Guid solutionId)
+        public async Task<QuestionSolution> GetQuestionSolutionByIdAsync(Guid solutionId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<QuestionSolution> GetQuestionSolutionsByQuestionIdAsync(Guid questionId)
+        public async Task<QuestionSolution> GetQuestionSolutionByQuestionIdAsync(Guid questionId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<QuestionSolution> UpdateQuestionSolutionAsync(QuestionSolution solution, byte[] rowVersion)
+        public async Task<QuestionSolution> UpdateQuestionSolutionAsync(QuestionSolution solution, byte[] rowVersion)
         {
             throw new NotImplementedException();
         }

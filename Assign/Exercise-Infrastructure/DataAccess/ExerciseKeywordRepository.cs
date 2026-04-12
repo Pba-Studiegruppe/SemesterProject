@@ -9,12 +9,12 @@ namespace Exercise_Infrastructure.DataAccess
 {
     public class ExerciseKeywordRepository : IExerciseKeywordRepository
     {
-        public Task<ExerciseKeyword> AddExerciseKeywordAsync(ExerciseKeyword exerciseKeyword)
+        public async Task<ExerciseKeyword> AddExerciseKeywordAsync(ExerciseKeyword exerciseKeyword)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ExerciseKeyword>> GetExerciseKeywordsByExerciseIdAsync(Guid exerciseId)
+        public async Task<IEnumerable<ExerciseKeyword>> GetExerciseKeywordsByExerciseIdAsync(Guid exerciseId)
         {
             throw new NotImplementedException();
         }

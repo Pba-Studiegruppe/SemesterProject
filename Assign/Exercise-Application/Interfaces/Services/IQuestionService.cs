@@ -7,5 +7,7 @@ namespace Exercise_Application.Interfaces.Services
         Task<QuestionDTO> CreateQuestionAsync(CreateQuestionRequest dto);
         Task<QuestionDTO?> GetQuestionByIdAsync(Guid id);
         Task<IEnumerable<QuestionDTO>> GetQuestionsByExerciseIdAsync(Guid exerciseId);
+
+        Task<QuestionDTO> UpdateQuestionAsync(Guid id, UpdateQuestionRequest dto, byte[] rowVersion);
     }
 }

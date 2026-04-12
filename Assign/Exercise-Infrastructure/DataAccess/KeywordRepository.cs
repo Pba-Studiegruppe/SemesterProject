@@ -10,17 +10,17 @@ namespace Exercise_Infrastructure.DataAccess
 {
     public class KeywordRepository : IKeywordRepository
     {
-        public Task<Keyword> AddKeywordAsync(Keyword keyword)
+        public async Task<Keyword> AddKeywordAsync(Keyword keyword)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Keyword>> GetAllKeywordsAsync()
+        public async Task<IEnumerable<Keyword>> GetAllKeywordsAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<Keyword> GetKeywordByIdAsync(Guid keywordId)
+        public async Task<Keyword> GetKeywordByIdAsync(Guid keywordId)
         {
             throw new NotImplementedException();
         }

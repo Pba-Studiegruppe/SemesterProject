@@ -1,6 +1,7 @@
 ﻿using Exercise_Application.DTO;
 using Exercise_Application.Interfaces.Repositories;
 using Exercise_Application.Interfaces.Services;
+using Exercise_Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,35 +20,79 @@ namespace Exercise_Application.Implementations
         }
 
 
-        public Task<ExerciseDTO> CreateExerciseAsync(CreateExerciseRequest dto)
+        public async Task<ExerciseDTO> CreateExerciseAsync(CreateExerciseRequest dto)
         {
-            var exercise = new Exercise(dto.Title, dto.Content, dto.CreatedByTeacherId);
-
-            _repository.AddExerciseAsync(exercise);
-
-            return Task.FromResult(MapToDTO(exercise));
+            try
+            {
+                var exercise = new Exercise(dto.Title, dto.Content, dto.CreatedByTeacherId);
+                var result = await _repository.AddExerciseAsync(exercise);
+                return MapToDTO(result);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while creating the exercise.", ex);
+            }
         }
 
-        public Task<IEnumerable<ExerciseDTO?>> GetExerciseByExerciseKeywords(List<Guid> keywordIds)
+        public async Task<IEnumerable<ExerciseDTO?>> GetExerciseByExerciseKeywords(List<Guid> keywordIds)
         {
-            var exercises = _repository.GetExercisesByKeywordsAsync(keywordIds);
-            if (exercises == null) {return Task.FromResult(Enumerable.Empty<ExerciseDTO?>());}
+            try
+            {
+                var exercises = await _repository.GetExercisesByKeywordsAsync(keywordIds);
+                if (exercises == null) { return Enumerable.Empty<ExerciseDTO?>(); }
 
-            return Task.FromResult(exercises.Result.Select(e => MapToDTO(e)));
+                return exercises.Select(e => MapToDTO(e));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving exercises by keywords.", ex);
+            }
         }
 
-        public Task<ExerciseDTO?> GetExerciseByIdAsync(Guid id)
+        public async Task<ExerciseDTO?> GetExerciseByIdAsync(Guid id)
         {
-            var exercise = _repository.GetExerciseByIdAsync(id);
-            if (exercise == null) { return Task.FromResult<ExerciseDTO?>(null); }
+            try
+            {
+                var exercise = await _repository.GetExerciseByIdAsync(id);
+                if (exercise == null) { return null; }
+                return MapToDTO(exercise);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving the exercise by ID.", ex);
+            }
+        }
 
-            return Task.FromResult<ExerciseDTO?>(MapToDTO(exercise.Result));
+        public async Task<IEnumerable<ExerciseDTO?>> GetExercisesByTeacherIdAsync(Guid teacherId)
+        {
+            try
+            {
+                var exercises = await _repository.GetExercisesByTeacherIdAsync(teacherId);
+                if (exercises == null) { return Enumerable.Empty<ExerciseDTO?>(); }
+                return exercises.Select(e => MapToDTO(e));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving exercises by teacher ID.", ex);
+            }
 
         }
 
-        public Task<IEnumerable<ExerciseDTO?>> GetExercisesByTeacherIdAsync(Guid teacherId)
+        public async Task<ExerciseDTO?> UpdateExerciseAsync(Guid id, UpdateExerciseRequest dto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var existingExercise = await _repository.GetExerciseByIdAsync(id);
+                if (existingExercise == null) { return null; }
+
+                existingExercise.Update(dto.Title, dto.Content);
+                var result = await _repository.UpdateExerciseAsync(existingExercise, existingExercise.RowVersion);
+                return MapToDTO(result);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while updating the exercise.", ex);
+            }
         }
 
         public ExerciseDTO MapToDTO(Exercise exercise)

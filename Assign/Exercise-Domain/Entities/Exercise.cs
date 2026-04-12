@@ -1,26 +1,22 @@
-using System.Collections.Generic;
-using System;
 using Exercise_Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 public class Exercise
 {
     public Guid Id { get; private set; }
-
     public string Title { get; private set; }
-
     public string Content { get; private set; }
-
     public DateTime CreatedAt { get; private set; }
-
     public Guid CreatedByTeacherId { get; private set; }
-
     private readonly List<Question> _questions = new();
     public IReadOnlyCollection<Question> Questions => _questions;
-
     private readonly List<ExerciseKeyword> _exerciseKeywords = new();
     public IReadOnlyCollection<ExerciseKeyword> ExerciseKeywords => _exerciseKeywords;
-
     public ExerciseSolution? Solution { get; private set; }
+    [Timestamp] public byte[] RowVersion { get; private set; } = [];
+
 
     private Exercise() { } // Required by EF Core
 
@@ -48,6 +44,12 @@ public class Exercise
     public void SetSolution(string content, string? videoUrl)
     {
         Solution = new ExerciseSolution(this.Id, content, videoUrl);
+    }
+
+    public void Update(string title, string content)
+    {
+        Title = title;
+        Content = content;
     }
 
 

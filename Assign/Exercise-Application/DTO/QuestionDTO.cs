@@ -20,4 +20,10 @@ namespace Exercise_Application.DTO
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
     }
+
+    public class UpdateQuestionRequest
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+    }
 }

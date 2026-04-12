@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Exercise_Domain.Entities;
 
 namespace Exercise_Application.Interfaces.Repositories
 {

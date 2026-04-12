@@ -27,5 +27,20 @@ namespace Exercise_Tests.Domain
             Assert.Equal(content, solution.Content);
             Assert.Equal(videoUrl, solution.VideoUrl);
         }
+
+        [Fact]
+        public void Update_Should_Modify_Content_And_VideoUrl()
+        {
+            // Arrange
+            var exerciseId = Guid.NewGuid();
+            var solution = new ExerciseSolution(exerciseId, "Initial content", "https://initialvideo.com");
+            var newContent = "Updated content";
+            var newVideoUrl = "https://updatedvideo.com";
+            // Act
+            solution.Update(newContent, newVideoUrl);
+            // Assert
+            Assert.Equal(newContent, solution.Content);
+            Assert.Equal(newVideoUrl, solution.VideoUrl);
+        }
     }
 }

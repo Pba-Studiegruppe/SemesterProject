@@ -9,7 +9,7 @@ namespace Exercise_Tests.Domain
     public class QuestionsTest
     {
         [Fact]
-        public void CreateQuestion_ShouldInitializeProperties()
+        public void Question_ShouldInitializeProperties()
         {
             // Arrange
             var exerciseId = Guid.NewGuid();
@@ -51,6 +51,20 @@ namespace Exercise_Tests.Domain
             Assert.NotNull(question.Solution);
             Assert.Equal(question.Id, question.Solution!.QuestionId);
             Assert.Equal(solutionContent, question.Solution.Content);
+        }
+
+        [Fact]
+        public void update_ShouldChangeTitleAndContent()
+        {
+            // Arrange
+            var question = new Exercise_Domain.Entities.Question(Guid.NewGuid(), "Old Title", "Old Content");
+            var newTitle = "New Title";
+            var newContent = "New Content";
+            // Act
+            question.Update(newTitle, newContent);
+            // Assert
+            Assert.Equal(newTitle, question.Title);
+            Assert.Equal(newContent, question.Content);
         }
     }
 }

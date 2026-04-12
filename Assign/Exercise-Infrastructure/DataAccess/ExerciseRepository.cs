@@ -9,29 +9,30 @@ namespace Exercise_Infrastructure.DataAccess
 {
     public class ExerciseRepository : IExerciseRepository
     {
-        public Task<Exercise> AddExerciseAsync(Exercise exercise)
+        public async Task<Exercise> AddExerciseAsync(Exercise exercise)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Exercise?> GetExerciseByIdAsync(Guid exerciseId)
+        public async Task<Exercise?> GetExerciseByIdAsync(Guid exerciseId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Exercise>> GetExercisesByKeywordsAsync(IEnumerable<Guid> keywordIds)
+        public async Task<IEnumerable<Exercise>> GetExercisesByKeywordsAsync(IEnumerable<Guid> keywordIds)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Exercise>> GetExercisesByTeacherIdAsync(Guid teacherId)
+        public async Task<IEnumerable<Exercise>> GetExercisesByTeacherIdAsync(Guid teacherId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Exercise> UpdateExerciseAsync(Exercise exercise, byte[] rowVersion)
+        public async Task<Exercise> UpdateExerciseAsync(Exercise exercise, byte[] rowVersion)
         {
             throw new NotImplementedException();
         }
+
     }
 }
