@@ -13,8 +13,6 @@ namespace Exercise_Application.Interfaces.Services
         Task<IEnumerable<ExerciseDTO?>> GetExerciseByExerciseKeywords(List<Guid> keywordIds);
         Task<IEnumerable<ExerciseDTO?>> GetExercisesByTeacherIdAsync(Guid teacherId);
         Task<ExerciseDTO?> GetExerciseByIdAsync(Guid id);
-        Task<ExerciseDTO?> UpdateExerciseAsync(Guid id, UpdateExerciseRequest dto);
-
-
+        Task<ExerciseDTO?> UpdateExerciseAsync(UpdateExerciseRequest dto);
     }
 }

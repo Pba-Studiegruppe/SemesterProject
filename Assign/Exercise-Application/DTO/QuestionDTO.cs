@@ -13,6 +13,7 @@ namespace Exercise_Application.DTO
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
         public QuestionSolutionDTO? Solution { get; set; }
+        public byte[]? RowVersion { get; set; }
     }
     public class CreateQuestionRequest
     {
@@ -23,7 +24,9 @@ namespace Exercise_Application.DTO
 
     public class UpdateQuestionRequest
     {
+        public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
+        public byte[]? RowVersion { get; set; }
     }
 }

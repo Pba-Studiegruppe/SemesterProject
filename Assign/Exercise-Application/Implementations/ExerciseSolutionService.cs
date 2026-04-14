@@ -82,7 +82,7 @@ namespace Exercise_Application.Implementations
         }
 
 
-        public async Task<ExerciseSolutionDTO> UpdateExerciseSolutionAsync(Guid id, UpdateExerciseSolutionRequest dto, byte[] rowVersion)
+        public async Task<ExerciseSolutionDTO> UpdateExerciseSolutionAsync(UpdateExerciseSolutionRequest dto)
         {
             throw new NotImplementedException();
         }

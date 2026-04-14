@@ -7,6 +7,6 @@ namespace Exercise_Application.Interfaces.Services
         Task<ExerciseSolutionDTO> CreateExerciseSolutionAsync(CreateExerciseSolutionRequest dto);
         Task<IEnumerable<ExerciseSolutionDTO?>> GetExerciseSolutionsByExerciseIdAsync(Guid exerciseId);
         Task<ExerciseSolutionDTO?> GetExerciseSolutionByIdAsync(Guid id);
-        Task<ExerciseSolutionDTO> UpdateExerciseSolutionAsync(Guid id, UpdateExerciseSolutionRequest dto, byte[] rowVersion);
+        Task<ExerciseSolutionDTO> UpdateExerciseSolutionAsync(UpdateExerciseSolutionRequest dto);
     }
 }

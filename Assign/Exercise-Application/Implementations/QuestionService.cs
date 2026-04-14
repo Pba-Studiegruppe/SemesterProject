@@ -88,17 +88,17 @@ namespace Exercise_Application.Implementations
             }
         }
 
-        public async Task<QuestionDTO> UpdateQuestionAsync(Guid id, UpdateQuestionRequest dto, byte[] rowVersion)
+        public async Task<QuestionDTO> UpdateQuestionAsync(UpdateQuestionRequest dto)
         {
             try
             {
-                if (id == Guid.Empty) { throw new ArgumentException("The Id cannot be empty.", nameof(id)); }
+                if (dto.Id == Guid.Empty) { throw new ArgumentException("The Id cannot be empty.", nameof(dto.Id)); }
                 if (dto == null) { throw new ArgumentNullException(nameof(dto), "The UpdateQuestionRequest cannot be null."); }
                 if (string.IsNullOrWhiteSpace(dto.Title)) { throw new ArgumentException("The Title cannot be null or whitespace.", nameof(dto.Title)); }
                 if (string.IsNullOrWhiteSpace(dto.Content)) { throw new ArgumentException("The Content cannot be null or whitespace.", nameof(dto.Content)); }
 
-                var existingQuestion = await _questionRepository.GetQuestionByIdAsync(id);
-                if (existingQuestion == null) { throw new KeyNotFoundException($"No question found with ID {id}."); }
+                var existingQuestion = await _questionRepository.GetQuestionByIdAsync(dto.Id);
+                if (existingQuestion == null) { throw new KeyNotFoundException($"No question found with ID {dto.Id}."); }
 
                 existingQuestion.Update(dto.Title, dto.Content);
 

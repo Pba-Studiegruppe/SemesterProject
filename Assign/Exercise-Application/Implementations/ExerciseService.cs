@@ -81,11 +81,11 @@ namespace Exercise_Application.Implementations
 
         }
 
-        public async Task<ExerciseDTO?> UpdateExerciseAsync(Guid id, UpdateExerciseRequest dto)
+        public async Task<ExerciseDTO?> UpdateExerciseAsync(UpdateExerciseRequest dto)
         {
             try
             {
-                var existingExercise = await _repository.GetExerciseByIdAsync(id);
+                var existingExercise = await _repository.GetExerciseByIdAsync(dto.Id);
                 if (existingExercise == null) { return null; }
 
                 existingExercise.Update(dto.Title, dto.Content);

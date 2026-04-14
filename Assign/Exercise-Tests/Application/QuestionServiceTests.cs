@@ -112,7 +112,7 @@ namespace Exercise_Tests.Application
                 var service = new QuestionService(mockRepository.Object);
 
                 // Act
-                var result = await service.UpdateQuestionAsync(existingQuestion.Id, updateRequest, existingQuestion.RowVersion);
+                var result = await service.UpdateQuestionAsync(updateRequest);
 
                 // Assert
                 Assert.NotNull(result);

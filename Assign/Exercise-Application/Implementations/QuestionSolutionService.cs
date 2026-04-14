@@ -91,15 +91,15 @@ namespace Exercise_Application.Implementations
             }
         }
 
-        public async Task<QuestionSolutionDTO> UpdateQuestionSolutionAsync(Guid id, UpdateQuestionSolutionRequest dto, byte[] rowVersion)
+        public async Task<QuestionSolutionDTO> UpdateQuestionSolutionAsync(UpdateQuestionSolutionRequest dto)
         {
             try
             {
-                if (id == Guid.Empty) { throw new ArgumentException("The Id cannot be empty.", nameof(id)); }
+                if (dto.Id == Guid.Empty) { throw new ArgumentException("The Id cannot be empty.", nameof(dto.Id)); }
                 if (dto == null) { throw new ArgumentNullException(nameof(dto), "The UpdateQuestionSolutionRequest cannot be null."); }
                 if (string.IsNullOrWhiteSpace(dto.Content)) { throw new ArgumentException("The Content cannot be null or whitespace.", nameof(dto.Content)); }
 
-                var solutionToUpdate = await _repository.GetQuestionSolutionByIdAsync(id);
+                var solutionToUpdate = await _repository.GetQuestionSolutionByIdAsync(dto.Id);
 
                 if (solutionToUpdate == null) { throw new Exception("The question solution to update was not found."); }
 

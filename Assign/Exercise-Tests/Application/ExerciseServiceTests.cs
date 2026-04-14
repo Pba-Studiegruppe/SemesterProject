@@ -311,56 +311,56 @@ namespace Exercise_Tests.Application
         }
     }
 
-        public class UpdateExerciseServiceTests
+    public class UpdateExerciseServiceTests
+    {
+        [Fact]
+        public async Task UpdateExerciseAsync_ShouldCallRepositoryUpdate()
         {
-            [Fact]
-            public async Task UpdateExerciseAsync_ShouldCallRepositoryUpdate()
+            // Arrange
+            var exercise = new Exercise("Title1", "Content1", Guid.NewGuid());
+            var mockRepo = new Mock<IExerciseRepository>();
+            var updateRequest = new UpdateExerciseRequest
             {
-                // Arrange
-                var exercise = new Exercise("Title1", "Content1", Guid.NewGuid());
-                var mockRepo = new Mock<IExerciseRepository>();
-                var updateRequest = new UpdateExerciseRequest
-                {
-                    Title = "Updated Title",
-                    Content = "Updated Content",
-                };
+                Title = "Updated Title",
+                Content = "Updated Content",
+            };
 
-                mockRepo.Setup(r => r.GetExerciseByIdAsync(exercise.Id))
-                        .ReturnsAsync(exercise);
-                mockRepo.Setup(r => r.UpdateExerciseAsync(exercise, exercise.RowVersion))
-                        .ReturnsAsync(exercise);
+            mockRepo.Setup(r => r.GetExerciseByIdAsync(exercise.Id))
+                    .ReturnsAsync(exercise);
+            mockRepo.Setup(r => r.UpdateExerciseAsync(exercise, exercise.RowVersion))
+                    .ReturnsAsync(exercise);
 
-                var service = new ExerciseService(mockRepo.Object);
+            var service = new ExerciseService(mockRepo.Object);
 
-                // Act
-                var result = await service.UpdateExerciseAsync(exercise.Id, updateRequest);
+            // Act
+            var result = await service.UpdateExerciseAsync(updateRequest);
 
-                // Assert
-                mockRepo.Verify(r => r.UpdateExerciseAsync(It.IsAny<Exercise>(), It.IsAny<byte[]>()), Times.Once);
-            }
+            // Assert
+            mockRepo.Verify(r => r.UpdateExerciseAsync(It.IsAny<Exercise>(), It.IsAny<byte[]>()), Times.Once);
+        }
 
-            [Fact]
-            public async Task UpdateExerciseAsync_shouldUpdateExerciseProperties()
+        [Fact]
+        public async Task UpdateExerciseAsync_shouldUpdateExerciseProperties()
+        {
+            // Arrange
+            var exercise = new Exercise("Title1", "Content1", Guid.NewGuid());
+            var mockRepo = new Mock<IExerciseRepository>();
+            var updateRequest = new UpdateExerciseRequest
             {
-                // Arrange
-                var exercise = new Exercise("Title1", "Content1", Guid.NewGuid());
-                var mockRepo = new Mock<IExerciseRepository>();
-                var updateRequest = new UpdateExerciseRequest
-                {
-                    Title = "Updated Title",
-                    Content = "Updated Content",
-                };
-                mockRepo.Setup(r => r.GetExerciseByIdAsync(exercise.Id))
-                        .ReturnsAsync(exercise);
-                mockRepo.Setup(r => r.UpdateExerciseAsync(exercise, exercise.RowVersion))
-                        .ReturnsAsync(exercise);
-                var service = new ExerciseService(mockRepo.Object);
-                // Act
-                var result = await service.UpdateExerciseAsync(exercise.Id, updateRequest);
+                Title = "Updated Title",
+                Content = "Updated Content",
+            };
+            mockRepo.Setup(r => r.GetExerciseByIdAsync(exercise.Id))
+                    .ReturnsAsync(exercise);
+            mockRepo.Setup(r => r.UpdateExerciseAsync(exercise, exercise.RowVersion))
+                    .ReturnsAsync(exercise);
+            var service = new ExerciseService(mockRepo.Object);
+            // Act
+            var result = await service.UpdateExerciseAsync(updateRequest);
 
-                // Assert
-                Assert.Equal(updateRequest.Title, exercise.Title);
-                Assert.Equal(updateRequest.Content, exercise.Content);
-            }
+            // Assert
+            Assert.Equal(updateRequest.Title, exercise.Title);
+            Assert.Equal(updateRequest.Content, exercise.Content);
         }
     }
+}

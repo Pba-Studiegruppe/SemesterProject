@@ -118,6 +118,7 @@ namespace Exercise_Tests.Application
                 var updatedContent = "Updated Content";
                 var questionSolutionUpdateRequest = new UpdateQuestionSolutionRequest
                 {
+                    Id = questionId,
                     QuestionId = questionId,
                     Content = updatedContent
                 };
@@ -129,7 +130,7 @@ namespace Exercise_Tests.Application
                 var service = new QuestionSolutionService(questionSolutionRepositoryMock.Object);
 
                 // Act
-                var result = await service.UpdateQuestionSolutionAsync(existingSolution.Id, questionSolutionUpdateRequest, existingSolution.RowVersion);
+                var result = await service.UpdateQuestionSolutionAsync(questionSolutionUpdateRequest);
 
                 // Assert
                 Assert.NotNull(result);
