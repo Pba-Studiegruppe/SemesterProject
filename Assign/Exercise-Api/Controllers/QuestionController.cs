@@ -19,31 +19,56 @@ namespace Exercise_Api.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateQuestion([FromBody] CreateQuestionRequest request)
         {
-            var CreatedQuestion = await _questionService.CreateQuestionAsync(request);
+            try
+            {
+                var CreatedQuestion = await _questionService.CreateQuestionAsync(request);
+                return CreatedAtAction(nameof(GetQuestionById), new { id = CreatedQuestion.Id }, CreatedQuestion);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
 
-            return CreatedAtAction(nameof(GetQuestionById), new { id = CreatedQuestion.Id }, CreatedQuestion);
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetQuestionById(Guid id)
         {
-            var question = await _questionService.GetQuestionByIdAsync(id);
-            if (question == null) { return NotFound(); }
-            return Ok(question);
+            try
+            {
+                var question = await _questionService.GetQuestionByIdAsync(id);
+                if (question == null) { return NotFound(); }
+                return Ok(question);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+
         }
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateQuestion(Guid id, [FromBody] UpdateQuestionRequest request)
         {
-            var updatedQuestion = await _questionService.UpdateQuestionAsync(request);
-            if (updatedQuestion == null) { return NotFound(); }
-            return Ok(updatedQuestion);
+            try
+            {
+                var updatedQuestion = await _questionService.UpdateQuestionAsync(request);
+                if (updatedQuestion == null) { return NotFound(); }
+                return Ok(updatedQuestion);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }
