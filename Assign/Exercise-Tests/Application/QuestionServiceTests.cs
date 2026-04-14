@@ -91,6 +91,7 @@ namespace Exercise_Tests.Application
             Assert.Equal(expectedQuestions.Count, result.Count());
             Assert.All(result, q => Assert.Equal(exerciseId, q.ExerciseId));
         }
+    }
 
         public class UpdateQuestionServiceTests
         {
@@ -122,5 +123,5 @@ namespace Exercise_Tests.Application
         }
     }
 
-}
+
 

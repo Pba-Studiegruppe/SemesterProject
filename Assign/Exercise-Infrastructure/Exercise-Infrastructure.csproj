@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EntityFramework" Version="6.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Exercise-Application\Exercise-Application.csproj" />
     <ProjectReference Include="..\Exercise-Domain\Exercise-Domain.csproj" />
   </ItemGroup>

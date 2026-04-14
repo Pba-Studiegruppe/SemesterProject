@@ -1,11 +1,11 @@
 using Exercise_Domain.Entities;
+using Exercise_Domain.shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-public class Exercise
+public class Exercise: Entity
 {
-    public Guid Id { get; private set; }
     public string Title { get; private set; }
     public string Content { get; private set; }
     public DateTime CreatedAt { get; private set; }
@@ -15,14 +15,18 @@ public class Exercise
     private readonly List<ExerciseKeyword> _exerciseKeywords = new();
     public IReadOnlyCollection<ExerciseKeyword> ExerciseKeywords => _exerciseKeywords;
     public ExerciseSolution? Solution { get; private set; }
-    [Timestamp] public byte[] RowVersion { get; private set; } = [];
 
 
-    private Exercise() { } // Required by EF Core
+    private Exercise() : base(Guid.NewGuid()) { } // Required by EF Core
 
-    public Exercise(string title, string content, Guid teacherId)
+    /// <summary>
+    /// Represents an exercise created by a teacher, containing a title, content, creation timestamp, and associations with questions and keywords. Each exercise is uniquely identified and linked to the teacher who created it through the CreatedByTeacherId property. The constructor initializes the exercise with the provided title, content, and teacher ID, while also setting the creation timestamp to the current UTC time.
+    /// </summary>
+    /// <param name="title"></param>
+    /// <param name="content"></param>
+    /// <param name="teacherId"></param>
+    public Exercise(string title, string content, Guid teacherId) : base(Guid.NewGuid())
     {
-        Id = Guid.NewGuid();
         Title = title;
         Content = content;
         CreatedByTeacherId = teacherId;

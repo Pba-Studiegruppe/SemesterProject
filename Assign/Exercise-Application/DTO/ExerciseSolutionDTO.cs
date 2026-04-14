@@ -20,4 +20,11 @@ namespace Exercise_Application.DTO
         public string Content { get; set; } = string.Empty;
         public string? VideoUrl { get; set; }
     }
+
+    public class UpdateExerciseSolutionRequest
+    {
+        public Guid ExerciseId { get; set; }
+        public string Content { get; set; } = string.Empty;
+        public string? VideoUrl { get; set; }
+    }
 }

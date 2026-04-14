@@ -8,7 +8,17 @@ namespace Exercise_Application.DTO
 {
     public class KeywordDTO
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public Guid Id { get; set; }
+        public string KeywordName { get; set; }
+        public string KeywordType { get; set; }
+
+
+    }
+
+    public class CreateKeywordRequest
+    {
+        public string KeywordName { get; set; }
+        public string KeywordType { get; set; }
+
     }
 }

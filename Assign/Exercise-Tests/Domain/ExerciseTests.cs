@@ -39,7 +39,7 @@ namespace Exercise_Tests.Domain
             exercise.SetSolution(solutionContent, videoUrl);
             // Assert
             Assert.NotNull(exercise.Solution);
-            Assert.Equal(exercise.Id, exercise.Solution!.ExerciseId);
+            Assert.Equal(exercise.Id, exercise.Solution.ExerciseId);
             Assert.Equal(solutionContent, exercise.Solution.Content);
             Assert.Equal(videoUrl, exercise.Solution.VideoUrl);
         }

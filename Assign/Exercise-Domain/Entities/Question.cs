@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Exercise_Domain.shared;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -6,24 +7,26 @@ using System.Text;
 
 namespace Exercise_Domain.Entities
 {
-    public class Question
+    public class Question : Entity
     {
-        public Guid Id { get; private set; }
-
         public Guid ExerciseId { get; private set; }
 
         public string Title { get; private set; }
 
         public string Content { get; private set; }
         public QuestionSolution? Solution { get; private set; }
-        [Timestamp] public byte[] RowVersion { get; private set; } = [];
 
 
-        private Question() { }
+        private Question() : base(Guid.NewGuid()) { }
 
-        public Question(Guid exerciseId, string title, string content)
+        /// <summary>
+        /// Represents a question associated with an exercise, containing a title, content, and an optional solution. Each question is linked to a specific exercise through the ExerciseId property and is created with a unique identifier.
+        /// </summary>
+        /// <param name="exerciseId"></param>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        public Question(Guid exerciseId, string title, string content) : base(Guid.NewGuid())
         {
-            Id = Guid.NewGuid();
             ExerciseId = exerciseId;
             Title = title;
             Content = content;

@@ -5,7 +5,8 @@ namespace Exercise_Application.Interfaces.Services
 {
     public interface IKeywordService
     {
-        Task<KeywordDTO> AddKeywordAsync(KeywordDTO dto);
+        Task<KeywordDTO> CreateKeywordAsync(CreateKeywordRequest dto);
         Task<IEnumerable<KeywordDTO>> GetAllKeywordsAsync();
+        Task<KeywordDTO> GetKeywordAsync(Guid id);
     }
 }

@@ -1,17 +1,16 @@
-﻿using System;
+﻿using Exercise_Domain.shared;
+using System;
 using System.ComponentModel.DataAnnotations;
 
-public class ExerciseSolution
+public class ExerciseSolution: Entity
 {
-    public Guid Id { get; private set; }
     public Guid ExerciseId { get; private set; }
     public string Content { get; private set; }
     public string? VideoUrl { get; private set; }
-    [Timestamp] public byte[] RowVersion { get; private set; } = [];
 
-    private ExerciseSolution() { }
+    private ExerciseSolution() : base(Guid.NewGuid()) { }
 
-    public ExerciseSolution(Guid exerciseId, string content, string? videoUrl)
+    public ExerciseSolution(Guid exerciseId, string content, string? videoUrl) : base(Guid.NewGuid())
     {
         Id = Guid.NewGuid();
         ExerciseId = exerciseId;

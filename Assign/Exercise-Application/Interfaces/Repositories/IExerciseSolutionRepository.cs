@@ -10,6 +10,7 @@ namespace Exercise_Application.Interfaces.Repositories
     {
         Task<ExerciseSolution> AddExerciseSolutionAsync(ExerciseSolution exerciseSolution);
         Task<ExerciseSolution> UpdateExerciseSolutionAsync(Guid solutionId, byte[] rowVersion);
-        Task<ExerciseSolution> GetExerciseSolution(Guid solutionId);
+        Task<ExerciseSolution> GetExerciseSolutionByIdAsync(Guid solutionId);
+        Task<IEnumerable<ExerciseSolution>> GetExerciseSolutionsByExerciseIdAsync(Guid exerciseId);
     }
 }

@@ -2,6 +2,7 @@
 using Exercise_Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,11 @@ namespace Exercise_Infrastructure.DataAccess
 {
     public class QuestionRepository : IQuestionRepository
     {
+        private DbContext dbContext;
+        public QuestionRepository(DbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
         public async Task<Question> AddQuestionAsync(Question question)
         {
             throw new NotImplementedException();

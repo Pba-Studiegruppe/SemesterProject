@@ -1,21 +1,21 @@
-﻿using System;
+﻿using Exercise_Domain.shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Exercise_Domain.Entities
 {
-    public class Keyword
+    public class Keyword: Entity
     {
-        public Guid Id { get; private set; }
 
         public string KeywordName { get; private set; }
 
         public KeywordType KeywordType { get; private set; }
 
-        private Keyword() { }
+        private Keyword() : base(Guid.NewGuid()) { }
 
-        public Keyword(string keywordName, KeywordType keywordType)
+        public Keyword(string keywordName, KeywordType keywordType) : base(Guid.NewGuid())
         {
             Id = Guid.NewGuid();
             KeywordName = keywordName;

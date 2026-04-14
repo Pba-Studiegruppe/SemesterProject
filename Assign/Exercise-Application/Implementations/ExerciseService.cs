@@ -26,6 +26,9 @@ namespace Exercise_Application.Implementations
             {
                 var exercise = new Exercise(dto.Title, dto.Content, dto.CreatedByTeacherId);
                 var result = await _repository.AddExerciseAsync(exercise);
+
+                if(result == null) { throw new Exception("Failed to create the exercise."); }
+
                 return MapToDTO(result);
             }
             catch (Exception ex)
@@ -118,7 +121,8 @@ namespace Exercise_Application.Implementations
                 Solution = exercise.Solution != null ? new ExerciseSolutionDTO
                 {
                     Id = exercise.Solution.Id,
-                    Content = exercise.Solution.Content
+                    Content = exercise.Solution.Content,
+                    VideoUrl = exercise.Solution.VideoUrl
                 } : null
             };
         }

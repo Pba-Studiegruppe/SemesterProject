@@ -12,5 +12,6 @@ namespace Exercise_Application.Interfaces.Repositories
         Task<Keyword> AddKeywordAsync(Keyword keyword);
         Task<IEnumerable<Keyword>> GetAllKeywordsAsync();
         Task<Keyword> GetKeywordByIdAsync(Guid keywordId);
+
     }
 }
