@@ -102,7 +102,7 @@ namespace Exercise_Tests.Application
                 var mockRepository = new Mock<IQuestionRepository>();
 
                 var existingQuestion = new Question(Guid.NewGuid(), "Old Title", "Old Content");
-                var updateRequest = new UpdateQuestionRequest {Title = "New Title", Content = "New Content" };
+                var updateRequest = new UpdateQuestionRequest {Id = existingQuestion.Id, Title = "New Title", Content = "New Content", RowVersion = existingQuestion.RowVersion };
 
                 var updatedQuestion = new Question(existingQuestion.ExerciseId, updateRequest.Title, updateRequest.Content);
 

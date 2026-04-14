@@ -118,9 +118,10 @@ namespace Exercise_Tests.Application
                 var updatedContent = "Updated Content";
                 var questionSolutionUpdateRequest = new UpdateQuestionSolutionRequest
                 {
-                    Id = questionId,
+                    Id = existingSolution.Id,
                     QuestionId = questionId,
-                    Content = updatedContent
+                    Content = updatedContent,
+                    RowVersion = existingSolution.RowVersion
                 };
                 var questionSolutionRepositoryMock = new Mock<IQuestionSolutionRepository>();
 

@@ -321,8 +321,10 @@ namespace Exercise_Tests.Application
             var mockRepo = new Mock<IExerciseRepository>();
             var updateRequest = new UpdateExerciseRequest
             {
+                Id = exercise.Id,
                 Title = "Updated Title",
                 Content = "Updated Content",
+                RowVersion = exercise.RowVersion
             };
 
             mockRepo.Setup(r => r.GetExerciseByIdAsync(exercise.Id))
@@ -347,8 +349,10 @@ namespace Exercise_Tests.Application
             var mockRepo = new Mock<IExerciseRepository>();
             var updateRequest = new UpdateExerciseRequest
             {
+                Id = exercise.Id,
                 Title = "Updated Title",
                 Content = "Updated Content",
+                RowVersion = exercise.RowVersion
             };
             mockRepo.Setup(r => r.GetExerciseByIdAsync(exercise.Id))
                     .ReturnsAsync(exercise);
