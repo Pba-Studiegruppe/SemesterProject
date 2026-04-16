@@ -29,4 +29,10 @@ namespace Exercise_Application.DTO
         public string Content { get; set; } = string.Empty;
         public byte[]? RowVersion { get; set; }
     }
+
+    public class RemoveQuestionRequest
+    {
+        public Guid Id { get; set; }
+        public byte[]? RowVersion { get; set; }
+    }
 }

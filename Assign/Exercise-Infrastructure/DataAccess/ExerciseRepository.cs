@@ -1,4 +1,6 @@
-﻿using Exercise_Application.Interfaces.Repositories;
+﻿using Exercise_Application.DTO;
+using Exercise_Application.Interfaces.Repositories;
+using Exercise_Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -20,6 +22,16 @@ namespace Exercise_Infrastructure.DataAccess
             throw new NotImplementedException();
         }
 
+        public Task<Exercise> AddExerciseKeywordsASync(List<ExerciseKeyword> ExerciseKeywords)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Exercise> AddQuestionsASync(List<Question> Questions)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Exercise?> GetExerciseByIdAsync(Guid exerciseId)
         {
             throw new NotImplementedException();
@@ -31,6 +43,31 @@ namespace Exercise_Infrastructure.DataAccess
         }
 
         public async Task<IEnumerable<Exercise>> GetExercisesByTeacherIdAsync(Guid teacherId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Exercise> RemoveExerciseKeywordAsync(RemoveExerciseKeywordRequest dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Exercise> RemoveExerciseSolutionAsync(Guid exerciseId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Exercise> RemoveQuestionAsync(RemoveQuestionRequest dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Exercise> RemoveQuestionSolutionAsync(Guid questionId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Exercise> SetExerciseSolution(ExerciseSolution ExerciseSolution)
         {
             throw new NotImplementedException();
         }

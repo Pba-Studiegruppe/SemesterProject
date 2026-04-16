@@ -72,20 +72,6 @@ namespace Exercise_Tests.Domain
             Assert.Equal(content, exercise.Questions.First().Content);
         }
 
-        [Fact]
-        public void Update_ShouldChangeTitleAndContent()
-        {
-            // Arrange
-            var exercise = new Exercise("Old Title", "Old Content", Guid.NewGuid());
-            var newTitle = "New Title";
-            var newContent = "New Content";
-            // Act
-            exercise.Update(newTitle, newContent);
-            // Assert
-            Assert.Equal(newTitle, exercise.Title);
-            Assert.Equal(newContent, exercise.Content);
-        }
-
         public class ExerciseMemberDataTests
         {
             public static IEnumerable<object[]> QuestionData =>

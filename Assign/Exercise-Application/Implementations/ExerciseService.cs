@@ -19,84 +19,81 @@ namespace Exercise_Application.Implementations
             _repository = repository;
         }
 
-
-        public async Task<ExerciseDTO> CreateExerciseAsync(CreateExerciseRequest dto)
+        public Task<ExerciseDTO> SetExerciseSolution(ExerciseSolutionDTO ExerciseSolution)
         {
-            try
-            {
-                var exercise = new Exercise(dto.Title, dto.Content, dto.CreatedByTeacherId);
-                var result = await _repository.AddExerciseAsync(exercise);
-
-                if(result == null) { throw new Exception("Failed to create the exercise."); }
-
-                return MapToDTO(result);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while creating the exercise.", ex);
-            }
+            throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<ExerciseDTO?>> GetExerciseByExerciseKeywords(List<Guid> keywordIds)
+        public Task<ExerciseDTO> UpdateQuestionAsync(UpdateQuestionRequest dto)
         {
-            try
-            {
-                var exercises = await _repository.GetExercisesByKeywordsAsync(keywordIds);
-                if (exercises == null) { return Enumerable.Empty<ExerciseDTO?>(); }
-
-                return exercises.Select(e => MapToDTO(e));
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while retrieving exercises by keywords.", ex);
-            }
+            throw new NotImplementedException();
         }
 
-        public async Task<ExerciseDTO?> GetExerciseByIdAsync(Guid id)
+        public Task<ExerciseDTO> UpdateExerciseSolutionAsync(UpdateExerciseSolutionRequest dto)
         {
-            try
-            {
-                var exercise = await _repository.GetExerciseByIdAsync(id);
-                if (exercise == null) { return null; }
-                return MapToDTO(exercise);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while retrieving the exercise by ID.", ex);
-            }
+            throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<ExerciseDTO?>> GetExercisesByTeacherIdAsync(Guid teacherId)
+        public Task<ExerciseDTO> UpdateQuestionSolutionAsync(UpdateQuestionSolutionRequest dto)
         {
-            try
-            {
-                var exercises = await _repository.GetExercisesByTeacherIdAsync(teacherId);
-                if (exercises == null) { return Enumerable.Empty<ExerciseDTO?>(); }
-                return exercises.Select(e => MapToDTO(e));
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while retrieving exercises by teacher ID.", ex);
-            }
-
+            throw new NotImplementedException();
         }
 
-        public async Task<ExerciseDTO?> UpdateExerciseAsync(UpdateExerciseRequest dto)
+        public Task<ExerciseDTO> RemoveQuestionAsync(RemoveQuestionRequest dto)
         {
-            try
-            {
-                var existingExercise = await _repository.GetExerciseByIdAsync(dto.Id);
-                if (existingExercise == null) { return null; }
-
-                existingExercise.Update(dto.Title, dto.Content);
-                var result = await _repository.UpdateExerciseAsync(existingExercise, existingExercise.RowVersion);
-                return MapToDTO(result);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while updating the exercise.", ex);
-            }
+            throw new NotImplementedException();
         }
+
+        public Task<ExerciseDTO> RemoveExerciseSolutionAsync(Guid exerciseId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ExerciseDTO> RemoveQuestionSolutionAsync(Guid questionId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ExerciseDTO> RemoveExerciseKeywordAsync(RemoveExerciseKeywordRequest dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ExerciseDTO> CreateExerciseAsync(CreateExerciseRequest dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ExerciseDTO?>> GetExerciseByExerciseKeywords(List<Guid> keywordIds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ExerciseDTO?>> GetExercisesByTeacherIdAsync(Guid teacherId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ExerciseDTO?> GetExerciseByIdAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ExerciseDTO?> UpdateExerciseAsync(UpdateExerciseRequest dto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ExerciseDTO> AddQuestionsAsync(List<QuestionDTO> Questions)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ExerciseDTO> AddExerciseKeywordsAsync(List<ExerciseKeywordDTO> ExerciseKeywords)
+        {
+            throw new NotImplementedException();
+        }
+
 
         public ExerciseDTO MapToDTO(Exercise exercise)
         {

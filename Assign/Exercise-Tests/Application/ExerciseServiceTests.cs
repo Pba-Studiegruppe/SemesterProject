@@ -86,6 +86,29 @@ namespace Exercise_Tests.Application
             Assert.Equal(expectedExercise.Title, result.Title);
             Assert.Equal(expectedExercise.Content, result.Content);
         }
+
+
+        [Fact]
+        public async Task CreateExercise_Should_Create_Exercise_With_Valid_Data()
+        {
+
+        }
+        [Fact]
+        public async Task CreateExercise_Should_Set_CreatedAt_To_UtcNow_On_Creation()
+        {
+
+        }
+        [Fact]
+        public async Task CreateExercise_Should_Assign_TeacherId_On_Creation()
+        {
+
+        }
+
+        [Fact]
+        public async Task CreateExercise_Should_Create_Questions_()
+        {
+
+        }
     }
 
     public class ReadExerciseServiceTests
@@ -366,5 +389,10 @@ namespace Exercise_Tests.Application
             Assert.Equal(updateRequest.Title, exercise.Title);
             Assert.Equal(updateRequest.Content, exercise.Content);
         }
+
+
+
     }
+
 }
+

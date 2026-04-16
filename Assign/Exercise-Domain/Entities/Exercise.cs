@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-public class Exercise: Entity
+public class Exercise : Entity
 {
     public string Title { get; private set; }
     public string Content { get; private set; }
@@ -33,28 +33,71 @@ public class Exercise: Entity
         CreatedAt = DateTime.UtcNow;
     }
 
+    public void SetSolution(string content, string? videoUrl)
+    {
+        Solution = new ExerciseSolution(this.Id, content, videoUrl);
+    }
+
+    public void RemoveSolution()
+    {
+        Solution = null;
+    }
+
+    public void UpdateTitle(string title)
+    {
+        Title = title;
+    }
+
+    public void UpdateContent(string content)
+    {
+        Content = content;
+    }
+
     public void AddQuestion(string title, string content)
     {
         var question = new Question(this.Id, title, content);
         _questions.Add(question);
     }
 
+    public void RemoveQuestion(Guid questionId)
+    {
+        var question = _questions.Find(q => q.Id == questionId);
+        if (question != null)
+        {
+            _questions.Remove(question);
+        }
+    }
+
+    public void UpdateQuestion(Guid questionId, string title, string content)
+    {
+        var question = _questions.Find(q => q.Id == questionId);
+        if (question != null)
+        {
+            question.Update(title, content);
+        }
+    }
+
     public void AddKeyword(Guid keywordId)
     {
         var exerciseKeyword = new ExerciseKeyword(this.Id, keywordId);
+        if (_exerciseKeywords.Exists(ek => ek.KeywordId == keywordId))
+        {
+            return; 
+        }
+
         _exerciseKeywords.Add(exerciseKeyword);
     }
 
-    public void SetSolution(string content, string? videoUrl)
+    public void RemoveKeyword(Guid keywordId)
     {
-        Solution = new ExerciseSolution(this.Id, content, videoUrl);
+        var exerciseKeyword = _exerciseKeywords.Find(ek => ek.KeywordId == keywordId);
+        if (exerciseKeyword != null)
+        {
+            _exerciseKeywords.Remove(exerciseKeyword);
+        }
     }
 
-    public void Update(string title, string content)
-    {
-        Title = title;
-        Content = content;
-    }
+
 
 
 }
