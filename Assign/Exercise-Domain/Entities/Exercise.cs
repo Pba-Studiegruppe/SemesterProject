@@ -29,7 +29,6 @@ public class Exercise : Entity
         Title = title;
         Content = content;
         CreatedByTeacherId = teacherId;
-        CreatedAt = DateTime.UtcNow;
     }
 
     public void SetSolution(string content, string? videoUrl)
@@ -52,9 +51,10 @@ public class Exercise : Entity
         Content = content;
     }
 
-    public void AddQuestion(string title, string content)
+    public void AddQuestion(string title, string content, string solutionTitle)
     {
         var question = new Question(this.Id, title, content);
+        question.SetSolution(solutionTitle);
         _questions.Add(question);
     }
 
@@ -92,6 +92,11 @@ public class Exercise : Entity
         {
             _exerciseKeywords.Remove(exerciseKeyword);
         }
+    }
+
+    public void SetCreatedAt(DateTime createdAt)
+    {
+        CreatedAt = createdAt;
     }
 
 

@@ -23,11 +23,10 @@ namespace Exercise_Application.DTO
     {
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
         public Guid CreatedByTeacherId { get; set; }
-        public List<QuestionDTO> Questions { get; set; } = new();
-        public List<ExerciseKeywordDTO> ExerciseKeywords { get; set; } = new();
-        public ExerciseSolutionDTO? Solution { get; set; }
+        public List<CreateQuestionRequest?> Questions { get; set; } = new();
+        public List<CreateExerciseKeywordRequest?> ExerciseKeywords { get; set; } = new();
+        public CreateExerciseSolutionRequest? Solution { get; set; }
     }
 
     public class UpdateExerciseRequest

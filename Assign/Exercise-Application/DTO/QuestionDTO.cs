@@ -17,9 +17,9 @@ namespace Exercise_Application.DTO
     }
     public class CreateQuestionRequest
     {
-        public Guid ExerciseId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
+        public CreateQuestionSolutionRequest? Solution { get; set; }
     }
 
     public class UpdateQuestionRequest

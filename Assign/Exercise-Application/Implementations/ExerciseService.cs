@@ -19,9 +19,9 @@ namespace Exercise_Application.Implementations
             _repository = repository;
         }
 
-        public Task<ExerciseDTO> CreateExerciseAsync(CreateExerciseRequest dto)
+        public async Task<ExerciseDTO> CreateExerciseAsync(CreateExerciseRequest dto)
         {
-            throw new NotImplementedException();
+            try { var exercise = new Exercise(dto.Title, dto.Content, dto.CreatedByTeacherId); var createdExercise = await _repository.AddExerciseAsync(exercise); return MapToDTO(createdExercise); } catch { throw new Exception(); }
         }
 
         public Task<IEnumerable<ExerciseDTO?>> GetExerciseByExerciseKeywords(List<Guid> keywordIds)
