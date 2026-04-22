@@ -61,19 +61,17 @@ public class Exercise : Entity
     public void RemoveQuestion(Guid questionId)
     {
         var question = _questions.Find(q => q.Id == questionId);
-        if (question != null)
-        {
-            _questions.Remove(question);
-        }
+        if (question == null) throw new ArgumentException("Question not found");
+
+        _questions.Remove(question);
     }
 
     public void UpdateQuestion(Guid questionId, string title, string content)
     {
         var question = _questions.Find(q => q.Id == questionId);
-        if (question != null)
-        {
-            question.Update(title, content);
-        }
+        if (question == null) throw new ArgumentException("Question not found");
+
+        question.Update(title, content);
     }
 
     public void AddKeyword(Guid keywordId)
@@ -81,7 +79,7 @@ public class Exercise : Entity
         var exerciseKeyword = new ExerciseKeyword(this.Id, keywordId);
         if (_exerciseKeywords.Exists(ek => ek.KeywordId == keywordId))
         {
-            return; 
+            return;
         }
 
         _exerciseKeywords.Add(exerciseKeyword);
