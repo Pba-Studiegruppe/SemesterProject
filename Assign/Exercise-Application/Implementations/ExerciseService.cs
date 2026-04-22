@@ -10,53 +10,13 @@ using System.Threading.Tasks;
 
 namespace Exercise_Application.Implementations
 {
-    public class ExerciseService : IExerciseService
+    public partial class ExerciseService : IExerciseService
     {
         private readonly IExerciseRepository _repository;
 
         public ExerciseService(IExerciseRepository repository)
         {
             _repository = repository;
-        }
-
-        public Task<ExerciseDTO> SetExerciseSolution(ExerciseSolutionDTO ExerciseSolution)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ExerciseDTO> UpdateQuestionAsync(UpdateQuestionRequest dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ExerciseDTO> UpdateExerciseSolutionAsync(UpdateExerciseSolutionRequest dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ExerciseDTO> UpdateQuestionSolutionAsync(UpdateQuestionSolutionRequest dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ExerciseDTO> RemoveQuestionAsync(RemoveQuestionRequest dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ExerciseDTO> RemoveExerciseSolutionAsync(Guid exerciseId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ExerciseDTO> RemoveQuestionSolutionAsync(Guid questionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ExerciseDTO> RemoveExerciseKeywordAsync(RemoveExerciseKeywordRequest dto)
-        {
-            throw new NotImplementedException();
         }
 
         public Task<ExerciseDTO> CreateExerciseAsync(CreateExerciseRequest dto)
@@ -69,32 +29,19 @@ namespace Exercise_Application.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ExerciseDTO?>> GetExercisesByTeacherIdAsync(Guid teacherId)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<ExerciseDTO?> GetExerciseByIdAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
+        public Task<IEnumerable<ExerciseDTO?>> GetExercisesByTeacherIdAsync(Guid teacherId)
+        {
+            throw new NotImplementedException();
+        }
         public Task<ExerciseDTO?> UpdateExerciseAsync(UpdateExerciseRequest dto)
         {
             throw new NotImplementedException();
         }
-
-        public Task<ExerciseDTO> AddQuestionsAsync(List<QuestionDTO> Questions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ExerciseDTO> AddExerciseKeywordsAsync(List<ExerciseKeywordDTO> ExerciseKeywords)
-        {
-            throw new NotImplementedException();
-        }
-
-
         public ExerciseDTO MapToDTO(Exercise exercise)
         {
             return new ExerciseDTO

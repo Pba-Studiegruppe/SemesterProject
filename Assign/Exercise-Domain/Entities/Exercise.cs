@@ -3,7 +3,6 @@ using Exercise_Domain.shared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-
 public class Exercise : Entity
 {
     public string Title { get; private set; }
