@@ -54,7 +54,7 @@ namespace Exercise_Tests.Application
             // Arrange
             var mockRepo = new Mock<IExerciseRepository>();
             var expectedExercise = new Exercise(exerciseDto.Title, exerciseDto.Content, exerciseDto.CreatedByTeacherId);
-            mockRepo.Setup(r => r.AddExerciseAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
+            mockRepo.Setup(r => r.AddAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
             var service = new ExerciseService(mockRepo.Object);
 
             // Act
@@ -62,7 +62,7 @@ namespace Exercise_Tests.Application
 
             // Assert
 
-            mockRepo.Verify(r => r.AddExerciseAsync(It.IsAny<Exercise>()), Times.Once);
+            mockRepo.Verify(r => r.AddAsync(It.IsAny<Exercise>()), Times.Once);
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Exercise_Tests.Application
                 CreatedByTeacherId = Guid.NewGuid(),
             };
             var expectedExercise = new Exercise(exerciseDto.Title, exerciseDto.Content, exerciseDto.CreatedByTeacherId);
-            mockRepo.Setup(r => r.AddExerciseAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
+            mockRepo.Setup(r => r.AddAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
             var service = new ExerciseService(mockRepo.Object);
             // Act
             var result = await service.CreateExerciseAsync(exerciseDto);
@@ -97,7 +97,7 @@ namespace Exercise_Tests.Application
             //Arrange
             var mockRepo = new Mock<IExerciseRepository>();
             var expectedExercise = new Exercise(exerciseDto.Title, exerciseDto.Content, exerciseDto.CreatedByTeacherId);
-            mockRepo.Setup(r => r.AddExerciseAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
+            mockRepo.Setup(r => r.AddAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
             var service = new ExerciseService(mockRepo.Object);
 
             // Act
@@ -116,53 +116,28 @@ namespace Exercise_Tests.Application
         {
             // Arrange
             var mockRepo = new Mock<IExerciseRepository>();
-            var exerciseDto = new CreateExerciseRequest
+
+            mockRepo.Setup(r => r.AddAsync(It.IsAny<Exercise>()))
+                    .ReturnsAsync((Exercise e) => e); // return the actual object
+
+            var dto = new CreateExerciseRequest
             {
                 Title = "Title1",
                 Content = "Content1",
                 CreatedByTeacherId = Guid.NewGuid(),
             };
-            var expectedExercise = new Exercise(exerciseDto.Title, exerciseDto.Content, exerciseDto.CreatedByTeacherId);
-            mockRepo.Setup(r => r.AddExerciseAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
+
             var service = new ExerciseService(mockRepo.Object);
-            
-            
+
+            var before = DateTime.UtcNow;
+
             // Act
-            var result = await service.CreateExerciseAsync(exerciseDto);
-            
-            // Assert
-
-        }
-
-        [Theory]
-        [InlineData("Title1", "Content1")]
-        [InlineData("Title2", "Content2")]
-        public async Task CreateExercise_Should_Map_Question_To_Exercise(string title, string content)
-        {
-            // Arrange
-            var mockRepo = new Mock<IExerciseRepository>();
-            var dto = new CreateExerciseRequest
-            {
-                Title = "Exercise",
-                Content = "Content",
-                CreatedByTeacherId = Guid.NewGuid(),
-                Questions = { new CreateQuestionRequest { Title = title, Content = content } }
-            };
-
-            mockRepo.Setup(r => r.AddExerciseAsync(It.IsAny<Exercise>()))
-                    .ReturnsAsync(new Exercise(dto.Title, dto.Content, dto.CreatedByTeacherId));
-
-            var service = new ExerciseService(mockRepo.Object);
-
-            //act
             var result = await service.CreateExerciseAsync(dto);
-            var question = result.Questions.Single();
 
+            var after = DateTime.UtcNow;
 
             // Assert
-            Assert.Equal(result.Id, question.ExerciseId);
-            Assert.Equal(title, question.Title);
-            Assert.Equal(content, question.Content);
+            Assert.InRange(result.CreatedAt, before, after);
         }
 
         [Fact]
@@ -172,22 +147,24 @@ namespace Exercise_Tests.Application
             var mockRepo = new Mock<IExerciseRepository>();
             var questionDto1 = new CreateQuestionRequest { Title = "T1", Content = "C1" };
             var questionDto2 = new CreateQuestionRequest { Title = "T2", Content = "C2" };
-            var dto = new CreateExerciseRequest
+            var exerciseDto = new CreateExerciseRequest
             {
                 Title = "Exercise",
                 Content = "Content",
                 CreatedByTeacherId = Guid.NewGuid(),
             };
-            dto.Questions.Add(questionDto1);
-            dto.Questions.Add(questionDto2);
+            exerciseDto.Questions.Add(questionDto1);
+            exerciseDto.Questions.Add(questionDto2);
 
-            mockRepo.Setup(r => r.AddExerciseAsync(It.IsAny<Exercise>()))
-                  .ReturnsAsync(new Exercise(dto.Title, dto.Content, dto.CreatedByTeacherId));
+            var expectedExercise = new Exercise(exerciseDto.Title, exerciseDto.Content, exerciseDto.CreatedByTeacherId);
+            expectedExercise.AddQuestion(questionDto1.Title, questionDto1.Content);
+            expectedExercise.AddQuestion(questionDto2.Title, questionDto2.Content);
 
+            mockRepo.Setup(r => r.AddAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
             var service = new ExerciseService(mockRepo.Object);
 
             //act
-            var result = await service.CreateExerciseAsync(dto);
+            var result = await service.CreateExerciseAsync(exerciseDto);
 
             // Assert
 
@@ -195,82 +172,94 @@ namespace Exercise_Tests.Application
             for (int i = 0; i < result.Questions.Count; i++)
             {
                 var question = result.Questions[i];
-                var input = dto.Questions[i];
+                var input = exerciseDto.Questions[i];
 
-                Assert.Equal(result.Id, question.ExerciseId);
                 Assert.Equal(input.Title, question.Title);
                 Assert.Equal(input.Content, question.Content);
             }
-
-
         }
 
         [Fact]
-        public async Task CreateExercise_Should_Map_QuestionSolution_to_Question()
+        public async Task CreateExercise_Should_Create_QuestionSolution_for_Question()
         {
             // Arrange
             var mockRepo = new Mock<IExerciseRepository>();
-            var dto = new CreateExerciseRequest
+            var question = new Question("title", "content");
+            question.SetSolution("solutionConent");
+
+            var questionSolutionDto = new CreateQuestionSolutionRequest { Content = question.Solution.Content };
+            var exerciseDto = new CreateExerciseRequest
             {
                 Title = "Exercise",
                 Content = "Content",
                 CreatedByTeacherId = Guid.NewGuid(),
-                Questions = { new CreateQuestionRequest { Title = "title", Content = "content", Solution = new CreateQuestionSolutionRequest { Content = "Content" } } }
+                Questions = { new CreateQuestionRequest
+                {
+                    Title = question.Title,
+                    Content = question.Content,
+                    Solution = questionSolutionDto
+                } }
             };
+            var expectedExercise = new Exercise(exerciseDto.Title, exerciseDto.Content, exerciseDto.CreatedByTeacherId);
+            expectedExercise.AddQuestion(question.Title, question.Content);
+            expectedExercise.Questions.Last().SetSolution(question.Solution.Content);
 
-            mockRepo.Setup(r => r.AddExerciseAsync(It.IsAny<Exercise>()))
-                    .ReturnsAsync(new Exercise(dto.Title, dto.Content, dto.CreatedByTeacherId));
+            mockRepo.Setup(r => r.AddAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
             var service = new ExerciseService(mockRepo.Object);
 
             // Act
-            var result = await service.CreateExerciseAsync(dto);
-            var question = result.Questions.Single();
+            var result = await service.CreateExerciseAsync(exerciseDto);
+            var questionResult = result.Questions.Single();
 
             // Assert
-            Assert.NotNull(question.Solution);
-            Assert.Equal(question.Id, question.Solution.Id);
-
+            Assert.NotNull(questionResult.Solution);
+            Assert.Equal(questionResult.Solution.Content, exerciseDto.Questions.Single().Solution.Content);
         }
 
         [Fact]
-        public async Task CreateExercise_Should_Map_ExerciseKeywords_To_Exercise()
+        public async Task CreateExercise_Should_Create_ExerciseKeywords()
         {
             // Arrange
+            var keyword = new Guid();
             var mockRepo = new Mock<IExerciseRepository>();
             var exerciseDto = new CreateExerciseRequest
             {
                 Title = "Title1",
                 Content = "Content1",
                 CreatedByTeacherId = Guid.NewGuid(),
-                ExerciseKeywords = { new CreateExerciseKeywordRequest { KeywordId = new Guid() } }
+                ExerciseKeywords = { new CreateExerciseKeywordRequest { KeywordId = keyword} }
             };
             var expectedExercise = new Exercise(exerciseDto.Title, exerciseDto.Content, exerciseDto.CreatedByTeacherId);
-            mockRepo.Setup(r => r.AddExerciseAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
+            expectedExercise.AddKeyword(keyword);
+            mockRepo.Setup(r => r.AddAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
             var service = new ExerciseService(mockRepo.Object);
 
             // Act
             var result = await service.CreateExerciseAsync(exerciseDto);
-            var keywords = result.ExerciseKeywords.Single();
+            var keywordResult = result.ExerciseKeywords.Single();
 
             // Assert
-            Assert.NotNull(keywords);
-            Assert.Equal(result.Id, result.ExerciseKeywords.Single().ExerciseId);
+            Assert.NotEmpty(result.ExerciseKeywords);
+            Assert.NotNull(keywordResult);
+            Assert.Equal(keywordResult.KeywordId, exerciseDto.ExerciseKeywords.Single().KeywordId);
         }
 
         [Fact]
-        public async Task CreateExercise_Should_Map_ExerciseSolution_To_ExerciseId()
+        public async Task CreateExercise_Should_Create_ExerciseSolution()
         {
             // Arrange
+            var solution = new CreateExerciseSolutionRequest { Content = "Content", VideoUrl = "url" };
             var mockRepo = new Mock<IExerciseRepository>();
             var exerciseDto = new CreateExerciseRequest()
             {
                 Title = "Title1",
                 Content = "Content1",
                 CreatedByTeacherId = Guid.NewGuid(),
-                Solution = new CreateExerciseSolutionRequest { Content = "Content" }
+                Solution = solution
             };
             var expectedExercise = new Exercise(exerciseDto.Title, exerciseDto.Content, exerciseDto.CreatedByTeacherId);
-            mockRepo.Setup(r => r.AddExerciseAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
+            expectedExercise.SetSolution(solution.Content, solution.VideoUrl);
+            mockRepo.Setup(r => r.AddAsync(It.IsAny<Exercise>())).ReturnsAsync(expectedExercise);
             var service = new ExerciseService(mockRepo.Object);
 
             // Act
@@ -278,7 +267,8 @@ namespace Exercise_Tests.Application
 
             // Assert
             Assert.NotNull(result.Solution);
-            Assert.Equal(result.Id, result.Solution.Id);
+            Assert.Equal(result.Solution.Content, exerciseDto.Solution.Content);
+            Assert.Equal(result.Solution.VideoUrl, exerciseDto.Solution.VideoUrl);
         }
     }
 
@@ -324,7 +314,7 @@ namespace Exercise_Tests.Application
         {
             // Arrange
             var mockRepo = new Mock<IExerciseRepository>();
-            mockRepo.Setup(r => r.GetExercisesByKeywordsAsync(keywordIds))
+            mockRepo.Setup(r => r.GetByKeywordsAsync(keywordIds))
                     .ReturnsAsync(expected);
 
             var service = new ExerciseService(mockRepo.Object);
@@ -365,7 +355,7 @@ namespace Exercise_Tests.Application
         {
             // Arrange
             var mockRepo = new Mock<IExerciseRepository>();
-            mockRepo.Setup(r => r.GetExercisesByTeacherIdAsync(teacherId))
+            mockRepo.Setup(r => r.GetByTeacherIdAsync(teacherId))
                     .ReturnsAsync(repoResult);
 
             var service = new ExerciseService(mockRepo.Object);
@@ -389,7 +379,7 @@ namespace Exercise_Tests.Application
             var exercise = new Exercise("Title1", "Content1", Guid.NewGuid());
             var mockRepo = new Mock<IExerciseRepository>();
 
-            mockRepo.Setup(r => r.GetExerciseByIdAsync(exercise.Id))
+            mockRepo.Setup(r => r.GetByIdAsync(exercise.Id))
                     .ReturnsAsync(exercise);
 
             var service = new ExerciseService(mockRepo.Object);
@@ -407,7 +397,7 @@ namespace Exercise_Tests.Application
         public static IEnumerable<object[]> ExerciseWithQuestionsTestData()
         {
             var exercise = new Exercise("Title1", "Content1", Guid.NewGuid());
-            exercise.AddQuestion("Question1", "Content1", "Solution1");
+            exercise.AddQuestion("Question1", "Content1");
 
             yield return new object[]
             {
@@ -416,8 +406,8 @@ namespace Exercise_Tests.Application
             };
 
             var exercise2 = new Exercise("Title2", "Content2", Guid.NewGuid());
-            exercise2.AddQuestion("Question2", "Content2", "Solution1");
-            exercise2.AddQuestion("Question3", "Content3", "Solution1");
+            exercise2.AddQuestion("Question2", "Content2");
+            exercise2.AddQuestion("Question3", "Content3");
 
             yield return new object[]
                 {
@@ -439,7 +429,7 @@ namespace Exercise_Tests.Application
         {
             // Arrange
             var mockRepo = new Mock<IExerciseRepository>();
-            mockRepo.Setup(r => r.GetExerciseByIdAsync(exerciseId))
+            mockRepo.Setup(r => r.GetByIdAsync(exerciseId))
                     .ReturnsAsync(expected);
             var service = new ExerciseService(mockRepo.Object);
             // Act
@@ -479,7 +469,7 @@ namespace Exercise_Tests.Application
         {
             // Arrange
             var mockRepo = new Mock<IExerciseRepository>();
-            mockRepo.Setup(r => r.GetExerciseByIdAsync(exerciseId))
+            mockRepo.Setup(r => r.GetByIdAsync(exerciseId))
                     .ReturnsAsync(expected);
             var service = new ExerciseService(mockRepo.Object);
 
@@ -521,9 +511,9 @@ namespace Exercise_Tests.Application
                 RowVersion = exercise.RowVersion
             };
 
-            mockRepo.Setup(r => r.GetExerciseByIdAsync(exercise.Id))
+            mockRepo.Setup(r => r.GetByIdAsync(exercise.Id))
                     .ReturnsAsync(exercise);
-            mockRepo.Setup(r => r.UpdateExerciseAsync(exercise, exercise.RowVersion))
+            mockRepo.Setup(r => r.UpdateAsync(exercise, exercise.RowVersion))
                     .ReturnsAsync(exercise);
 
             var service = new ExerciseService(mockRepo.Object);
@@ -532,7 +522,7 @@ namespace Exercise_Tests.Application
             var result = await service.UpdateExerciseAsync(updateRequest);
 
             // Assert
-            mockRepo.Verify(r => r.UpdateExerciseAsync(It.IsAny<Exercise>(), It.IsAny<byte[]>()), Times.Once);
+            mockRepo.Verify(r => r.UpdateAsync(It.IsAny<Exercise>(), It.IsAny<byte[]>()), Times.Once);
         }
 
         [Fact]
@@ -548,9 +538,9 @@ namespace Exercise_Tests.Application
                 Content = "Updated Content",
                 RowVersion = exercise.RowVersion
             };
-            mockRepo.Setup(r => r.GetExerciseByIdAsync(exercise.Id))
+            mockRepo.Setup(r => r.GetByIdAsync(exercise.Id))
                     .ReturnsAsync(exercise);
-            mockRepo.Setup(r => r.UpdateExerciseAsync(exercise, exercise.RowVersion))
+            mockRepo.Setup(r => r.UpdateAsync(exercise, exercise.RowVersion))
                     .ReturnsAsync(exercise);
             var service = new ExerciseService(mockRepo.Object);
             // Act
@@ -560,9 +550,6 @@ namespace Exercise_Tests.Application
             Assert.Equal(updateRequest.Title, exercise.Title);
             Assert.Equal(updateRequest.Content, exercise.Content);
         }
-
-
-
     }
 
 }

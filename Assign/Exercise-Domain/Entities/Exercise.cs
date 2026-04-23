@@ -51,10 +51,9 @@ public class Exercise : Entity
         Content = content;
     }
 
-    public void AddQuestion(string title, string content, string solutionTitle)
+    public void AddQuestion(string title, string content)
     {
-        var question = new Question(this.Id, title, content);
-        question.SetSolution(solutionTitle);
+        var question = new Question(title, content);
         _questions.Add(question);
     }
 

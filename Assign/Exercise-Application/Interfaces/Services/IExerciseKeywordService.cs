@@ -2,6 +2,6 @@
 
 public interface IExerciseKeywordService
 {
-    Task<ExerciseDTO> AddExerciseKeywordsAsync(List<ExerciseKeywordDTO> exerciseKeywords);
-    Task<ExerciseDTO> RemoveExerciseKeywordAsync(RemoveExerciseKeywordRequest dto);
+    Task<ExerciseDTO> AddExerciseKeywordsAsync(Guid ExerciseId, List<CreateExerciseKeywordRequest> exerciseKeywords);
+    Task<ExerciseDTO> RemoveExerciseKeywordAsync(Guid ExerciseId, RemoveExerciseKeywordRequest dto);
 }

@@ -10,19 +10,10 @@ namespace Exercise_Application.Interfaces.Repositories
 {
     public interface IExerciseRepository
     {
-        Task<Exercise> AddExerciseAsync(Exercise exercise);
-        Task<IEnumerable<Exercise>> GetExercisesByKeywordsAsync(IEnumerable<Guid> keywordIds);
-        Task<IEnumerable<Exercise>> GetExercisesByTeacherIdAsync(Guid teacherId);
-        Task<Exercise?> GetExerciseByIdAsync(Guid exerciseId);
-        Task<Exercise> UpdateExerciseAsync(Exercise exercise, byte[] rowVersion);
-
-        Task<Exercise> AddQuestionsASync(List<Question> Questions);
-        Task<Exercise> AddExerciseKeywordsASync(List<ExerciseKeyword> ExerciseKeywords);
-        Task<Exercise> SetExerciseSolution(ExerciseSolution ExerciseSolution);
-
-        Task<Exercise> RemoveQuestionAsync(RemoveQuestionRequest dto);
-        Task<Exercise> RemoveExerciseSolutionAsync(Guid exerciseId);
-        Task<Exercise> RemoveQuestionSolutionAsync(Guid questionId);
-        Task<Exercise> RemoveExerciseKeywordAsync(RemoveExerciseKeywordRequest dto);
+        Task<Exercise> AddAsync(Exercise exercise);
+        Task<Exercise?> GetByIdAsync(Guid exerciseId);
+        Task<IEnumerable<Exercise>> GetByTeacherIdAsync(Guid teacherId);
+        Task<IEnumerable<Exercise>> GetByKeywordsAsync(IEnumerable<Guid> keywordIds);
+        Task<Exercise> UpdateAsync(Exercise exercise, byte[] rowVersion);
     }
 }

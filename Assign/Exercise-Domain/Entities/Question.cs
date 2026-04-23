@@ -25,9 +25,8 @@ namespace Exercise_Domain.Entities
         /// <param name="exerciseId"></param>
         /// <param name="title"></param>
         /// <param name="content"></param>
-        public Question(Guid exerciseId, string title, string? content) : base(Guid.NewGuid())
+        public Question(string title, string? content) : base(Guid.NewGuid())
         {
-            ExerciseId = exerciseId;
             Title = title;
             if (content != null)
             {

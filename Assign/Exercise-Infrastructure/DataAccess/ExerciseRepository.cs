@@ -13,69 +13,30 @@ namespace Exercise_Infrastructure.DataAccess
     public class ExerciseRepository : IExerciseRepository
     {
         private DbContext dbContext;
-        public ExerciseRepository(DbContext dbContext)
-        {
-            this.dbContext = dbContext;
-        }
-        public async Task<Exercise> AddExerciseAsync(Exercise exercise)
+
+        public Task<Exercise> AddAsync(Exercise exercise)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Exercise> AddExerciseKeywordsASync(List<ExerciseKeyword> ExerciseKeywords)
+        public Task<Exercise?> GetByIdAsync(Guid exerciseId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Exercise> AddQuestionsASync(List<Question> Questions)
+        public Task<IEnumerable<Exercise>> GetByKeywordsAsync(IEnumerable<Guid> keywordIds)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Exercise?> GetExerciseByIdAsync(Guid exerciseId)
+        public Task<IEnumerable<Exercise>> GetByTeacherIdAsync(Guid teacherId)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Exercise>> GetExercisesByKeywordsAsync(IEnumerable<Guid> keywordIds)
+        public Task<Exercise> UpdateAsync(Exercise exercise, byte[] rowVersion)
         {
             throw new NotImplementedException();
         }
-
-        public async Task<IEnumerable<Exercise>> GetExercisesByTeacherIdAsync(Guid teacherId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Exercise> RemoveExerciseKeywordAsync(RemoveExerciseKeywordRequest dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Exercise> RemoveExerciseSolutionAsync(Guid exerciseId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Exercise> RemoveQuestionAsync(RemoveQuestionRequest dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Exercise> RemoveQuestionSolutionAsync(Guid questionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Exercise> SetExerciseSolution(ExerciseSolution ExerciseSolution)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<Exercise> UpdateExerciseAsync(Exercise exercise, byte[] rowVersion)
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

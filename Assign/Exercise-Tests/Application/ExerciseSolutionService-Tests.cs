@@ -9,24 +9,20 @@ namespace Exercise_Tests.Application
     public class SetExerciseSolution_Tests
     {
         [Fact]
-        public async Task SetExerciseSolution_Should_Set_Solution_For_Question()
+        public async Task SetExerciseSolution_Should_Set_Solution_For_Exercise()
+        {
+            
+
+        }
+
+        [Fact]
+        public async Task SetExerciseSolution_Should_Overwrite_Existing_Solution()
         {
         }
 
         [Fact]
-        public async Task SetExerciseSolution_Should_Overwrite_Existing_Question_Solution()
+        public async Task SetExerciseSolution_Should_Throw_When_Setting_Solution_For_Nonexistent_Exercise()
         {
-        }
-
-        [Fact]
-        public async Task SetExerciseSolution_Should_Throw_When_Setting_Solution_For_Nonexistent_Question()
-        {
-        }
-
-        [Fact]
-        public async Task SetExerciseSolution_Should_Throw_When_Setting_Solution_For_Question_With_Null_Content()
-        {
-
         }
     }
 

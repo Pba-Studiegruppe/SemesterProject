@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Exercise_Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,14 +13,12 @@ namespace Exercise_Tests.Domain
         public void Question_ShouldInitializeProperties()
         {
             // Arrange
-            var exerciseId = Guid.NewGuid();
             var title = "Sample Question";
             var content = "What is the capital of France?";
             // Act
-            var question = new Exercise_Domain.Entities.Question(exerciseId, title, content);
+            var question = new Question(title, content);
             // Assert
             Assert.NotEqual(Guid.Empty, question.Id);
-            Assert.Equal(exerciseId, question.ExerciseId);
             Assert.Equal(title, question.Title);
             Assert.Equal(content, question.Content);
             Assert.Null(question.Solution);
@@ -29,7 +28,7 @@ namespace Exercise_Tests.Domain
         public void Update_ShouldChangeTitleAndContent()
         {
             // Arrange
-            var question = new Exercise_Domain.Entities.Question(Guid.NewGuid(), "Old Title", "Old Content");
+            var question = new Question("Old Title", "Old Content");
             var newTitle = "New Title";
             var newContent = "New Content";
             // Act
@@ -43,7 +42,7 @@ namespace Exercise_Tests.Domain
         public void SetSolution_ShouldInitializeSolution()
         {
             // Arrange
-            var question = new Exercise_Domain.Entities.Question(Guid.NewGuid(), "Sample Question", "Sample Content");
+            var question = new Question("Sample Question", "Sample Content");
             var solutionContent = "The capital of France is Paris.";
             // Act
             question.SetSolution(solutionContent);
@@ -57,7 +56,7 @@ namespace Exercise_Tests.Domain
         public void update_ShouldChangeTitleAndContent()
         {
             // Arrange
-            var question = new Exercise_Domain.Entities.Question(Guid.NewGuid(), "Old Title", "Old Content");
+            var question = new Question( "Old Title", "Old Content");
             var newTitle = "New Title";
             var newContent = "New Content";
             // Act

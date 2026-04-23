@@ -111,29 +111,11 @@ namespace Exercise_Tests.Domain
             var title = "Sample Question";
             var content = "What is 2 + 2?";
             // Act
-            exercise.AddQuestion(title, content, null);
+            exercise.AddQuestion(title, content);
             // Assert
             Assert.Single(exercise.Questions);
             Assert.Equal(title, exercise.Questions.First().Title);
             Assert.Equal(content, exercise.Questions.First().Content);
-        }
-
-        [Fact]
-        public void AddQuestion_ShouldAddQuestionToExercise_AndQuestionSolutionToQuestion()
-        {
-            // Arrange
-            var exercise = new Exercise("Test", "Test", Guid.NewGuid());
-            var title = "Sample Question";
-            var content = "What is 2 + 2?";
-            var solutionContent = "Sample Solution";
-            // Act
-            exercise.AddQuestion(title, content, solutionContent);
-            // Assert
-            Assert.Single(exercise.Questions);
-            Assert.Equal(title, exercise.Questions.First().Title);
-            Assert.Equal(content, exercise.Questions.First().Content);
-            Assert.NotNull(exercise.Questions.First().Solution);
-            Assert.Equal(solutionContent, exercise.Questions.First().Solution!.Content);
         }
 
         [Fact]
@@ -143,7 +125,7 @@ namespace Exercise_Tests.Domain
             var exercise = new Exercise("Test", "Test", Guid.NewGuid());
             var title = "Sample Question";
             var content = "What is 2 + 2?";
-            exercise.AddQuestion(title, content, null);
+            exercise.AddQuestion(title, content);
             var questionId = exercise.Questions.First().Id;
             // Act
             exercise.RemoveQuestion(questionId);
@@ -169,7 +151,7 @@ namespace Exercise_Tests.Domain
             var exercise = new Exercise("Test", "Test", Guid.NewGuid());
             var title = "Sample Question";
             var content = "What is 2 + 2?";
-            exercise.AddQuestion(title, content, null);
+            exercise.AddQuestion(title, content);
             var questionId = exercise.Questions.First().Id;
             var newTitle = "Updated Question";
             var newContent = "What is 3 + 3?";
@@ -226,10 +208,6 @@ namespace Exercise_Tests.Domain
         }
     }
 
-
-
-
-
     public class ExerciseMemberDataTests
     {
         public static IEnumerable<object[]> QuestionData =>
@@ -250,7 +228,7 @@ namespace Exercise_Tests.Domain
             var exercise = new Exercise("Test", "Test", Guid.NewGuid());
 
             // Act
-            exercise.AddQuestion(title, content, null);
+            exercise.AddQuestion(title, content);
 
             // Assert
             Assert.Single(exercise.Questions);
@@ -281,7 +259,7 @@ namespace Exercise_Tests.Domain
             // Act
             for (int i = 0; i < numberOfQuestions; i++)
             {
-                exercise.AddQuestion($"Q{i}", "Content", null);
+                exercise.AddQuestion($"Q{i}", "Content");
             }
 
             // Assert
