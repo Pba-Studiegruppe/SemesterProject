@@ -1,4 +1,9 @@
-﻿using System;
+﻿using Exercise_Application.DTO;
+using Exercise_Application.Implementations;
+using Exercise_Application.Interfaces.Repositories;
+using Exercise_Domain.Entities;
+using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,34 +16,62 @@ namespace Exercise_Tests.Application
         [Fact]
         public async Task SetExerciseSolution_Should_Set_Solution_For_Exercise()
         {
-            
+            // Arrange
+            var exercise = new Exercise("title", "content", Guid.NewGuid());
+            var request = new CreateExerciseSolutionRequest
+            {
+                Content = "content",
+                VideoUrl = "video url"
+            };
 
+            var mockRepo = new Mock<IExerciseRepository>();
+            mockRepo.Setup(r => r.GetByIdAsync(exercise.Id))
+                    .ReturnsAsync(exercise);
+
+            exercise.SetSolution(request.Content, request.VideoUrl);
+            mockRepo.Setup(r => r.UpdateAsync(exercise, exercise.RowVersion)).ReturnsAsync(exercise);
+
+            var service = new ExerciseSolutionService(mockRepo.Object);
+
+            // Act
+
+            var result = await service.SetExerciseSolution(exercise.Id, request);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Equal(exercise.Solution.Content, result.Solution.Content);
+            Assert.Equal(exercise.Solution.VideoUrl, result.Solution.VideoUrl);
         }
 
         [Fact]
         public async Task SetExerciseSolution_Should_Overwrite_Existing_Solution()
         {
-        }
+            // Arrange
+            var exercise = new Exercise("title", "content", Guid.NewGuid());
+            exercise.SetSolution("content", "video url");
+            var request = new CreateExerciseSolutionRequest
+            {
+                Content = "new content",
+                VideoUrl = "new video url"
+            };
 
-        [Fact]
-        public async Task SetExerciseSolution_Should_Throw_When_Setting_Solution_For_Nonexistent_Exercise()
-        {
-        }
-    }
+            var mockRepo = new Mock<IExerciseRepository>();
+            mockRepo.Setup(r => r.GetByIdAsync(exercise.Id))
+                    .ReturnsAsync(exercise);
 
-    public class UpdateExerciseSolution_Tests
-    {
-        [Fact]
-        public async Task UpdateExerciseSolution_Should_Update_Solution_For_Exercise()
-        {
-        }
-        [Fact]
-        public async Task UpdateExerciseSolution_Should_Throw_When_Updating_Solution_For_Nonexistent_Exercise()
-        {
-        }
-        [Fact]
-        public async Task UpdateExerciseSolution_Should_Throw_When_Updating_Solution_With_Null_Content()
-        {
+            exercise.SetSolution(request.Content, request.VideoUrl);
+            mockRepo.Setup(r => r.UpdateAsync(exercise, exercise.RowVersion)).ReturnsAsync(exercise);
+
+            var service = new ExerciseSolutionService(mockRepo.Object);
+
+            // Act
+
+            var result = await service.SetExerciseSolution(exercise.Id, request);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Equal(exercise.Solution.Content, result.Solution.Content);
+            Assert.Equal(exercise.Solution.VideoUrl, result.Solution.VideoUrl);
         }
     }
 
@@ -47,10 +80,26 @@ namespace Exercise_Tests.Application
         [Fact]
         public async Task RemoveExerciseSolution_Should_Remove_Solution_From_Exercise()
         {
-        }
-        [Fact]
-        public async Task RemoveExerciseSolution_Should_Throw_When_Removing_Solution_For_Nonexistent_Exercise()
-        {
+            // Arrange
+            var exercise = new Exercise("title", "content", Guid.NewGuid());
+            exercise.SetSolution("content", "video url");
+
+            var mockRepo = new Mock<IExerciseRepository>();
+            mockRepo.Setup(r => r.GetByIdAsync(exercise.Id))
+                    .ReturnsAsync(exercise);
+
+            exercise.RemoveSolution();
+            mockRepo.Setup(r => r.UpdateAsync(exercise, exercise.RowVersion)).ReturnsAsync(exercise);
+
+            var service = new ExerciseSolutionService(mockRepo.Object);
+
+            // Act
+
+            var result = await service.RemoveExerciseSolutionAsync(exercise.Id);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Null(result.Solution);
         }
     }
 }
