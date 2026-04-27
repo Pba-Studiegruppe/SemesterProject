@@ -29,7 +29,6 @@ namespace Exercise_Tests.Application
             };
             var mockRepo = new Mock<IExerciseRepository>();
             mockRepo.Setup(r => r.GetByIdAsync(exercise.Id)).ReturnsAsync(exercise);
-            exercise.AddKeyword(keyword.Id);
             mockRepo.Setup(r => r.UpdateAsync(exercise,exercise.RowVersion)).ReturnsAsync(exercise);
             var service = new ExerciseKeywordService(mockRepo.Object);
 
@@ -60,10 +59,6 @@ namespace Exercise_Tests.Application
             var mockRepo = new Mock<IExerciseRepository>();
             mockRepo.Setup(r => r.GetByIdAsync(exercise.Id)).ReturnsAsync(exercise);
 
-            exercise.AddKeyword(keyword1.Id);
-            exercise.AddKeyword(keyword2.Id);
-            exercise.AddKeyword(keyword3.Id);
-
             mockRepo.Setup(r => r.UpdateAsync(exercise, exercise.RowVersion)).ReturnsAsync(exercise);
             var service = new ExerciseKeywordService(mockRepo.Object);
 
@@ -93,7 +88,6 @@ namespace Exercise_Tests.Application
             };
             var mockRepo = new Mock<IExerciseRepository>();
             mockRepo.Setup(r => r.GetByIdAsync(exercise.Id)).ReturnsAsync(exercise);
-            exercise.AddKeyword(keyword.Id);
             mockRepo.Setup(r => r.UpdateAsync(exercise, exercise.RowVersion)).ReturnsAsync(exercise);
             var service = new ExerciseKeywordService(mockRepo.Object);
 

@@ -43,6 +43,7 @@ namespace Exercise_Domain.Entities
         public void SetSolution(string content)
         {
             Solution = new QuestionSolution(this.Id, content);
+
         }
     }
 }

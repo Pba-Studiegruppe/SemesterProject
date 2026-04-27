@@ -26,7 +26,8 @@ namespace Exercise_Application.Helper
                     Solution = q.Solution != null ? new QuestionSolutionDTO
                     {
                         Id = q.Solution.Id,
-                        Content = q.Solution.Content
+                        Content = q.Solution.Content,
+                        QuestionId = q.Id,
                     } : null
                 }).ToList(),
                 ExerciseKeywords = exercise.ExerciseKeywords.Select(ek => new ExerciseKeywordDTO

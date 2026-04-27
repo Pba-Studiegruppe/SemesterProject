@@ -27,8 +27,6 @@ namespace Exercise_Tests.Application
             var mockRepo = new Mock<IExerciseRepository>();
             mockRepo.Setup(r => r.GetByIdAsync(exercise.Id))
                     .ReturnsAsync(exercise);
-
-            exercise.SetSolution(request.Content, request.VideoUrl);
             mockRepo.Setup(r => r.UpdateAsync(exercise, exercise.RowVersion)).ReturnsAsync(exercise);
 
             var service = new ExerciseSolutionService(mockRepo.Object);
@@ -59,7 +57,6 @@ namespace Exercise_Tests.Application
             mockRepo.Setup(r => r.GetByIdAsync(exercise.Id))
                     .ReturnsAsync(exercise);
 
-            exercise.SetSolution(request.Content, request.VideoUrl);
             mockRepo.Setup(r => r.UpdateAsync(exercise, exercise.RowVersion)).ReturnsAsync(exercise);
 
             var service = new ExerciseSolutionService(mockRepo.Object);
@@ -87,8 +84,6 @@ namespace Exercise_Tests.Application
             var mockRepo = new Mock<IExerciseRepository>();
             mockRepo.Setup(r => r.GetByIdAsync(exercise.Id))
                     .ReturnsAsync(exercise);
-
-            exercise.RemoveSolution();
             mockRepo.Setup(r => r.UpdateAsync(exercise, exercise.RowVersion)).ReturnsAsync(exercise);
 
             var service = new ExerciseSolutionService(mockRepo.Object);
