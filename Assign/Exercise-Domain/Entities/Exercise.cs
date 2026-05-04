@@ -12,7 +12,7 @@ public class Exercise : Entity
     private readonly List<Question> _questions = new();
     public IReadOnlyCollection<Question> Questions => _questions;
     private readonly List<ExerciseKeyword> _exerciseKeywords = new();
-    public IReadOnlyCollection<ExerciseKeyword> ExerciseKeywords => _exerciseKeywords;
+    public IReadOnlyCollection<ExerciseKeyword?> ExerciseKeywords => _exerciseKeywords;
     public ExerciseSolution? Solution { get; private set; }
 
 

@@ -1,10 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Exercise_Domain.Entities;
+﻿using Exercise_Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace Exercise_Api
 {
     public partial class ExerciseDbContext : DbContext
     {
+
+        // The correct parameter for specifying the DbContext in Add-Migration is '-Context', not '-Context' (case-sensitive).
+        // However, in some versions of the EF Core tools, the parameter is '-Context' (capital 'C').
+        // If you get a "parameter cannot be found" error, try removing the '-Context' parameter entirely if you only have one DbContext in your project,
+        // or use the correct casing: -Context ExerciseDbContext
+
+        // Example (with correct casing):
+        // Add-Migration InitialCreate -Project Exercise-Domain -StartupProject Exercise-Api -Context ExerciseDbContext
+
+        // Or, if you only have one DbContext, simply:
+        // Add-Migration InitialCreate -Project Exercise-Domain -StartupProject Exercise-Api
+
+
         public ExerciseDbContext() { }
 
         public ExerciseDbContext(DbContextOptions<ExerciseDbContext> options)
@@ -112,4 +126,16 @@ namespace Exercise_Api
             });
         }
     }
+    public class ExerciseDbContextFactory : IDesignTimeDbContextFactory<ExerciseDbContext>
+    {
+        public ExerciseDbContext CreateDbContext(string[] args)
+        {
+
+            // TODO: Fix this so it isnt hardcoded, maybe use user secrets or something
+            var optionsBuilder = new DbContextOptionsBuilder<ExerciseDbContext>();
+            optionsBuilder.UseSqlServer("Server=localhost,14333;Database=AssignDB;User Id=sa;Password=Admin123!;Trust Server Certificate=true");
+            return new ExerciseDbContext(optionsBuilder.Options);
+        }
+    }
+
 }

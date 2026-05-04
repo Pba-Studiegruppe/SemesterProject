@@ -7,23 +7,23 @@ namespace Exercise_Infrastructure.DataAccess
 {
     public class ExerciseRepository : IExerciseRepository
     {
-        private readonly ExerciseDbContext dbContext;
+        private readonly ExerciseDbContext _dbContext;
 
         public ExerciseRepository(ExerciseDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<Exercise> AddAsync(Exercise exercise)
         {
-            dbContext.Exercises.Add(exercise);
-            await dbContext.SaveChangesAsync();
+            _dbContext.Exercises.Add(exercise);
+            await _dbContext.SaveChangesAsync();
             return exercise;
         }
 
         public async Task<Exercise?> GetByIdAsync(Guid exerciseId)
         {
-            return await dbContext.Exercises
+            return await _dbContext.Exercises
                 .Include(e => e.Questions)
                 .Include(e => e.ExerciseKeywords)
                 .Include(e => e.Solution)
@@ -32,7 +32,7 @@ namespace Exercise_Infrastructure.DataAccess
 
         public async Task<IEnumerable<Exercise>> GetByKeywordsAsync(IEnumerable<Guid> keywordIds)
         {
-            return await dbContext.Exercises
+            return await _dbContext.Exercises
                 .Include(e => e.Questions)
                 .Include(e => e.ExerciseKeywords)
                 .Include(e => e.Solution)
@@ -42,7 +42,7 @@ namespace Exercise_Infrastructure.DataAccess
 
         public async Task<IEnumerable<Exercise>> GetByTeacherIdAsync(Guid teacherId)
         {
-            return await dbContext.Exercises
+            return await _dbContext.Exercises
                 .Include(e => e.Questions)
                 .Include(e => e.ExerciseKeywords)
                 .Include(e => e.Solution)
@@ -52,9 +52,9 @@ namespace Exercise_Infrastructure.DataAccess
 
         public async Task<Exercise> UpdateAsync(Exercise exercise, byte[] rowVersion)
         {
-            dbContext.Entry(exercise).OriginalValues["RowVersion"] = rowVersion;
-            dbContext.Exercises.Update(exercise);
-            await dbContext.SaveChangesAsync();
+            _dbContext.Entry(exercise).OriginalValues["RowVersion"] = rowVersion;
+            _dbContext.Exercises.Update(exercise);
+            await _dbContext.SaveChangesAsync();
             return exercise;
         }
     }

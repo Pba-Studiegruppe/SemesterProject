@@ -1,4 +1,5 @@
-﻿using Exercise_Application.Interfaces.Repositories;
+﻿using Exercise_Api;
+using Exercise_Application.Interfaces.Repositories;
 using Exercise_Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,10 @@ namespace Exercise_Infrastructure.DataAccess
 {
     public class KeywordRepository : IKeywordRepository
     {
-        private DbContext dbContext;
-        public KeywordRepository(DbContext dbContext)
+        private ExerciseDbContext _dbContext;
+        public KeywordRepository(ExerciseDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<Keyword> AddKeywordAsync(Keyword keyword)
