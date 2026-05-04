@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Assignment-Api\Assignment-Api.csproj" />
     <ProjectReference Include="..\Course-Api\Course-Api.csproj" />
+    <ProjectReference Include="..\Exercise-Api\Exercise-Api.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using Exercise_Application.DTO;
+using Exercise_Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
