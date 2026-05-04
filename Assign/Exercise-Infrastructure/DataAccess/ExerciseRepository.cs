@@ -1,4 +1,6 @@
-﻿using Exercise_Application.Interfaces.Repositories;
+﻿using Exercise_Application.DTO;
+using Exercise_Application.Interfaces.Repositories;
+using Exercise_Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -11,34 +13,30 @@ namespace Exercise_Infrastructure.DataAccess
     public class ExerciseRepository : IExerciseRepository
     {
         private DbContext dbContext;
-        public ExerciseRepository(DbContext dbContext)
-        {
-            this.dbContext = dbContext;
-        }
-        public async Task<Exercise> AddExerciseAsync(Exercise exercise)
+
+        public Task<Exercise> AddAsync(Exercise exercise)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Exercise?> GetExerciseByIdAsync(Guid exerciseId)
+        public Task<Exercise?> GetByIdAsync(Guid exerciseId)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Exercise>> GetExercisesByKeywordsAsync(IEnumerable<Guid> keywordIds)
+        public Task<IEnumerable<Exercise>> GetByKeywordsAsync(IEnumerable<Guid> keywordIds)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Exercise>> GetExercisesByTeacherIdAsync(Guid teacherId)
+        public Task<IEnumerable<Exercise>> GetByTeacherIdAsync(Guid teacherId)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Exercise> UpdateExerciseAsync(Exercise exercise, byte[] rowVersion)
+        public Task<Exercise> UpdateAsync(Exercise exercise, byte[] rowVersion)
         {
             throw new NotImplementedException();
         }
-
     }
 }

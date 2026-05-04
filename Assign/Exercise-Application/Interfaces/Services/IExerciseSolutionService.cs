@@ -1,12 +1,7 @@
 ﻿using Exercise_Application.DTO;
 
-namespace Exercise_Application.Interfaces.Services
+public interface IExerciseSolutionService
 {
-    public interface IExerciseSolutionService
-    {
-        Task<ExerciseSolutionDTO> CreateExerciseSolutionAsync(CreateExerciseSolutionRequest dto);
-        Task<IEnumerable<ExerciseSolutionDTO?>> GetExerciseSolutionsByExerciseIdAsync(Guid exerciseId);
-        Task<ExerciseSolutionDTO?> GetExerciseSolutionByIdAsync(Guid id);
-        Task<ExerciseSolutionDTO> UpdateExerciseSolutionAsync(Guid id, UpdateExerciseSolutionRequest dto, byte[] rowVersion);
-    }
+    Task<ExerciseDTO> SetExerciseSolution(Guid exerciseId, CreateExerciseSolutionRequest solution);
+    Task<ExerciseDTO> RemoveExerciseSolutionAsync(Guid exerciseId);
 }

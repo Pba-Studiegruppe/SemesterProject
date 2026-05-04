@@ -12,19 +12,21 @@ namespace Exercise_Application.DTO
         public Guid ExerciseId { get; set; }
         public string Content { get; set; } = string.Empty;
         public string? VideoUrl { get; set; }
+        public byte[]? RowVersion { get; set; }
     }
 
     public class CreateExerciseSolutionRequest
     {
-        public Guid ExerciseId { get; set; }
         public string Content { get; set; } = string.Empty;
         public string? VideoUrl { get; set; }
     }
 
     public class UpdateExerciseSolutionRequest
     {
+        public Guid Id { get; set; }
         public Guid ExerciseId { get; set; }
         public string Content { get; set; } = string.Empty;
         public string? VideoUrl { get; set; }
+        public byte[]? RowVersion { get; set; }
     }
 }

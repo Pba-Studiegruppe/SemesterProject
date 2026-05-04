@@ -1,10 +1,7 @@
 ﻿using Exercise_Application.DTO;
 
-namespace Exercise_Application.Interfaces.Services
+public interface IExerciseKeywordService
 {
-    public interface IExerciseKeywordService
-    {
-        Task<ExerciseKeyword> AddExerciseKeywordAsync(ExerciseKeywordDTO dto);
-        Task<IEnumerable<ExerciseKeyword>> GetExerciseKeywordsByExerciseIdAsync(Guid exerciseId);
-    }
-}                                                                                                                                                                                                                                         
+    Task<ExerciseDTO> AddExerciseKeywordsAsync(Guid ExerciseId, List<CreateExerciseKeywordRequest> exerciseKeywords);
+    Task<ExerciseDTO> RemoveExerciseKeywordAsync(Guid ExerciseId, RemoveExerciseKeywordRequest dto);
+}

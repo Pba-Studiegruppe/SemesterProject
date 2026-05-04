@@ -1,6 +1,7 @@
 ﻿using Exercise_Application.DTO;
 using Exercise_Application.Interfaces.Repositories;
 using Exercise_Application.Interfaces.Services;
+using Exercise_Application.Helper;
 using Exercise_Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Exercise_Application.Implementations
 {
-    public class ExerciseService : IExerciseService
+    public partial class ExerciseService : IExerciseService
     {
         private readonly IExerciseRepository _repository;
 
@@ -19,17 +20,37 @@ namespace Exercise_Application.Implementations
             _repository = repository;
         }
 
-
         public async Task<ExerciseDTO> CreateExerciseAsync(CreateExerciseRequest dto)
         {
             try
             {
                 var exercise = new Exercise(dto.Title, dto.Content, dto.CreatedByTeacherId);
-                var result = await _repository.AddExerciseAsync(exercise);
+                
+                foreach (var q in dto.Questions.Where(q => q != null))
+                {
+                    exercise.AddQuestion(q!.Title, q.Content);
 
-                if(result == null) { throw new Exception("Failed to create the exercise."); }
+                    if (q.Solution != null)
+                    {
+                        exercise.Questions.Last().SetSolution(q.Solution.Content);
+                    }
+                }
 
-                return MapToDTO(result);
+                foreach (var k in dto.ExerciseKeywords.Where(k => k != null))
+                {
+                    exercise.AddKeyword(k!.KeywordId);
+                }
+
+                if (dto.Solution != null)
+                {
+                    exercise.SetSolution(dto.Solution.Content, dto.Solution.VideoUrl);
+                }
+
+                var result = await _repository.AddAsync(exercise);
+
+                if (result == null) { throw new Exception("Failed to create the exercise."); }
+
+                return Mapper.MapToDTO(result);
             }
             catch (Exception ex)
             {
@@ -41,10 +62,10 @@ namespace Exercise_Application.Implementations
         {
             try
             {
-                var exercises = await _repository.GetExercisesByKeywordsAsync(keywordIds);
+                var exercises = await _repository.GetByKeywordsAsync(keywordIds);
                 if (exercises == null) { return Enumerable.Empty<ExerciseDTO?>(); }
 
-                return exercises.Select(e => MapToDTO(e));
+                return exercises.Select(e => Mapper.MapToDTO(e));
             }
             catch (Exception ex)
             {
@@ -56,9 +77,9 @@ namespace Exercise_Application.Implementations
         {
             try
             {
-                var exercise = await _repository.GetExerciseByIdAsync(id);
+                var exercise = await _repository.GetByIdAsync(id);
                 if (exercise == null) { return null; }
-                return MapToDTO(exercise);
+                return Mapper.MapToDTO(exercise);
             }
             catch (Exception ex)
             {
@@ -70,61 +91,32 @@ namespace Exercise_Application.Implementations
         {
             try
             {
-                var exercises = await _repository.GetExercisesByTeacherIdAsync(teacherId);
+                var exercises = await _repository.GetByTeacherIdAsync(teacherId);
                 if (exercises == null) { return Enumerable.Empty<ExerciseDTO?>(); }
-                return exercises.Select(e => MapToDTO(e));
+                return exercises.Select(e => Mapper.MapToDTO(e));
             }
             catch (Exception ex)
             {
                 throw new Exception("An error occurred while retrieving exercises by teacher ID.", ex);
             }
-
         }
-
-        public async Task<ExerciseDTO?> UpdateExerciseAsync(Guid id, UpdateExerciseRequest dto)
+        public async Task<ExerciseDTO?> UpdateExerciseAsync(UpdateExerciseRequest dto)
         {
             try
             {
-                var existingExercise = await _repository.GetExerciseByIdAsync(id);
+                var existingExercise = await _repository.GetByIdAsync(dto.Id);
                 if (existingExercise == null) { return null; }
 
-                existingExercise.Update(dto.Title, dto.Content);
-                var result = await _repository.UpdateExerciseAsync(existingExercise, existingExercise.RowVersion);
-                return MapToDTO(result);
+                existingExercise.UpdateTitle(dto.Title);
+                existingExercise.UpdateContent(dto.Content);
+
+                var result = await _repository.UpdateAsync(existingExercise, existingExercise.RowVersion);
+                return Mapper.MapToDTO(result);
             }
             catch (Exception ex)
             {
                 throw new Exception("An error occurred while updating the exercise.", ex);
             }
-        }
-
-        public ExerciseDTO MapToDTO(Exercise exercise)
-        {
-            return new ExerciseDTO
-            {
-                Id = exercise.Id,
-                Title = exercise.Title,
-                Content = exercise.Content,
-                CreatedAt = exercise.CreatedAt,
-                CreatedByTeacherId = exercise.CreatedByTeacherId,
-                Questions = exercise.Questions.Select(q => new QuestionDTO
-                {
-                    Id = q.Id,
-                    Title = q.Title,
-                    Content = q.Content
-                }).ToList(),
-                ExerciseKeywords = exercise.ExerciseKeywords.Select(ek => new ExerciseKeywordDTO
-                {
-                    ExerciseId = ek.ExerciseId,
-                    KeywordId = ek.KeywordId
-                }).ToList(),
-                Solution = exercise.Solution != null ? new ExerciseSolutionDTO
-                {
-                    Id = exercise.Solution.Id,
-                    Content = exercise.Solution.Content,
-                    VideoUrl = exercise.Solution.VideoUrl
-                } : null
-            };
         }
     }
 }

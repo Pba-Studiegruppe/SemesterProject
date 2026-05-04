@@ -11,4 +11,15 @@ namespace Exercise_Application.DTO
         public Guid ExerciseId { get; set; }
         public Guid KeywordId { get; set; }
     }
+
+    public class CreateExerciseKeywordRequest
+    {
+        public Guid KeywordId { get; set; }
+    }
+
+    public class RemoveExerciseKeywordRequest
+    {
+        public Guid ExerciseId { get; set; }
+        public Guid KeywordId { get; set; }
+    }
 }

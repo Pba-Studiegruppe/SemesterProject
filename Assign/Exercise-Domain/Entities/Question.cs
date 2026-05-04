@@ -25,11 +25,13 @@ namespace Exercise_Domain.Entities
         /// <param name="exerciseId"></param>
         /// <param name="title"></param>
         /// <param name="content"></param>
-        public Question(Guid exerciseId, string title, string content) : base(Guid.NewGuid())
+        public Question(string title, string? content) : base(Guid.NewGuid())
         {
-            ExerciseId = exerciseId;
             Title = title;
-            Content = content;
+            if (content != null)
+            {
+                Content = content;
+            }
         }
 
         public void Update(string title, string content)
@@ -41,6 +43,7 @@ namespace Exercise_Domain.Entities
         public void SetSolution(string content)
         {
             Solution = new QuestionSolution(this.Id, content);
+
         }
     }
 }

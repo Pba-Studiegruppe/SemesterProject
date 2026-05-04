@@ -1,54 +1,65 @@
 ﻿using Exercise_Application.DTO;
+using Exercise_Application.Helper;
 using Exercise_Application.Interfaces.Repositories;
-using Exercise_Application.Interfaces.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Exercise_Application.Implementations
 {
     public class ExerciseKeywordService : IExerciseKeywordService
     {
-
-        private IExerciseKeywordRepository _repository;
-
-        public ExerciseKeywordService(IExerciseKeywordRepository repository)
+        private readonly IExerciseRepository _repository;
+        public ExerciseKeywordService(IExerciseRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<ExerciseKeyword> AddExerciseKeywordAsync(ExerciseKeywordDTO dto)
+        public async Task<ExerciseDTO> AddExerciseKeywordsAsync(Guid ExerciseId, List<CreateExerciseKeywordRequest> exerciseKeywords)
         {
             try
             {
-                if (dto == null) { throw new ArgumentNullException(nameof(dto), "The ExerciseKeywordDTO cannot be null."); }
-                if (dto.ExerciseId == Guid.Empty) { throw new ArgumentException("The ExerciseId cannot be empty.", nameof(dto.ExerciseId)); }
-                if (dto.KeywordId == Guid.Empty) { throw new ArgumentException("The KeywordId cannot be empty.", nameof(dto.KeywordId)); }
+                var exercise = await _repository.GetByIdAsync(ExerciseId);
+                if (exercise == null) { throw new KeyNotFoundException(nameof(exercise)); }
 
-                var exerciseKeyword = new ExerciseKeyword(dto.ExerciseId, dto.KeywordId);
-                return await _repository.AddExerciseKeywordAsync(exerciseKeyword);
+                var existingKeywordIds = exercise.ExerciseKeywords.Select(ek => ek.KeywordId).ToHashSet();
 
+                foreach (var exerciseKeyword in exerciseKeywords)
+                {
+                    if (!existingKeywordIds.Contains(exerciseKeyword.KeywordId))
+                    {
+                        exercise.AddKeyword(exerciseKeyword.KeywordId);
+                        existingKeywordIds.Add(exerciseKeyword.KeywordId); // keep in sync
+                    }
+                }
+
+                exercise = await _repository.UpdateAsync(exercise, exercise.RowVersion);
+
+                return Mapper.MapToDTO(exercise);
             }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred while adding the exercise keyword.", ex);
+                throw new Exception("An error occurred while adding keyword to the exercise.", ex);
             }
         }
 
-        public async Task<IEnumerable<ExerciseKeyword>> GetExerciseKeywordsByExerciseIdAsync(Guid exerciseId)
+        public async Task<ExerciseDTO> RemoveExerciseKeywordAsync(Guid ExerciseId, RemoveExerciseKeywordRequest dto)
         {
             try
             {
-                if (exerciseId == Guid.Empty) { throw new ArgumentException("The ExerciseId cannot be empty.", nameof(exerciseId)); }
-                return await _repository.GetExerciseKeywordsByExerciseIdAsync(exerciseId);
+                var exercise = await _repository.GetByIdAsync(ExerciseId);
+                if (exercise == null) { throw new KeyNotFoundException(nameof(exercise)); }
+
+              
+                exercise.RemoveKeyword(dto.KeywordId);
+                exercise = await _repository.UpdateAsync(exercise,exercise.RowVersion);
+
+                return Mapper.MapToDTO(exercise);
+
             }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred while retrieving exercise keywords by exercise ID.", ex);
+                throw new Exception("An error occured while removing keyword from exercise.", ex);
             }
-
         }
     }
 }
+
+
