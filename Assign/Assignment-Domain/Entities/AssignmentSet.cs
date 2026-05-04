@@ -1,37 +1,33 @@
-﻿using Assignment_Domain.Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Assignment_Domain.Entities
+namespace Assignment_Api;
+
+public partial class AssignmentSet
 {
-    public class AssignmentSet: Entity
-    {
-        public string Title { get; private set; } //Tilføjet, mangler at komme på klasse diagrammet
-        public Guid CourseId { get; private set; }
-        public DateTime CreatedAt { get; private set; } //Tilføjet, mangler at komme på klasse diagrammet
-        public Guid CreatedByTeacherId { get; private set; } //Tilføjet, mangler at komme på klasse diagrammet
-       
-        private readonly List<Assignment> _assignments = new();
-        public IReadOnlyCollection<Assignment> Assignments => _assignments;
-        private AssignmentSet() : base(Guid.NewGuid()) { }
+    public Guid Id { get; set; }
 
-        public GradeSheet GradeSheet { get; private set; }
+    public Guid? CourseId { get; set; }
 
-        public AssignmentSet(string title, string description, Guid teacherId) : base(Guid.NewGuid())
-        {
-            Title = title;
-            CreatedByTeacherId = teacherId;
-            CreatedAt = DateTime.UtcNow;
-        }
-        public void AddAssignment(Assignment assignment)
-        {
-            if (assignment == null)
-                throw new ArgumentNullException(nameof(assignment));
+    public Guid? AssignmentId { get; set; }
 
-            _assignments.Add(assignment);
-        }
-    }
+    public Guid? GradesheetId { get; set; }
+
+    public bool? IsPublihsed { get; set; }
+
+    public bool? GradingPublished { get; set; }
+
+    public bool? Inactive { get; set; }
+
+    public string? Title { get; set; }
+
+    public string? Description { get; set; }
+
+    public DateOnly? CreatedAt { get; set; }
+
+    public byte[]? RowVersion { get; set; }
+
+    public virtual ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
+
+    public virtual ICollection<GradeSheet> GradeSheets { get; set; } = new List<GradeSheet>();
 }

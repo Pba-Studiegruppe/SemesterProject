@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Assignment_Domain.Entities
+namespace Assignment_Api;
+
+public partial class GradeSheet
 {
-    public class GradeSheet
-    {
-    }
+    public Guid Id { get; set; }
+
+    public Guid? AssignmentSetId { get; set; }
+
+    public byte[]? RowVersion { get; set; }
+
+    public virtual AssignmentSet? AssignmentSet { get; set; }
 }
