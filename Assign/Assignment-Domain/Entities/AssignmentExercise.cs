@@ -1,17 +1,15 @@
-﻿using Assignment_Domain.Shared;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Assignment_Domain.Entities
+namespace Assignment_Api;
+
+public partial class AssignmentExercise
 {
-    public class AssignmentExercise 
-    {
-        
-        public Guid ExerciseId { get; private set; }
-        private AssignmentExercise() { } // Required by EF Core
+    public Guid AssignmentId { get; set; }
 
-    }
+    public Guid ExerciseId { get; set; }
+
+    public byte[]? RowVersion { get; set; }
+
+    public virtual Assignment Assignment { get; set; } = null!;
 }

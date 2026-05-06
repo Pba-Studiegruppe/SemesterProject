@@ -1,42 +1,61 @@
-﻿using Exercise_Application.DTO;
+﻿using Exercise_Api;
 using Exercise_Application.Interfaces.Repositories;
 using Exercise_Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Exercise_Infrastructure.DataAccess
 {
     public class ExerciseRepository : IExerciseRepository
     {
-        private DbContext dbContext;
+        private readonly ExerciseDbContext _dbContext;
 
-        public Task<Exercise> AddAsync(Exercise exercise)
+        public ExerciseRepository(ExerciseDbContext dbContext)
         {
-            throw new NotImplementedException();
+            _dbContext = dbContext;
         }
 
-        public Task<Exercise?> GetByIdAsync(Guid exerciseId)
+        public async Task<Exercise> AddAsync(Exercise exercise)
         {
-            throw new NotImplementedException();
+            _dbContext.Exercises.Add(exercise);
+            await _dbContext.SaveChangesAsync();
+            return exercise;
         }
 
-        public Task<IEnumerable<Exercise>> GetByKeywordsAsync(IEnumerable<Guid> keywordIds)
+        public async Task<Exercise?> GetByIdAsync(Guid exerciseId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Exercises
+                .Include(e => e.Questions)
+                .Include(e => e.ExerciseKeywords)
+                .Include(e => e.Solution)
+                .FirstOrDefaultAsync(e => e.Id == exerciseId);
         }
 
-        public Task<IEnumerable<Exercise>> GetByTeacherIdAsync(Guid teacherId)
+        public async Task<IEnumerable<Exercise>> GetByKeywordsAsync(IEnumerable<Guid> keywordIds)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Exercises
+                .Include(e => e.Questions)
+                .Include(e => e.ExerciseKeywords)
+                .Include(e => e.Solution)
+                .Where(e => e.ExerciseKeywords.Any(ek => keywordIds.Contains(ek.KeywordId)))
+                .ToListAsync();
         }
 
-        public Task<Exercise> UpdateAsync(Exercise exercise, byte[] rowVersion)
+        public async Task<IEnumerable<Exercise>> GetByTeacherIdAsync(Guid teacherId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Exercises
+                .Include(e => e.Questions)
+                .Include(e => e.ExerciseKeywords)
+                .Include(e => e.Solution)
+                .Where(e => e.CreatedByTeacherId == teacherId)
+                .ToListAsync();
+        }
+
+        public async Task<Exercise> UpdateAsync(Exercise exercise, byte[] rowVersion)
+        {
+            _dbContext.Entry(exercise).OriginalValues["RowVersion"] = rowVersion;
+            _dbContext.Exercises.Update(exercise);
+            await _dbContext.SaveChangesAsync();
+            return exercise;
         }
     }
 }
