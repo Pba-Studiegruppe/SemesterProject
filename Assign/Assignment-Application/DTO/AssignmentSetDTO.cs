@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace Assignment_Application.DTO
 {
-    internal class AssignmentSetDTO
+    public class AssignmentSetDTO
+    {
+    }
+
+    public class CreateAssignmentSetRequest
+    {
+    }
+
+    public class UpdateAssignmentSetRequest
     {
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assignment_Tests.Domain
 {
-    internal class AssignmentSetTests
+    public class AssignmentSetTests
     {
     }
 }
