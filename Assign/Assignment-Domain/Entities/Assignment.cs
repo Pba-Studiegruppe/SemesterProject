@@ -6,11 +6,11 @@ namespace Assignment_Api;
 public partial class Assignment
 {
     public Guid Id { get; set; }
-    public int? TotalPoints { get; set; }
+    public int? TotalPoints { get; private set; }
     public Guid? AssignmentSetId { get; set; }
-    public string? Title { get; set; }
-    public string? Description { get; set; }
-    public DateOnly? CreatedAt { get; set; }
+    public string? Title { get; private set; }
+    public string? Description { get; private set; }
+    public DateOnly? CreatedAt { get; private set; }
     public byte[]? RowVersion { get; set; }
 
     private readonly List<AssignmentExercise> _assignmentExercises = new();
@@ -20,30 +20,39 @@ public partial class Assignment
     private readonly List<SubmittedAssignment> _submittedAssignments = new();
     public IReadOnlyCollection<SubmittedAssignment> SubmittedAssignments => _submittedAssignments;
 
-    public Assignment(Guid? assignmentSetId, string? title, string? description)
+    public Assignment(string? title, string? description)
     {
-        AssignmentSetId = assignmentSetId;
         Title = title;
         Description = description;
     }
 
     public void AddExercise(Guid exerciseId)
     {
-        var exercise = new AssignmentExercise();
+        if (_assignmentExercises.Any(e => e.ExerciseId == exerciseId))
+        {
+            throw new InvalidOperationException($"Exercise with id '{exerciseId}' already exists in assignment.");
+        }
+
+        var exercise = new AssignmentExercise(Id, exerciseId);
         _assignmentExercises.Add(exercise);
     }
 
     public void RemoveExercise(Guid exerciseId)
     {
-        var exercise = _assignmentExercises.Find(q => q.ExerciseId == exerciseId);
-        if (exercise == null) { throw new ArgumentException("exercise not found"); }
+        var exercise = _assignmentExercises.FirstOrDefault(e => e.ExerciseId == exerciseId);
+
+        if (exercise == null)
+        {
+            throw new KeyNotFoundException($"Exercise with id '{exerciseId}' was not found in assignment.");
+        }
 
         _assignmentExercises.Remove(exercise);
     }
 
     public void AddSubmittedAssignment(SubmittedAssignment submittedAssignment)
     {
-        //validations
+        //Todo validations of submitted assignment
+        // Has to filled out correctly, no duplicates, etc
         _submittedAssignments.Add(submittedAssignment);
     }
 
@@ -55,5 +64,10 @@ public partial class Assignment
     public void UpdateDescription(string description)
     {
         Description = description;
+    }
+
+    internal void SetAssignmentSet(Guid id)
+    {
+        AssignmentSetId = id;
     }
 }

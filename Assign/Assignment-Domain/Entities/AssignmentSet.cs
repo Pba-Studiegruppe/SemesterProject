@@ -43,28 +43,45 @@ public partial class AssignmentSet
     }
     public void AddAssignment(Assignment assignment)
     {
+        if (assignment == null)
+            throw new ArgumentNullException(nameof(assignment));
 
+        if (_assignments.Contains(assignment))
+            throw new InvalidOperationException("Assignment already exists in set");
+
+        assignment.SetAssignmentSet(Id);
+        _assignments.Add(assignment);
     }
 
-    public void RemoveAssignment(Assignment assignment) 
-    { 
-
-    }
-
-
-    public bool Publish()
+    public void RemoveAssignment(Assignment assignment)
     {
-        if (Assignments == null) { return false; }
-        if (CourseId == null) { return false; }
+        if (!_assignments.Contains(assignment))
+            throw new KeyNotFoundException("Assignment not found in set");
+
+        _assignments.Remove(assignment);
+    }
+
+
+    public void Publish()
+    {
+        if (CourseId == null)
+            throw new InvalidOperationException("Cannot publish without course");
+
+        if (!_assignments.Any())
+            throw new InvalidOperationException("Cannot publish without assignments");
+
+        if (_assignments.Any(a => !a.AssignmentExercises.Any()))
+            throw new InvalidOperationException("All assignments must be valid");
 
         IsPublihsed = true;
-        return true;
     }
 
     public void AddGradeSheet()
     {
-        if (Assignments == null) { return; }
+        if (!_assignments.Any())
+            throw new InvalidOperationException("Cannot create gradesheet without assignments");
 
+        _gradeSheets.Add(new GradeSheet());
     }
 
     /// <summary>
@@ -72,10 +89,15 @@ public partial class AssignmentSet
     /// </summary>
     public void PublishGrades()
     {
-        if (GradeSheets == null) { return; }
-        if (Assignments == null) { return; }
+        if (!_gradeSheets.Any())
+            throw new InvalidOperationException("Cannot publish grades without gradesheets");
 
-       
+        if (!_assignments.Any())
+            throw new InvalidOperationException("Cannot publish grades without assignments");
 
+        if (_assignments.Any(a => !a.SubmittedAssignments.Any()))
+            throw new InvalidOperationException("All assignments must have submissions");
+
+        GradingPublished = true;
     }
 }
