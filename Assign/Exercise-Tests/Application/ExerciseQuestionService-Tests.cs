@@ -27,7 +27,6 @@ namespace Exercise_Tests.Application
 
             mockRepo.Setup(r => r.GetByIdAsync(expectedExercise.Id))
                 .ReturnsAsync(expectedExercise);
-            expectedExercise.AddQuestion(expectedQuestion.Title, expectedExercise.Content);
             mockRepo.Setup(r => r.UpdateAsync(expectedExercise, expectedExercise.RowVersion))
                 .ReturnsAsync(expectedExercise);
 
@@ -54,7 +53,6 @@ namespace Exercise_Tests.Application
 
             mockRepo.Setup(r => r.GetByIdAsync(expectedExercise.Id))
                 .ReturnsAsync(expectedExercise);
-            expectedExercise.AddQuestion(expectedQuestion.Title, expectedExercise.Content);
             mockRepo.Setup(r => r.UpdateAsync(expectedExercise, expectedExercise.RowVersion))
                 .ReturnsAsync(expectedExercise);
 

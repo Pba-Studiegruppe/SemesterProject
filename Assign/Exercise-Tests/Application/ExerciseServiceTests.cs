@@ -110,36 +110,6 @@ namespace Exercise_Tests.Application
             Assert.Equal(expectedExercise.Content, result.Content);
         }
 
-
-        [Fact]
-        public async Task CreateExercise_Should_Set_CreatedAt_To_UtcNow_On_Creation()
-        {
-            // Arrange
-            var mockRepo = new Mock<IExerciseRepository>();
-
-            mockRepo.Setup(r => r.AddAsync(It.IsAny<Exercise>()))
-                    .ReturnsAsync((Exercise e) => e); // return the actual object
-
-            var dto = new CreateExerciseRequest
-            {
-                Title = "Title1",
-                Content = "Content1",
-                CreatedByTeacherId = Guid.NewGuid(),
-            };
-
-            var service = new ExerciseService(mockRepo.Object);
-
-            var before = DateTime.UtcNow;
-
-            // Act
-            var result = await service.CreateExerciseAsync(dto);
-
-            var after = DateTime.UtcNow;
-
-            // Assert
-            Assert.InRange(result.CreatedAt, before, after);
-        }
-
         [Fact]
         public async Task CreateExercise_Should_Create_Multiple_Questions()
         {

@@ -53,6 +53,7 @@ public class Exercise : Entity
 
     public void AddQuestion(string title, string content)
     {
+        if (title == null) throw new ArgumentNullException("title"); title = title.Trim();
         var question = new Question(title, content);
         _questions.Add(question);
     }

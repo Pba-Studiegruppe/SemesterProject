@@ -27,7 +27,7 @@ namespace Exercise_Domain.Entities
         /// <param name="content"></param>
         public Question(string title, string? content) : base(Guid.NewGuid())
         {
-            Title = title;
+            this.Title = title;
             if (content != null)
             {
                 Content = content;
@@ -43,7 +43,9 @@ namespace Exercise_Domain.Entities
         public void SetSolution(string content)
         {
             Solution = new QuestionSolution(this.Id, content);
-
         }
+
+        public void RemoveSolution()
+        { Solution = null; }
     }
 }

@@ -2,6 +2,7 @@
 
 public interface IExerciseQuestionSolutionService
 {
-    Task<ExerciseDTO> UpdateQuestionSolutionAsync(UpdateQuestionSolutionRequest dto);
-    Task<ExerciseDTO> RemoveQuestionSolutionAsync(Guid questionId);
+    Task<ExerciseDTO> SetQuestionSolutionAsync(Guid exerciseId, CreateQuestionSolutionRequest dto);
+    Task<ExerciseDTO> UpdateQuestionSolutionAsync(Guid exerciseId, UpdateQuestionSolutionRequest dto);
+    Task<ExerciseDTO> RemoveQuestionSolutionAsync(Guid exerciseId, RemoveQuestionSolutionRequest dto);
 }
