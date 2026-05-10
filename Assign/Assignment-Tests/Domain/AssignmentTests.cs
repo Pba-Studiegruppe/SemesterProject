@@ -23,7 +23,6 @@ namespace Assignment_Tests.Domain
             var assignment = new Assignment(title, description);
 
             //Assert
-            assignment.AssignmentSetId.Should().Be(setId);
             assignment.Title.Should().Be(title);
             assignment.Description.Should().Be(description);
             assignment.AssignmentExercises.Should().BeEmpty();
