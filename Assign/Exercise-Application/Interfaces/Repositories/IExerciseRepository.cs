@@ -15,5 +15,7 @@ namespace Exercise_Application.Interfaces.Repositories
         Task<IEnumerable<Exercise>> GetByTeacherIdAsync(Guid teacherId);
         Task<IEnumerable<Exercise>> GetByKeywordsAsync(IEnumerable<Guid> keywordIds);
         Task<Exercise> UpdateAsync(Exercise exercise, byte[] rowVersion);
+        Task<Exercise?> GetForSnapshotAsync(Guid exerciseId);
+        Task<Exercise?> GetForEvaluationAsync(Guid exerciseId);
     }
 }

@@ -81,37 +81,67 @@ namespace Assignment_Application.Implementations
             };
         }
 
-        public async Task<AssignmentExerciseDTO> AddExerciseAsync(Guid assignmentId, CreateAssignmentExerciseRequest request)
+        public async Task<AssignmentExerciseDTO> AddExerciseAsync(
+            Guid assignmentId,
+            CreateAssignmentExerciseRequest request)
         {
-            throw new NotImplementedException();
-            //if (request is null) throw new ArgumentNullException(nameof(request));
+            if (request is null) throw new ArgumentNullException(nameof(request));
 
-            //var assignment = await _repository.GetByIdAsync(assignmentId);
-            //if (assignment is null) throw new KeyNotFoundException($"Assignment with id '{assignmentId}' not found.");
+            var assignment = await _repository.GetByIdAsync(assignmentId);
+            if (assignment is null)
+                throw new KeyNotFoundException($"Assignment with id '{assignmentId}' not found.");
 
-            //// domain may throw InvalidOperationException if duplicate
-            //assignment.AddExercise(request.ExerciseId);
+            var snapshot = await _exerciseProvider.GetExerciseSnapshotAsync(request.ExerciseId);
+            if (snapshot is null)
+                throw new KeyNotFoundException(
+                    $"Exercise with id '{request.ExerciseId}' not found.");
 
-            //await _repository.SaveChangesAsync();
+            // domain throws InvalidOperationException on duplicate
+            var assignmentExercise = assignment.AddExerciseFromSnapshot(snapshot);
 
-            //return new AssignmentExerciseDTO
-            //{
-            //    ExerciseId = request.ExerciseId
-            //};
+            await _repository.SaveChangesAsync();
+
+            return ToDto(assignmentExercise);
         }
 
-        public async Task RemoveExerciseAsync(Guid assignmentId, RemoveAssignmentExerciseRequest request)
+        public async Task RemoveExerciseAsync(
+            Guid assignmentId,
+            RemoveAssignmentExerciseRequest request)
         {
-            throw new NotImplementedException();
-            //if (request is null) throw new ArgumentNullException(nameof(request));
+            if (request is null) throw new ArgumentNullException(nameof(request));
 
-            //var assignment = await _repository.GetByIdAsync(assignmentId);
-            //if (assignment is null) throw new KeyNotFoundException($"Assignment with id '{assignmentId}' not found.");
+            var assignment = await _repository.GetByIdAsync(assignmentId);
+            if (assignment is null)
+                throw new KeyNotFoundException($"Assignment with id '{assignmentId}' not found.");
 
-            //// domain should throw if exercise not present
-            //assignment.RemoveExercise(request.ExerciseId);
+            // domain throws KeyNotFoundException if AE not in this assignment
+            assignment.RemoveExercise(request.AssignmentExerciseId);
 
-            //await _repository.SaveChangesAsync();
+            await _repository.SaveChangesAsync();
         }
+
+        private static AssignmentExerciseDTO ToDto(AssignmentExercise ae) =>
+            new()
+            {
+                Id = ae.Id,
+                AssignmentId = ae.AssignmentId,
+                SourceExerciseId = ae.SourceExerciseId,
+                Title = ae.Title,
+                Content = ae.Content,
+                Order = ae.Order,
+                SnapshotTakenAt = ae.SnapshotTakenAt,
+                TotalPoints = ae.TotalPoints,
+                Questions = ae.Questions
+                    .Select(q => new AssignmentQuestionDTO
+                    {
+                        Id = q.Id,
+                        SourceQuestionId = q.SourceQuestionId,
+                        Title = q.Title,
+                        Content = q.Content,
+                        Points = q.Points,
+                        Order = q.Order
+                    })
+                    .ToList()
+            };
     }
 }

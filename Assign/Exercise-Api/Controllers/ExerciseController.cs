@@ -11,10 +11,16 @@ namespace Exercise_Api.Controllers
     public class ExerciseController : ControllerBase
     {
         private readonly IExerciseService _exerciseService;
-
-        public ExerciseController(IExerciseService exerciseService)
+        private readonly IExerciseSnapshotQueryService _snapshotQuery;
+        private readonly IExerciseEvaluationQueryService _evaluationQuery;
+        public ExerciseController(
+            IExerciseService exerciseService,
+            IExerciseSnapshotQueryService snapshotQuery,
+            IExerciseEvaluationQueryService evaluationQuery)
         {
             _exerciseService = exerciseService;
+            _snapshotQuery = snapshotQuery;
+            _evaluationQuery = evaluationQuery;
         }
 
         [HttpPost]
@@ -63,6 +69,34 @@ namespace Exercise_Api.Controllers
             var updatedExercise = await _exerciseService.UpdateExerciseAsync(request);
             if (updatedExercise == null) return NotFound();
             return Ok(updatedExercise);
+        }
+
+        [HttpGet("{id}/snapshot")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetSnapshot(Guid id)
+        {
+            var projection = await _snapshotQuery.GetForSnapshotAsync(id);
+            if (projection is null) return NotFound();
+            return Ok(projection);
+        }
+
+        [HttpGet("{id}/evaluation")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetEvaluation(Guid id, [FromQuery] Guid teacherId)
+        {
+            try
+            {
+                var projection = await _evaluationQuery.GetForEvaluationAsync(id, teacherId);
+                if (projection is null) return NotFound();
+                return Ok(projection);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
         }
     }
 }

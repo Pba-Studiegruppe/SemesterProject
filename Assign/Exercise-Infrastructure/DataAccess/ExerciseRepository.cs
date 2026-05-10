@@ -57,5 +57,24 @@ namespace Exercise_Infrastructure.DataAccess
             await _dbContext.SaveChangesAsync();
             return exercise;
         }
+
+        public async Task<Exercise?> GetForSnapshotAsync(Guid exerciseId)
+        {
+            // Solutions deliberately not loaded — wrong tool for the job.
+            return await _dbContext.Exercises
+                .AsNoTracking()
+                .Include(e => e.Questions)
+                .FirstOrDefaultAsync(e => e.Id == exerciseId);
+        }
+
+        public async Task<Exercise?> GetForEvaluationAsync(Guid exerciseId)
+        {
+            return await _dbContext.Exercises
+                .AsNoTracking()
+                .Include(e => e.Solution)
+                .Include(e => e.Questions)
+                    .ThenInclude(q => q.Solution)
+                .FirstOrDefaultAsync(e => e.Id == exerciseId);
+        }
     }
 }
