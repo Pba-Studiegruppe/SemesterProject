@@ -22,6 +22,7 @@ public partial class Assignment
 
     public Assignment(string? title, string? description)
     {
+        Id = Guid.NewGuid();
         Title = title;
         Description = description;
     }

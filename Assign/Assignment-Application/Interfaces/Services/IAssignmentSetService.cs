@@ -11,7 +11,7 @@ namespace Assignment_Application.Interfaces.Services
     {
         Task<AssignmentSetDTO> GetAssignmentSetsAsync(Guid id);
         Task<IEnumerable<AssignmentSetDTO>> GetAssignmentSetsByCourseIdAsync(Guid courseId);
-        Task<AssignmentSetDTO> CreateAssignmentSetAsync(CreateAssignmentExerciseRequest request);
-         Task<AssignmentSetDTO> UpdateAssignmentSetAsync(UpdateAssignmentSetRequest request);
+        Task<AssignmentSetDTO> CreateAssignmentSetAsync(CreateAssignmentSetRequest request);
+         Task<AssignmentSetDTO> UpdateAssignmentSetAsync(Guid assignmentSetId, UpdateAssignmentSetRequest request);
     }
 }

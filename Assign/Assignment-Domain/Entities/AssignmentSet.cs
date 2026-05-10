@@ -24,6 +24,7 @@ public partial class AssignmentSet
 
     public AssignmentSet(Guid? courseId, string? title, string? description)
     {
+        Id = Guid.NewGuid();
         CourseId = courseId;
         IsPublihsed = false;
         GradingPublished = false;
@@ -48,6 +49,9 @@ public partial class AssignmentSet
 
         if (_assignments.Contains(assignment))
             throw new InvalidOperationException("Assignment already exists in set");
+
+        if (IsPublihsed == true)
+            throw new InvalidOperationException("Cannot add assignment to published set");
 
         assignment.SetAssignmentSet(Id);
         _assignments.Add(assignment);

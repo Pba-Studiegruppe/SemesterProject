@@ -127,13 +127,41 @@ namespace Assignment_Tests.Domain
         public void UpdateDescription_Should_Change_Description()
         {
             // Arrange
-            var assignment = new Assignment( null, "old");
+            var assignment = new Assignment(null, "old");
 
             // Act
             assignment.UpdateDescription("new");
 
             // Assert
             assignment.Description.Should().Be("new");
+        }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        [InlineData(false, false)]
+        public void Publish_Should_Throw_When_Requirements_Not_Met(bool hasCourse, bool hasAssignments)
+        {
+            // Arrange
+            var courseId = hasCourse
+                ? Guid.NewGuid()
+                : (Guid?)null;
+
+            var set = new AssignmentSet(courseId, "title", "desc");
+
+            if (hasAssignments)
+            {
+                var assignment = new Assignment("a", "b");
+                assignment.AddExercise(Guid.NewGuid());
+
+                set.AddAssignment(assignment);
+            }
+
+            // Act
+            Action act = () => set.Publish();
+
+            // Assert
+            act.Should().Throw<InvalidOperationException>();
         }
     }
 }

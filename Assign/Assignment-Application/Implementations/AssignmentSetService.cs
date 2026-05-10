@@ -18,7 +18,7 @@ namespace Assignment_Application.Implementations
             _repository = repository;
         }
 
-        public Task<AssignmentSetDTO> CreateAssignmentSetAsync(CreateAssignmentExerciseRequest request)
+        public Task<AssignmentSetDTO> CreateAssignmentSetAsync(CreateAssignmentSetRequest request)
         {
             throw new NotImplementedException();
         }
@@ -33,7 +33,7 @@ namespace Assignment_Application.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<AssignmentSetDTO> UpdateAssignmentSetAsync(UpdateAssignmentSetRequest request)
+        public Task<AssignmentSetDTO> UpdateAssignmentSetAsync(Guid assignmentSetId, UpdateAssignmentSetRequest request)
         {
             throw new NotImplementedException();
         }

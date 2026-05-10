@@ -18,22 +18,17 @@ namespace Assignment_Infrastructure.DataAccess
             this.dbContext = dbContext;
         }
 
-        public Task<AssignmentSet> AddAsync(AssignmentSet assignmentSet)
+        public Task CreateAsync(Assignment assignment)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<AssignmentSet>> GetByCourseIdAsync(Guid courseId)
+        public Task<Assignment?> GetByIdAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<AssignmentSet?> GetByIdAsync(Guid exerciseId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<AssignmentSet> UpdateAsync(AssignmentSet assignmentSet, byte[] rowVersion)
+        public Task SaveChangesAsync()
         {
             throw new NotImplementedException();
         }

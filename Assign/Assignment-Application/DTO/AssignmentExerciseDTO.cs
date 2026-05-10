@@ -8,15 +8,17 @@ namespace Assignment_Application.DTO
 {
     public class AssignmentExerciseDTO
     {
-
+        public Guid AssignmentId { get; set; }
+        public Guid ExerciseId { get; set; }
     }
 
     public class CreateAssignmentExerciseRequest
     {
-
+        public Guid ExerciseId { get; set; }
     }
 
-    public class RemoveAssignmentExerciseRequest 
+    public class RemoveAssignmentExerciseRequest
     {
+        public Guid ExerciseId { get; set; }
     }
 }

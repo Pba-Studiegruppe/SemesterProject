@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace Assignment_Application.Interfaces.Repositories
 {
-    public interface IAssignmentRepository
+    public interface IAssignmentSetRepository
     {
-        Task<Assignment?> GetByIdAsync(Guid id);
-        Task CreateAsync(Assignment assignment);
+        Task<AssignmentSet?> GetByIdAsync(Guid id);
+        Task<IEnumerable<AssignmentSet>> GetByCourseIdAsync(Guid courseId);
+        Task CreateAsync(AssignmentSet assignmentSet);
         Task SaveChangesAsync();
+
     }
 }
