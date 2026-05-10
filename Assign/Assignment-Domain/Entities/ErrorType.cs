@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Assignment_Api;
+namespace Assignment_Domain.Entities;
 
 public partial class ErrorType
 {

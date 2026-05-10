@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assignment_Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Assignment_Api;
@@ -65,7 +66,7 @@ public partial class AssignmentDbContext : DbContext
 
         modelBuilder.Entity<AssignmentExercise>(entity =>
         {
-            entity.HasKey(e => new { e.AssignmentId, e.ExerciseId });
+            entity.HasKey(e => new { e.AssignmentId, e.SourceExerciseId });
 
             entity.ToTable("AssignmentExercise");
 

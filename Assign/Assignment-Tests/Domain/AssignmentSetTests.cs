@@ -1,4 +1,6 @@
 ﻿using Assignment_Api;
+using Assignment_Domain.Entities;
+using Assignment_Domain.SnapShots;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
@@ -89,19 +91,22 @@ namespace Assignment_Tests.Domain
         [Fact]
         public void Publish_Should_Set_IsPublished_When_All_Assignments_Are_Valid()
         {
-    // Arrange
-    var set = new AssignmentSet(Guid.NewGuid(), "title", "desc");
+            // Arrange
+            var set = new AssignmentSet(Guid.NewGuid(), "title", "desc");
 
-    var assignment = new Assignment("a", "b");
-    assignment.AddExercise(Guid.NewGuid());
-    set.AddAssignment(assignment);
+            var assignment = new Assignment("a", "b");
+            assignment.AddExerciseFromSnapshot(new ExerciseSnapshotInput(
+            Guid.NewGuid(), "Ex", "C",
+            new List<QuestionSnapshotInput> { new(Guid.NewGuid(), "Q", "C") }));
 
-    // Act
-    Action act = () => set.Publish();
+            set.AddAssignment(assignment);
 
-    // Assert
-    act.Should().NotThrow();
-    set.IsPublihsed.Should().BeTrue();
+            // Act
+            Action act = () => set.Publish();
+
+            // Assert
+            act.Should().NotThrow();
+            set.IsPublihsed.Should().BeTrue();
         }
 
         [Fact]
@@ -158,7 +163,8 @@ namespace Assignment_Tests.Domain
             var set = new AssignmentSet(Guid.NewGuid(), "title", "desc");
 
             var valid = new Assignment("valid", "desc");
-            valid.AddExercise(Guid.NewGuid());
+            valid.AddExerciseFromSnapshot(new ExerciseSnapshotInput(Guid.NewGuid(), "Ex", "C",
+                new List<QuestionSnapshotInput> { new(Guid.NewGuid(), "Q", "C") }));
 
             var invalid = new Assignment("invalid", "desc");
             // no exercises

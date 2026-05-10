@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Assignment_Domain.Entities;
+using Assignment_Domain.SnapShots;
+using System;
 using System.Collections.Generic;
 
-namespace Assignment_Api;
+namespace Assignment_Domain.Entities;
 
 public partial class Assignment
 {
     public Guid Id { get; set; }
-    public int? TotalPoints { get; private set; }
+    public int TotalPoints => _assignmentExercises.Sum(ae => ae.TotalPoints);
     public Guid? AssignmentSetId { get; set; }
     public string? Title { get; private set; }
     public string? Description { get; private set; }
@@ -27,27 +29,45 @@ public partial class Assignment
         Description = description;
     }
 
-    public void AddExercise(Guid exerciseId)
+    public AssignmentExercise AddExerciseFromSnapshot(ExerciseSnapshotInput snapshot)
     {
-        if (_assignmentExercises.Any(e => e.ExerciseId == exerciseId))
+        if (snapshot is null)
+            throw new ArgumentNullException(nameof(snapshot));
+
+        if (_assignmentExercises.Any(ae => ae.SourceExerciseId == snapshot.SourceExerciseId))
+            throw new InvalidOperationException(
+                $"Exercise '{snapshot.SourceExerciseId}' is already in this assignment.");
+
+        var nextOrder = _assignmentExercises.Count == 0
+            ? 0
+            : _assignmentExercises.Max(ae => ae.Order) + 1;
+
+        var ae = new AssignmentExercise(
+            Id,
+            snapshot.SourceExerciseId,
+            snapshot.Title,
+            snapshot.Content,
+            nextOrder,
+            DateTime.UtcNow);
+
+        var qOrder = 0;
+        foreach (var q in snapshot.Questions)
         {
-            throw new InvalidOperationException($"Exercise with id '{exerciseId}' already exists in assignment.");
+            ae.AddQuestionFromSnapshot(q.SourceQuestionId, q.Title, q.Content, qOrder++);
         }
 
-        var exercise = new AssignmentExercise(Id, exerciseId);
-        _assignmentExercises.Add(exercise);
+        _assignmentExercises.Add(ae);
+        return ae;
     }
 
-    public void RemoveExercise(Guid exerciseId)
+    public void RemoveExercise(Guid assignmentExerciseId)
     {
-        var exercise = _assignmentExercises.FirstOrDefault(e => e.ExerciseId == exerciseId);
+        var ae = _assignmentExercises.FirstOrDefault(e => e.Id == assignmentExerciseId);
+        if (ae is null)
+            throw new KeyNotFoundException(
+                $"AssignmentExercise '{assignmentExerciseId}' not found.");
 
-        if (exercise == null)
-        {
-            throw new KeyNotFoundException($"Exercise with id '{exerciseId}' was not found in assignment.");
-        }
-
-        _assignmentExercises.Remove(exercise);
+        _assignmentExercises.Remove(ae);
     }
 
     public void AddSubmittedAssignment(SubmittedAssignment submittedAssignment)

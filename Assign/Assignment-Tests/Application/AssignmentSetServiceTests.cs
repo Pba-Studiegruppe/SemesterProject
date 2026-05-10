@@ -2,6 +2,8 @@
 using Assignment_Application.DTO;
 using Assignment_Application.Implementations;
 using Assignment_Application.Interfaces.Repositories;
+using Assignment_Domain.Entities;
+using Assignment_Domain.SnapShots;
 using FluentAssertions;
 using Moq;
 using System;
@@ -163,9 +165,10 @@ namespace Assignment_Tests.Application
                 "Assignment Set",
                 "Description");
 
-            var assignment = new Assignment("Assignment","Assignment Description");
+            var assignment = new Assignment("Assignment", "Assignment Description");
 
-            assignment.AddExercise(Guid.NewGuid());
+            assignment.AddExerciseFromSnapshot(new ExerciseSnapshotInput(Guid.NewGuid(), "Ex", "C",
+                new List<QuestionSnapshotInput> { new(Guid.NewGuid(), "Q", "C") }));
 
             assignmentSet.AddAssignment(assignment);
 

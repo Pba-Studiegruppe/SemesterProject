@@ -1,5 +1,6 @@
 ﻿using Assignment_Api;
 using Assignment_Application.Interfaces.Repositories;
+using Assignment_Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

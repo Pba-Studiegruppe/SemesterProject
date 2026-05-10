@@ -1,7 +1,7 @@
-﻿using Assignment_Api;
-using Assignment_Application.DTO;
+﻿using Assignment_Application.DTO;
 using Assignment_Application.Interfaces.Repositories;
 using Assignment_Application.Interfaces.Services;
+using Assignment_Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,7 +1,9 @@
-﻿using Assignment_Api;
+﻿
 using Assignment_Application.DTO;
+using Assignment_Application.Interfaces;
 using Assignment_Application.Interfaces.Repositories;
 using Assignment_Application.Interfaces.Services;
+using Assignment_Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +15,12 @@ namespace Assignment_Application.Implementations
     public class AssignmentService : IAssignmentService
     {
         private readonly IAssignmentRepository _repository;
+        private readonly IExerciseProvider _exerciseProvider;
 
-        public AssignmentService(IAssignmentRepository repository)
+        public AssignmentService(IAssignmentRepository repository, IExerciseProvider exerciseProvider)
         {
             _repository = repository;
+            _exerciseProvider = exerciseProvider;
         }
 
         public async Task<AssignmentDTO> CreateAssignmentAsync(CreateAssignmentRequest request)
@@ -79,33 +83,35 @@ namespace Assignment_Application.Implementations
 
         public async Task<AssignmentExerciseDTO> AddExerciseAsync(Guid assignmentId, CreateAssignmentExerciseRequest request)
         {
-            if (request is null) throw new ArgumentNullException(nameof(request));
+            throw new NotImplementedException();
+            //if (request is null) throw new ArgumentNullException(nameof(request));
 
-            var assignment = await _repository.GetByIdAsync(assignmentId);
-            if (assignment is null) throw new KeyNotFoundException($"Assignment with id '{assignmentId}' not found.");
+            //var assignment = await _repository.GetByIdAsync(assignmentId);
+            //if (assignment is null) throw new KeyNotFoundException($"Assignment with id '{assignmentId}' not found.");
 
-            // domain may throw InvalidOperationException if duplicate
-            assignment.AddExercise(request.ExerciseId);
+            //// domain may throw InvalidOperationException if duplicate
+            //assignment.AddExercise(request.ExerciseId);
 
-            await _repository.SaveChangesAsync();
+            //await _repository.SaveChangesAsync();
 
-            return new AssignmentExerciseDTO
-            {
-                ExerciseId = request.ExerciseId
-            };
+            //return new AssignmentExerciseDTO
+            //{
+            //    ExerciseId = request.ExerciseId
+            //};
         }
 
         public async Task RemoveExerciseAsync(Guid assignmentId, RemoveAssignmentExerciseRequest request)
         {
-            if (request is null) throw new ArgumentNullException(nameof(request));
+            throw new NotImplementedException();
+            //if (request is null) throw new ArgumentNullException(nameof(request));
 
-            var assignment = await _repository.GetByIdAsync(assignmentId);
-            if (assignment is null) throw new KeyNotFoundException($"Assignment with id '{assignmentId}' not found.");
+            //var assignment = await _repository.GetByIdAsync(assignmentId);
+            //if (assignment is null) throw new KeyNotFoundException($"Assignment with id '{assignmentId}' not found.");
 
-            // domain should throw if exercise not present
-            assignment.RemoveExercise(request.ExerciseId);
+            //// domain should throw if exercise not present
+            //assignment.RemoveExercise(request.ExerciseId);
 
-            await _repository.SaveChangesAsync();
+            //await _repository.SaveChangesAsync();
         }
     }
 }
