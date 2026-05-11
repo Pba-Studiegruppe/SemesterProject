@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Exercise_Application.Projections
 {
-    public sealed record ExerciseEvaluationProjection(
+    public sealed record ExerciseReviewProjection(
         Guid Id,
         string Title,
         string Content,
         ExerciseSolutionProjection? Solution,
-        IReadOnlyList<QuestionEvaluationProjection> Questions);
+        IReadOnlyList<QuestionReviewProjection> Questions);
 
-    public sealed record QuestionEvaluationProjection(
+    public sealed record QuestionReviewProjection(
         Guid Id,
         string Title,
         string Content,

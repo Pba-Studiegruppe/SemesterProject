@@ -8,14 +8,12 @@ using System.Threading.Tasks;
 namespace Exercise_Application.Interfaces.Services
 {
     /// <summary>
-    /// Teacher-authorized projection of an Exercise that includes solutions.
-    /// Implementation is responsible for verifying the requester is permitted
-    /// to see solution data.
+    /// Projection of an Exercise including its solutions, for any teacher
+    /// browsing the exercise catalog to review an exercise before adding it
+    /// to one of their assignments.
     /// </summary>
-    public interface IExerciseEvaluationQueryService
+    public interface IExerciseReviewQueryService
     {
-        Task<ExerciseEvaluationProjection?> GetForEvaluationAsync(
-            Guid exerciseId,
-            Guid teacherId);
+        Task<ExerciseReviewProjection?> GetForReviewAsync(Guid exerciseId);
     }
 }

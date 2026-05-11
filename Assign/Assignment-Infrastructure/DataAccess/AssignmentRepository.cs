@@ -2,36 +2,35 @@
 using Assignment_Application.Interfaces.Repositories;
 using Assignment_Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Assignment_Infrastructure.DataAccess
 {
-    public class AssignmentRepository: IAssignmentRepository
+    public class AssignmentRepository : IAssignmentRepository
     {
-        private DbContext dbContext;
+        private readonly AssignmentDbContext _dbContext;
 
-        public AssignmentRepository(DbContext dbContext)
+        public AssignmentRepository(AssignmentDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public Task CreateAsync(Assignment assignment)
         {
-            throw new NotImplementedException();
+            _dbContext.Assignments.Add(assignment);
+            return Task.CompletedTask;
         }
 
-        public Task<Assignment?> GetByIdAsync(Guid id)
+        public async Task<Assignment?> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Assignments
+                .Include(a => a.AssignmentExercises)
+                    .ThenInclude(ae => ae.Questions)
+                .FirstOrDefaultAsync(a => a.Id == id);
         }
 
         public Task SaveChangesAsync()
         {
-            throw new NotImplementedException();
+            return _dbContext.SaveChangesAsync();
         }
     }
 }

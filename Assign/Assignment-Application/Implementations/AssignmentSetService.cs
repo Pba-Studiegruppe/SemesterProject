@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Assignment_Application.Implementations
 {
-    public class AssignmentSetService: IAssignmentSetService
+    public class AssignmentSetService : IAssignmentSetService
     {
         private readonly IAssignmentSetRepository _repository;
 
@@ -81,8 +81,30 @@ namespace Assignment_Application.Implementations
                         Id = a.Id,
                         Title = a.Title,
                         Description = a.Description,
-                        Exercises = (a.AssignmentExercises ?? new List<AssignmentExercise>())
-                            .Select(e => new AssignmentExerciseDTO())
+                        TotalPoints = a.TotalPoints,
+                        Exercises = a.AssignmentExercises
+                            .Select(ae => new AssignmentExerciseDTO
+                            {
+                                Id = ae.Id,
+                                AssignmentId = ae.AssignmentId,
+                                SourceExerciseId = ae.SourceExerciseId,
+                                Title = ae.Title,
+                                Content = ae.Content,
+                                Order = ae.Order,
+                                SnapshotTakenAt = ae.SnapshotTakenAt,
+                                TotalPoints = ae.TotalPoints,
+                                Questions = ae.Questions
+                                    .Select(q => new AssignmentQuestionDTO
+                                    {
+                                        Id = q.Id,
+                                        SourceQuestionId = q.SourceQuestionId,
+                                        Title = q.Title,
+                                        Content = q.Content,
+                                        Points = q.Points,
+                                        Order = q.Order
+                                    })
+                                    .ToList()
+                            })
                             .ToList()
                     })
                     .ToList()

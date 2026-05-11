@@ -67,7 +67,7 @@ namespace Exercise_Infrastructure.DataAccess
                 .FirstOrDefaultAsync(e => e.Id == exerciseId);
         }
 
-        public async Task<Exercise?> GetForEvaluationAsync(Guid exerciseId)
+        public async Task<Exercise?> GetForReviewAsync(Guid exerciseId)
         {
             return await _dbContext.Exercises
                 .AsNoTracking()

@@ -25,7 +25,7 @@ builder.Services.AddScoped<IKeywordService, KeywordService>();
 builder.Services.AddScoped<IExerciseSolutionService, ExerciseSolutionService>();
 builder.Services.AddScoped<IExerciseQuestionService, ExerciseQuestionService>();
 builder.Services.AddScoped<IExerciseSnapshotQueryService, ExerciseSnapshotQueryService>();
-builder.Services.AddScoped<IExerciseEvaluationQueryService, ExerciseEvaluationQueryService>();
+builder.Services.AddScoped<IExerciseReviewQueryService, ExerciseReviewQueryService>();
 
 var app = builder.Build();
 
