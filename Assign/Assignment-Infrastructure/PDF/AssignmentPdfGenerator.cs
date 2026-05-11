@@ -9,7 +9,8 @@ using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
 using iText.Layout.Properties;
-
+using iText.Kernel.Font;
+using iText.IO.Font.Constants;
 
 
 // Lavet ved hjælp af Claude
@@ -25,12 +26,14 @@ namespace Assignment_Infrastructure.Pdf
             _repository = repository;
         }
 
+
         public async Task<byte[]> GenerateAsync(Guid assignmentId)
         {
             var assignment = await _repository.GetByIdAsync(assignmentId);
             if (assignment is null)
                 throw new KeyNotFoundException($"Assignment '{assignmentId}' not found.");
 
+            var bold = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
             using var ms = new MemoryStream();
             using (var writer = new PdfWriter(ms))
             using (var pdf = new PdfDocument(writer))
@@ -41,7 +44,7 @@ namespace Assignment_Infrastructure.Pdf
                 // Header
                 doc.Add(new Paragraph(assignment.Title ?? string.Empty)
                     .SetFontSize(20)
-                    .SimulateBold());
+                    .SetFont(bold));
 
                 if (!string.IsNullOrWhiteSpace(assignment.Description))
                     doc.Add(new Paragraph(assignment.Description));
@@ -57,7 +60,7 @@ namespace Assignment_Infrastructure.Pdf
                 {
                     doc.Add(new Paragraph(exercise.Title)
                         .SetFontSize(14)
-                        .SimulateBold()
+                        .SetFont(bold)
                         .SetMarginTop(16));
 
                     if (!string.IsNullOrWhiteSpace(exercise.Content))
@@ -66,7 +69,7 @@ namespace Assignment_Infrastructure.Pdf
                     foreach (var question in exercise.Questions.OrderBy(q => q.Order))
                     {
                         doc.Add(new Paragraph($"{question.Title}  ({question.Points} pts)")
-                            .SimulateBold()
+                            .SetFont(bold)
                             .SetMarginTop(8));
 
                         if (!string.IsNullOrWhiteSpace(question.Content))
