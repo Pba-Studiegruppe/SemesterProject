@@ -1,0 +1,128 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   ASSIGN — Teacher workspace
+   Refined-academic design system: warm paper background, deep navy primary,
+   serif headings (Fraunces) + clean sans-serif body (Geist).
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+    /* Surfaces */
+    --paper: #FBFAF7;
+    --paper-deep: #F5F2EB;
+    --surface: #FFFFFF;
+    --surface-hover: #F4F1EA;
+    --surface-sunken: #F8F6F0;
+
+    /* Ink (text) */
+    --ink: #11151C;
+    --ink-2: #4A5160;
+    --ink-3: #8B92A0;
+    --ink-4: #B5BAC2;
+
+    /* Borders */
+    --border: #ECE9E1;
+    --border-2: #DDD8CB;
+    --border-strong: #C7C1B0;
+
+    /* Brand */
+    --primary: #1B3A5F;
+    --primary-2: #2C4E78;
+    --primary-soft: #EDF2F8;
+    --primary-soft-2: #DCE6F1;
+
+    /* Accent (used for solutions / optional supporting material) */
+    --gold: #A07A3D;
+    --gold-soft: #FAF3E4;
+    --gold-soft-2: #F2E7CC;
+
+    /* Status */
+    --danger: #A53F3F;
+    --danger-soft: #FBEEEE;
+    --success: #2E6B4D;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(17, 21, 28, 0.04);
+    --shadow-md: 0 1px 2px rgba(17, 21, 28, 0.04), 0 4px 12px -4px rgba(17, 21, 28, 0.06);
+    --shadow-lg: 0 1px 2px rgba(17, 21, 28, 0.05), 0 12px 32px -12px rgba(17, 21, 28, 0.14);
+
+    /* Radii */
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 14px;
+    --r-xl: 18px;
+
+    /* Type */
+    --font-serif: 'Fraunces', 'Charter', Georgia, serif;
+    --font-sans: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+a {
+    color: var(--primary);
+}
+
+/* Scrollbar refinement */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 5px; border: 2px solid var(--paper); }
+::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+/* Focus rings */
+:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Selection */
+::selection {
+    background: var(--primary-soft-2);
+    color: var(--primary);
+}
+
+/* Blazor error UI */
+#blazor-error-ui {
+    background: var(--ink);
+    color: white;
+    bottom: 0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+    display: none;
+    left: 0;
+    padding: 0.75rem 1.5rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    top: 0.75rem;
+}

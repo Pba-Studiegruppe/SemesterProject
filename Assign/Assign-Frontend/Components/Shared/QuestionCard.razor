@@ -1,0 +1,94 @@
+@using Assign_Frontend.Models
+@* A single question inside the exercise editor. Expandable / collapsible. *@
+
+<div class="qcard @(Question.Expanded ? "qcard-open" : "qcard-collapsed")">
+    <header class="qcard-head" @onclick="ToggleExpanded">
+        <div class="qcard-index">Q@(Index + 1)</div>
+
+        <div class="qcard-head-main">
+            @if (Question.Expanded)
+            {
+                <input type="text"
+                       class="qcard-title-input"
+                       @bind="Question.Title"
+                       @bind:event="oninput"
+                       @onclick:stopPropagation
+                       placeholder="Question title — e.g. 'Find the derivative of f(x)'" />
+            }
+            else
+            {
+                <div class="qcard-title-preview">
+                    @(string.IsNullOrWhiteSpace(Question.Title) ? "Untitled question" : Question.Title)
+                </div>
+            }
+        </div>
+
+        <div class="qcard-head-actions" @onclick:stopPropagation>
+            @if (Question.SolutionContent is { Length: > 0 })
+            {
+                <span class="qcard-tag qcard-tag-gold" title="Solution attached">solution</span>
+            }
+            <button type="button" class="qcard-chev" @onclick="ToggleExpanded" aria-label="Toggle question">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    @if (Question.Expanded)
+    {
+        <div class="qcard-body">
+            <div class="qcard-field">
+                <label class="field-label">Question content</label>
+                <RichTextEditor @bind-Value="Question.Content"
+                                Placeholder="Describe what the student needs to do…" />
+            </div>
+
+            @* ── Solution (collapsible, optional) ─────────────────────── *@
+            <div class="qsol @(Question.SolutionExpanded ? "qsol-open" : "")">
+                <button type="button" class="qsol-toggle" @onclick="ToggleSolution">
+                    <span class="qsol-chev @(Question.SolutionExpanded ? "qsol-chev-open" : "")">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </span>
+                    <span class="qsol-label">Question solution</span>
+                    <span class="qsol-optional">Optional</span>
+                </button>
+
+                @if (Question.SolutionExpanded)
+                {
+                    <div class="qsol-body">
+                        <RichTextEditor @bind-Value="Question.SolutionContent"
+                                        Placeholder="The intended solution or worked answer…" />
+                    </div>
+                }
+            </div>
+
+            <footer class="qcard-foot">
+                <button type="button" class="ghost-btn" @onclick="OnDuplicate">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Duplicate question
+                </button>
+                <button type="button" class="ghost-btn ghost-btn-danger" @onclick="OnDelete">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                    Delete question
+                </button>
+            </footer>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public QuestionFormItem Question { get; set; } = default!;
+    [Parameter] public int Index { get; set; }
+    [Parameter] public EventCallback<QuestionFormItem> OnDuplicateRequested { get; set; }
+    [Parameter] public EventCallback<QuestionFormItem> OnDeleteRequested { get; set; }
+
+    private void ToggleExpanded() => Question.Expanded = !Question.Expanded;
+    private void ToggleSolution() => Question.SolutionExpanded = !Question.SolutionExpanded;
+
+    private Task OnDuplicate() => OnDuplicateRequested.InvokeAsync(Question);
+    private Task OnDelete() => OnDeleteRequested.InvokeAsync(Question);
+}

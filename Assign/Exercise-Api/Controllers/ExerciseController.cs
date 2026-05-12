@@ -2,74 +2,81 @@
 using Exercise_Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
-public class ExerciseController : ControllerBase
+namespace Exercise_Api.Controllers
 {
-    private readonly IExerciseService _exerciseService;
-    private readonly IExerciseSnapshotQueryService _snapshotQuery;
-    private readonly IExerciseReviewQueryService _reviewQuery;
-
-    public ExerciseController(
-        IExerciseService exerciseService,
-        IExerciseSnapshotQueryService snapshotQuery,
-        IExerciseReviewQueryService reviewQuery)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ExerciseController : ControllerBase
     {
-        _exerciseService = exerciseService;
-        _snapshotQuery = snapshotQuery;
-        _reviewQuery = reviewQuery;
-    }
+        private readonly IExerciseService _exerciseService;
+        private readonly IExerciseSnapshotQueryService _snapshotQuery;
+        private readonly IExerciseReviewQueryService _reviewQuery;
 
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateExercise([FromBody] CreateExerciseRequest request)
-    {
-        var created = await _exerciseService.CreateExerciseAsync(request);
-        return CreatedAtAction(nameof(GetReview), new { id = created.Id }, created);
-    }
+        public ExerciseController(
+            IExerciseService exerciseService,
+            IExerciseSnapshotQueryService snapshotQuery,
+            IExerciseReviewQueryService reviewQuery)
+        {
+            _exerciseService = exerciseService;
+            _snapshotQuery = snapshotQuery;
+            _reviewQuery = reviewQuery;
+        }
 
-    [HttpGet("by-teacher/{teacherId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetExercisesByTeacherId(Guid teacherId)
-    {
-        var exercises = await _exerciseService.GetExercisesByTeacherIdAsync(teacherId);
-        return Ok(exercises);
-    }
 
-    [HttpGet("by-keywords")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetExercisesByKeywords([FromQuery] List<Guid> keywordIds)
-    {
-        var exercises = await _exerciseService.GetExerciseByExerciseKeywords(keywordIds);
-        return Ok(exercises);
-    }
 
-    [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateExercise(Guid id, [FromBody] UpdateExerciseRequest request)
-    {
-        var updated = await _exerciseService.UpdateExerciseAsync(request);
-        if (updated is null) return NotFound();
-        return Ok(updated);
-    }
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateExercise([FromBody] CreateExerciseRequest request)
+        {
+            var created = await _exerciseService.CreateExerciseAsync(request);
+            return CreatedAtAction(nameof(GetReview), new { id = created.Id }, created);
+        }
 
-    [HttpGet("{id}/snapshot")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetSnapshot(Guid id)
-    {
-        var projection = await _snapshotQuery.GetForSnapshotAsync(id);
-        if (projection is null) return NotFound();
-        return Ok(projection);
-    }
+        [HttpGet("by-teacher/{teacherId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetExercisesByTeacherId(Guid teacherId)
+        {
+            var exercises = await _exerciseService.GetExercisesByTeacherIdAsync(teacherId);
+            return Ok(exercises);
+        }
 
-    [HttpGet("{id}/review")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetReview(Guid id)
-    {
-        var projection = await _reviewQuery.GetForReviewAsync(id);
-        if (projection is null) return NotFound();
-        return Ok(projection);
+        [HttpGet("by-keywords")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetExercisesByKeywords([FromQuery] List<Guid> keywordIds)
+        {
+            var exercises = await _exerciseService.GetExerciseByExerciseKeywords(keywordIds);
+            return Ok(exercises);
+        }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateExercise(Guid id, [FromBody] UpdateExerciseRequest request)
+        {
+            var updated = await _exerciseService.UpdateExerciseAsync(request);
+            if (updated is null) return NotFound();
+            return Ok(updated);
+        }
+
+        [HttpGet("{id}/snapshot")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetSnapshot(Guid id)
+        {
+            var projection = await _snapshotQuery.GetForSnapshotAsync(id);
+            if (projection is null) return NotFound();
+            return Ok(projection);
+        }
+
+        [HttpGet("{id}/review")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetReview(Guid id)
+        {
+            var projection = await _reviewQuery.GetForReviewAsync(id);
+            if (projection is null) return NotFound();
+            return Ok(projection);
+        }
     }
 }

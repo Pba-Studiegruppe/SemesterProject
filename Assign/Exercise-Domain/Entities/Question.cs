@@ -10,9 +10,7 @@ namespace Exercise_Domain.Entities
     public class Question : Entity
     {
         public Guid ExerciseId { get; private set; }
-
         public string Title { get; private set; }
-
         public string Content { get; private set; }
         public QuestionSolution? Solution { get; private set; }
 

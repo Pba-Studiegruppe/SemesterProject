@@ -1,0 +1,131 @@
+@using System.Linq
+@using Assign_Frontend.Models
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="kw">
+    <div class="kw-head">
+        <label class="kw-label">@Label</label>
+        @if (!string.IsNullOrEmpty(Description))
+        {
+            <p class="kw-desc">@Description</p>
+        }
+    </div>
+
+    <div class="kw-control @(_isFocused ? "kw-focused" : "")">
+        @if (SelectedIds.Count > 0)
+        {
+            <div class="kw-chips">
+                @foreach (var id in SelectedIds)
+                {
+                    var keyword = Available.FirstOrDefault(k => k.Id == id);
+                    if (keyword is null) continue;
+                    <span class="kw-chip">
+                        <span class="kw-chip-dot"></span>
+                        @keyword.KeywordName
+                        <button type="button"
+                                class="kw-chip-x"
+                                @onclick="() => Remove(id)"
+                                title="Remove">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </span>
+                }
+            </div>
+        }
+
+        <input type="text"
+               class="kw-input"
+               placeholder="@(SelectedIds.Count == 0 ? Placeholder : "Add another…")"
+               @bind="_query"
+               @bind:event="oninput"
+               @onfocus="() => _isFocused = true"
+               @onblur="OnBlur"
+               @onkeydown="HandleKey" />
+    </div>
+
+    @if (_isFocused && Filtered.Any())
+    {
+        <div class="kw-dropdown">
+            @foreach (var k in Filtered.Take(8))
+            {
+                <button type="button"
+                        class="kw-opt"
+                        @onmousedown:preventDefault="true"
+                        @onclick="() => Add(k.Id)">
+                    <span class="kw-opt-name">@k.KeywordName</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+            }
+        </div>
+    }
+    else if (_isFocused && !string.IsNullOrWhiteSpace(_query) && Available.Count > 0)
+    {
+        <div class="kw-dropdown kw-dropdown-empty">
+            No matches for "@_query".
+        </div>
+    }
+    else if (Available.Count == 0)
+    {
+        <div class="kw-dropdown kw-dropdown-empty kw-static">
+            No keywords of this type yet. Create them via the API or seed the database.
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter] public string Description { get; set; } = "";
+    [Parameter] public string Placeholder { get; set; } = "Type to search…";
+
+    /// <summary>All keywords matching this category — filtered upstream by KeywordType.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<KeywordDto> Available { get; set; } = Array.Empty<KeywordDto>();
+
+    [Parameter] public List<Guid> SelectedIds { get; set; } = new();
+    [Parameter] public EventCallback<List<Guid>> SelectedIdsChanged { get; set; }
+
+    private string _query = "";
+    private bool _isFocused;
+
+    private IEnumerable<KeywordDto> Filtered =>
+        Available
+            .Where(k => !SelectedIds.Contains(k.Id))
+            .Where(k => string.IsNullOrWhiteSpace(_query)
+                        || k.KeywordName.Contains(_query, StringComparison.OrdinalIgnoreCase));
+
+    private async Task Add(Guid id)
+    {
+        if (!SelectedIds.Contains(id))
+        {
+            SelectedIds.Add(id);
+            await SelectedIdsChanged.InvokeAsync(SelectedIds);
+        }
+        _query = "";
+    }
+
+    private async Task Remove(Guid id)
+    {
+        SelectedIds.Remove(id);
+        await SelectedIdsChanged.InvokeAsync(SelectedIds);
+    }
+
+    private async Task HandleKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            var first = Filtered.FirstOrDefault();
+            if (first is not null) await Add(first.Id);
+        }
+        else if (e.Key == "Backspace" && string.IsNullOrEmpty(_query) && SelectedIds.Count > 0)
+        {
+            await Remove(SelectedIds[^1]);
+        }
+    }
+
+    private async Task OnBlur()
+    {
+        // Delay so a click on a dropdown option still registers.
+        await Task.Delay(120);
+        _isFocused = false;
+        StateHasChanged();
+    }
+}

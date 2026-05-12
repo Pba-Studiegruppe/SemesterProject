@@ -1,4 +1,29 @@
-﻿version: "3.9"
+﻿# version: "3.9"
+
+# services:
+
+#   sqlserver:
+#     image: mcr.microsoft.com/mssql/server:2022-latest
+#     container_name: sqlserver
+#     environment:
+#       ACCEPT_EULA: ${ACCEPT_EULA}
+#       SA_PASSWORD: ${SA_PASSWORD}
+#     ports:
+#       - "${SQL_PORT}:1433"
+#     volumes:
+#       - sqlserver_data:/var/opt/mssql
+#       - ./docker/sqlserver:/docker-entrypoint-initdb.d
+#     healthcheck:
+#       test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -Q 'SELECT 1'"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 10
+  
+
+# volumes:
+#   sqlserver_data:
+
+version: "3.9"
 
 services:
 
@@ -18,7 +43,39 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-  
+
+  exercise-api:
+    build:
+      context: .
+      dockerfile: Exercise-Api/Dockerfile
+    container_name: exercise-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__DefaultConnectionGateway: "Server=sqlserver,1433;Database=AssignDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true"
+    ports:
+      - "5199:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  assignment-api:
+    build:
+      context: .
+      dockerfile: Assignment-Api/Dockerfile
+    container_name: assignment-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=AssignDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true"
+      ExerciseApi__BaseUrl: "http://exercise-api:8080"
+    ports:
+      - "5158:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      exercise-api:
+        condition: service_started
 
 volumes:
-  sqlserver_data:
+  sqlserver_data:  

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Assignment_Api.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class AssignmentController : Controller
     {
         private readonly IAssignmentPdfService _pdfService;
