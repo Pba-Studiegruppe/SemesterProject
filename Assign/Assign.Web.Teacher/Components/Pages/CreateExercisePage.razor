@@ -1,0 +1,411 @@
+﻿@page "/create-exercise"
+
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="min-h-screen bg-gray-50">
+
+    <div class="max-w-7xl mx-auto px-6 py-6">
+
+        <div class="mb-6">
+
+            <div class="flex items-center gap-2 text-sm text-gray-600 mb-4">
+
+                <span class="hover:text-gray-900 cursor-pointer">
+                    Dashboard
+                </span>
+
+                <i class="fas fa-chevron-right w-4 h-4"></i>
+
+                <span class="hover:text-gray-900 cursor-pointer">
+                    Exercises
+                </span>
+
+                <i class="fas fa-chevron-right w-4 h-4"></i>
+
+                <span class="text-gray-900">
+                    Create Exercise
+                </span>
+            </div>
+
+            <h1 class="text-3xl">
+                Create Exercise
+            </h1>
+        </div>
+
+        <div class="flex gap-6">
+
+            <!-- LEFT SIDE -->
+            <div class="flex-1 space-y-6">
+
+                <!-- Exercise Info -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
+
+                    <div>
+                        <label class="block mb-2 text-sm text-gray-700">
+                            Exercise Title
+                        </label>
+
+                        <input type="text"
+                               value="@ExerciseTitle"
+                               @oninput="HandleExerciseTitleChanged"
+                               placeholder="Enter exercise title..."
+                               class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    </div>
+
+                    <div>
+                        <label class="block mb-2 text-sm text-gray-700">
+                            Exercise Description
+                        </label>
+
+                        <RichTextEditor
+                            Placeholder="Describe the exercise objectives, context, and instructions..."
+                            MinHeight="200px" />
+                    </div>
+
+                    <div class="flex gap-3">
+
+                        <button type="button"
+                                class="inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+
+                            <i class="fas fa-image w-4 h-4"></i>
+                            Add Image
+                        </button>
+
+                        <button type="button"
+                                class="inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+
+                            <i class="fas fa-link w-4 h-4"></i>
+                            Add Video Link
+                        </button>
+
+                        <button type="button"
+                                class="inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+
+                            <i class="fas fa-upload w-4 h-4"></i>
+                            Add File
+                        </button>
+
+                    </div>
+                </div>
+
+                <!-- Questions -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
+
+                    <div>
+                        <h2 class="mb-1">
+                            Questions (Optional)
+                        </h2>
+
+                        <p class="text-sm text-gray-600">
+                            You can split the exercise into smaller questions.
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+
+                        @for (int i = 0; i < Questions.Count; i++)
+                        {
+                            var index = i;
+
+                            <QuestionCard QuestionNumber="@(index + 1)"
+                                          OnDuplicate="@(() => DuplicateQuestion(index))"
+                                          OnDelete="@(() => DeleteQuestion(index))" />
+                        }
+
+                    </div>
+
+                    <button type="button"
+                            @onclick="AddQuestion"
+                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-sm bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+
+                        <i class="fas fa-plus w-4 h-4"></i>
+                        Add Question
+                    </button>
+
+                </div>
+
+                <!-- Exercise Solution -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-4">
+
+                    <div class="flex items-center justify-between">
+
+                        <h2>
+                            Exercise Solution (Optional)
+                        </h2>
+
+                        <button type="button"
+                                @onclick="ToggleExerciseSolution"
+                                class="text-blue-600 hover:text-blue-700 transition-colors">
+
+                            @if (ShowExerciseSolution)
+                            {
+                                <i class="fas fa-chevron-down w-5 h-5"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-plus w-5 h-5"></i>
+                            }
+
+                        </button>
+                    </div>
+
+                    @if (ShowExerciseSolution)
+                    {
+                        <div class="space-y-4">
+
+                            <RichTextEditor
+                                Placeholder="Enter complete exercise solution..."
+                                Value="@ExerciseSolution"
+                                ValueChanged="HandleExerciseSolutionChanged"
+                                MinHeight="150px" />
+
+                            <div class="flex gap-3">
+
+                                <button type="button"
+                                        class="inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+
+                                    <i class="fas fa-image w-4 h-4"></i>
+                                    Add Image
+                                </button>
+
+                                <button type="button"
+                                        class="inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+
+                                    <i class="fas fa-link w-4 h-4"></i>
+                                    Add Video Link
+                                </button>
+
+                            </div>
+
+                            <div class="flex items-center gap-3 pt-2 border-t border-gray-200">
+
+                                <input type="checkbox"
+                                       checked="@StudentsCanViewSolution"
+                                       @onchange="HandleStudentsCanViewSolutionChanged"
+                                       class="w-4 h-4" />
+
+                                <span class="text-sm text-gray-700">
+                                    Students can view this solution
+                                </span>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="w-80 space-y-4">
+
+                <!-- Keywords -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 space-y-4">
+
+                    <h3>
+                        Keywords
+                    </h3>
+
+                    <KeywordSelector
+                        Label="School Subject"
+                        Options="@SubjectOptions"
+                        Placeholder="Search or add subjects..." />
+
+                    <KeywordSelector
+                        Label="Exercise Type"
+                        Options="@ExerciseTypeOptions"
+                        Placeholder="Search or add types..." />
+
+                    <KeywordSelector
+                        Label="Subject Area"
+                        Options="@SubjectAreaOptions"
+                        Placeholder="Search or add areas..." />
+
+                </div>
+
+                <!-- Settings -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 space-y-4">
+
+                    <h3>
+                        Exercise Settings
+                    </h3>
+
+                    <div>
+
+                        <label class="block mb-2 text-sm text-gray-700">
+                            Difficulty
+                        </label>
+
+                        <select value="@Difficulty"
+                                @onchange="HandleDifficultyChanged"
+                                class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                            <option>Easy</option>
+                            <option>Medium</option>
+                            <option>Hard</option>
+
+                        </select>
+
+                    </div>
+
+                    <div>
+
+                        <label class="block mb-2 text-sm text-gray-700">
+                            Estimated Time (minutes)
+                        </label>
+
+                        <input type="number"
+                               value="@EstimatedTime"
+                               @oninput="HandleEstimatedTimeChanged"
+                               placeholder="30"
+                               class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+                    </div>
+
+                    <div>
+
+                        <label class="block mb-2 text-sm text-gray-700">
+                            Visibility
+                        </label>
+
+                        <select value="@Visibility"
+                                @onchange="HandleVisibilityChanged"
+                                class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                            <option>Private</option>
+                            <option>Shared with School</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="flex items-center justify-end gap-3 mt-6 pb-8">
+
+            <button type="button"
+                    class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+
+                Cancel
+            </button>
+
+            <button type="button"
+                    class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+
+                Save Draft
+            </button>
+
+            <button type="button"
+                    class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+
+                Publish Exercise
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    private List<int> Questions = new();
+
+    private string ExerciseTitle = string.Empty;
+
+    private bool ShowExerciseSolution = false;
+
+    private string ExerciseSolution = string.Empty;
+
+    private bool StudentsCanViewSolution = false;
+
+    private string Difficulty = "Medium";
+
+    private string EstimatedTime = string.Empty;
+
+    private string Visibility = "Private";
+
+    private List<string> SubjectOptions = new()
+    {
+        "Math",
+        "Physics",
+        "Chemistry",
+        "Biology",
+        "English",
+        "History"
+    };
+
+    private List<string> ExerciseTypeOptions = new()
+    {
+        "Multiple Choice",
+        "Theory",
+        "Calculation",
+        "Essay",
+        "Practical"
+    };
+
+    private List<string> SubjectAreaOptions = new()
+    {
+        "Algebra",
+        "Geometry",
+        "Thermodynamics",
+        "Mechanics",
+        "Grammar"
+    };
+
+    private void AddQuestion()
+    {
+        Questions.Add(Questions.Count + 1);
+    }
+
+    private void DuplicateQuestion(int index)
+    {
+        Questions.Insert(index + 1, Questions.Count + 1);
+    }
+
+    private void DeleteQuestion(int index)
+    {
+        Questions.RemoveAt(index);
+    }
+
+    private void ToggleExerciseSolution()
+    {
+        ShowExerciseSolution = !ShowExerciseSolution;
+    }
+
+    private void HandleExerciseTitleChanged(ChangeEventArgs e)
+    {
+        ExerciseTitle = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private void HandleExerciseSolutionChanged(string value)
+    {
+        ExerciseSolution = value;
+    }
+
+    private void HandleStudentsCanViewSolutionChanged(ChangeEventArgs e)
+    {
+        StudentsCanViewSolution = (bool)(e.Value ?? false);
+    }
+
+    private void HandleDifficultyChanged(ChangeEventArgs e)
+    {
+        Difficulty = e.Value?.ToString() ?? "Medium";
+    }
+
+    private void HandleEstimatedTimeChanged(ChangeEventArgs e)
+    {
+        EstimatedTime = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private void HandleVisibilityChanged(ChangeEventArgs e)
+    {
+        Visibility = e.Value?.ToString() ?? "Private";
+    }
+}

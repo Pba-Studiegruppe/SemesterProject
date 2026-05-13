@@ -1,0 +1,197 @@
+﻿@* QuestionCard.razor *@
+
+@using Microsoft.AspNetCore.Components
+
+<div class="bg-white border border-gray-200 rounded-lg shadow-sm">
+
+    <div class="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+         @onclick="ToggleExpanded">
+
+        <div class="flex items-center gap-3">
+            <span class="text-sm text-gray-500">
+                Question @QuestionNumber
+            </span>
+
+            @if (!string.IsNullOrWhiteSpace(Title))
+            {
+                <span class="text-sm">@Title</span>
+            }
+        </div>
+
+        @if (IsExpanded)
+        {
+            <i class="fas fa-chevron-up w-5 h-5 text-gray-500"></i>
+        }
+        else
+        {
+            <i class="fas fa-chevron-down w-5 h-5 text-gray-500"></i>
+        }
+    </div>
+
+    @if (IsExpanded)
+    {
+        <div class="px-4 pb-4 space-y-4 border-t border-gray-100">
+
+            <div class="pt-4">
+                <label class="block mb-2 text-sm text-gray-700">
+                    Question Title
+                </label>
+
+                <input type="text"
+                       value="@Title"
+                       @oninput="HandleTitleChanged"
+                       placeholder="Enter question title..."
+                       class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div>
+                <label class="block mb-2 text-sm text-gray-700">
+                    Question Content
+                </label>
+
+                <RichTextEditor Placeholder="Enter your question here..."
+                                Value="@Content"
+                                ValueChanged="HandleContentChanged" />
+            </div>
+
+            <div class="flex gap-2">
+
+                <button type="button"
+                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+
+                    <i class="fas fa-image w-4 h-4"></i>
+                    Add Image
+                </button>
+
+                <button type="button"
+                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+
+                    <i class="fas fa-link w-4 h-4"></i>
+                    Add Video Link
+                </button>
+
+                <button type="button"
+                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+
+                    <i class="fas fa-upload w-4 h-4"></i>
+                    Add File
+                </button>
+            </div>
+
+            <div class="border-t border-gray-200 pt-4">
+
+                <button type="button"
+                        @onclick="ToggleSolution"
+                        class="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 transition-colors">
+
+                    @if (ShowSolution)
+                    {
+                        <i class="fas fa-chevron-up w-4 h-4"></i>
+                    }
+                    else
+                    {
+                        <i class="fas fa-chevron-down w-4 h-4"></i>
+                    }
+
+                    Question Solution (Optional)
+                </button>
+
+                @if (ShowSolution)
+                {
+                    <div class="mt-3 space-y-3">
+
+                        <RichTextEditor Placeholder="Enter solution here..."
+                                        Value="@Solution"
+                                        ValueChanged="HandleSolutionChanged"
+                                        MinHeight="120px" />
+
+                        <div class="flex gap-2">
+
+                            <button type="button"
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+
+                                <i class="fas fa-image w-4 h-4"></i>
+                                Add Image
+                            </button>
+
+                            <button type="button"
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+
+                                <i class="fas fa-link w-4 h-4"></i>
+                                Add Video Link
+                            </button>
+
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="flex gap-2 pt-2">
+
+                <button type="button"
+                        @onclick="OnDuplicate"
+                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-700 hover:text-gray-900 transition-colors">
+
+                    <i class="fas fa-copy w-4 h-4"></i>
+                    Duplicate Question
+                </button>
+
+                <button type="button"
+                        @onclick="OnDelete"
+                        class="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 transition-colors">
+
+                    <i class="fas fa-trash w-4 h-4"></i>
+                    Delete Question
+                </button>
+
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public int QuestionNumber { get; set; }
+
+    [Parameter]
+    public EventCallback OnDuplicate { get; set; }
+
+    [Parameter]
+    public EventCallback OnDelete { get; set; }
+
+    private bool IsExpanded = true;
+
+    private bool ShowSolution = false;
+
+    private string Title = string.Empty;
+
+    private string Content = string.Empty;
+
+    private string Solution = string.Empty;
+
+    private void ToggleExpanded()
+    {
+        IsExpanded = !IsExpanded;
+    }
+
+    private void ToggleSolution()
+    {
+        ShowSolution = !ShowSolution;
+    }
+
+    private void HandleTitleChanged(ChangeEventArgs e)
+    {
+        Title = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private void HandleContentChanged(string value)
+    {
+        Content = value;
+    }
+
+    private void HandleSolutionChanged(string value)
+    {
+        Solution = value;
+    }
+}
