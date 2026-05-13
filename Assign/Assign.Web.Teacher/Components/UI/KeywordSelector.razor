@@ -1,4 +1,5 @@
 ﻿@* KeywordSelector.razor *@
+@using Assign.Web.Teacher.Models.Exercise
 
 <div>
     <label class="block mb-2 text-sm text-gray-700">
@@ -6,9 +7,7 @@
     </label>
 
     <div class="space-y-2">
-
         <div class="relative">
-
             <input type="text"
                    value="@InputValue"
                    @oninput="HandleInputChange"
@@ -30,10 +29,9 @@
                                 @onclick="() => AddKeyword(option)"
                                 class="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors text-sm">
 
-                            @option
+                            @option.KeywordName
                         </button>
                     }
-
                 </div>
             }
         </div>
@@ -41,12 +39,10 @@
         @if (Selected.Any())
         {
             <div class="flex flex-wrap gap-2">
-
                 @foreach (var keyword in Selected)
                 {
                     <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-sm">
-
-                        @keyword
+                        @keyword.KeywordName
 
                         <button type="button"
                                 @onclick="() => RemoveKeyword(keyword)"
@@ -56,50 +52,57 @@
                         </button>
                     </span>
                 }
-
             </div>
         }
-
     </div>
 </div>
 
 @code {
 
-    [Parameter]
-    public string Label { get; set; } = string.Empty;
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public List<KeywordDto> Options { get; set; } = new();
+    [Parameter] public string Placeholder { get; set; } = "Add keyword...";
 
-    [Parameter]
-    public List<string> Options { get; set; } = new();
+    /// <summary>IDs of keywords currently selected. Two-way bindable.</summary>
+    [Parameter] public List<Guid> SelectedIds { get; set; } = new();
+    [Parameter] public EventCallback<List<Guid>> SelectedIdsChanged { get; set; }
 
-    [Parameter]
-    public string Placeholder { get; set; } = "Add keyword...";
-
-    private List<string> Selected = new();
-
+    private List<KeywordDto> Selected = new();
     private string InputValue = string.Empty;
-
     private bool SuggestionsVisible = false;
-
-    private IEnumerable<string> FilteredOptions =>
-        Options.Where(option =>
-            option.Contains(InputValue, StringComparison.OrdinalIgnoreCase)
-            && !Selected.Contains(option));
-
-    private void AddKeyword(string keyword)
+    protected override void OnParametersSet()
     {
-        if (!Selected.Contains(keyword))
+        // Resync Selected from SelectedIds whenever the parent changes them.
+        Selected = Options
+            .Where(o => SelectedIds.Contains(o.Id))
+            .ToList();
+    }
+
+    private IEnumerable<KeywordDto> FilteredOptions =>
+        Options.Where(option =>
+            option.KeywordName.Contains(InputValue, StringComparison.OrdinalIgnoreCase)
+            && !Selected.Any(s => s.Id == option.Id));
+
+    private async Task AddKeyword(KeywordDto keyword)
+    {
+        if (!Selected.Any(s => s.Id == keyword.Id))
         {
             Selected.Add(keyword);
+            await NotifyChanged();
         }
 
         InputValue = string.Empty;
         SuggestionsVisible = false;
     }
 
-    private void RemoveKeyword(string keyword)
+    private async Task RemoveKeyword(KeywordDto keyword)
     {
-        Selected.Remove(keyword);
+        Selected.RemoveAll(s => s.Id == keyword.Id);
+        await NotifyChanged();
     }
+
+    private Task NotifyChanged() =>
+        SelectedIdsChanged.InvokeAsync(Selected.Select(s => s.Id).ToList());
 
     private void HandleInputChange(ChangeEventArgs e)
     {
@@ -109,10 +112,9 @@
 
     private void HandleKeyDown(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(InputValue))
-        {
-            AddKeyword(InputValue.Trim());
-        }
+        // Free-text "add" via Enter is disabled: keywords must exist on the
+        // backend (they have a Guid Id). If you later want a "create-new-keyword"
+        // flow, this is where to call KeywordApi.CreateAsync(...) then AddKeyword.
     }
 
     private void ShowSuggestions(FocusEventArgs e)
@@ -122,11 +124,8 @@
 
     private async Task HideSuggestions(FocusEventArgs e)
     {
-        // Small delay so button clicks still register
         await Task.Delay(200);
-
         SuggestionsVisible = false;
-
         await InvokeAsync(StateHasChanged);
     }
 }

@@ -1,18 +1,14 @@
 ﻿using Exercise_Api;
 using Exercise_Application.Interfaces.Repositories;
 using Exercise_Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Exercise_Infrastructure.DataAccess
 {
     public class KeywordRepository : IKeywordRepository
     {
-        private ExerciseDbContext _dbContext;
+        private readonly ExerciseDbContext _dbContext;
+
         public KeywordRepository(ExerciseDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -20,17 +16,19 @@ namespace Exercise_Infrastructure.DataAccess
 
         public async Task<Keyword> AddKeywordAsync(Keyword keyword)
         {
-            throw new NotImplementedException();
+            _dbContext.Keywords.Add(keyword);
+            await _dbContext.SaveChangesAsync();
+            return keyword;
         }
 
         public async Task<IEnumerable<Keyword>> GetAllKeywordsAsync()
         {
-            throw new NotImplementedException();
+            return await _dbContext.Keywords.ToListAsync();
         }
 
         public async Task<Keyword> GetKeywordByIdAsync(Guid keywordId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Keywords.FirstOrDefaultAsync(k => k.Id == keywordId);
         }
     }
 }

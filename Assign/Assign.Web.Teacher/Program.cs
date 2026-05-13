@@ -6,6 +6,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddHttpClient<Assign_Frontend.Services.ExerciseApiClient>(c =>
+{
+    c.BaseAddress = new Uri(builder.Configuration["ExerciseApi:BaseUrl"]!);
+});
+builder.Services.AddHttpClient<Assign_Frontend.Services.KeywordApiClient>(c =>
+{
+    c.BaseAddress = new Uri(builder.Configuration["ExerciseApi:BaseUrl"]!);
+});
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(o =>
+{
+    o.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

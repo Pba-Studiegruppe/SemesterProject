@@ -3,6 +3,7 @@ using Exercise_Application.Implementations;
 using Exercise_Application.Interfaces.Repositories;
 using Exercise_Application.Interfaces.Services;
 using Exercise_Infrastructure.DataAccess;
+using Exercise_Infrastructure.DataAccess.Fakes;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,8 +19,15 @@ builder.Services.AddDbContext<ExerciseDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionGateway")));
 //TODO: Hardcoded connectionstring, fix for later
 
+// Real (when the DB is up):
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
 builder.Services.AddScoped<IKeywordRepository, KeywordRepository>();
+
+// Fake (while waiting for the DB):
+//builder.Services.AddSingleton<IExerciseRepository, FakeExerciseRepository>();
+//builder.Services.AddSingleton<IKeywordRepository, FakeKeywordRepository>();
+
+// Services
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddScoped<IKeywordService, KeywordService>();
 builder.Services.AddScoped<IExerciseSolutionService, ExerciseSolutionService>();

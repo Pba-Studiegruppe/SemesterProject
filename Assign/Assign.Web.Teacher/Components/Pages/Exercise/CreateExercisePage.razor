@@ -1,6 +1,12 @@
-﻿@page "/create-exercise"
+@page "/create-exercise"
+@rendermode InteractiveServer
 
 @using Microsoft.AspNetCore.Components.Web
+@using Assign.Web.Teacher.Models.Exercise
+@using Assign_Frontend.Services
+@inject ExerciseApiClient ExerciseApi
+@inject KeywordApiClient KeywordApi
+@inject NavigationManager Nav
 
 <div class="min-h-screen bg-gray-50">
 
@@ -46,7 +52,7 @@
                         </label>
 
                         <input type="text"
-                               value="@ExerciseTitle"
+                               value="@Form.Title"
                                @oninput="HandleExerciseTitleChanged"
                                placeholder="Enter exercise title..."
                                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -57,9 +63,10 @@
                             Exercise Description
                         </label>
 
-                        <RichTextEditor
-                            Placeholder="Describe the exercise objectives, context, and instructions..."
-                            MinHeight="200px" />
+                        <RichTextEditor Placeholder="Describe the exercise objectives, context, and instructions..."
+                                        Value="@Form.Content"
+                                        ValueChanged="HandleExerciseContentChanged"
+                                        MinHeight="200px" />
                     </div>
 
                     <div class="flex gap-3">
@@ -103,11 +110,13 @@
 
                     <div class="space-y-3">
 
-                        @for (int i = 0; i < Questions.Count; i++)
+                        @for (int i = 0; i < Form.Questions.Count; i++)
                         {
                             var index = i;
+                            var question = Form.Questions[index];
 
-                            <QuestionCard QuestionNumber="@(index + 1)"
+                            <QuestionCard @key="question.LocalId"
+                                          QuestionNumber="@(index + 1)"
                                           OnDuplicate="@(() => DuplicateQuestion(index))"
                                           OnDelete="@(() => DeleteQuestion(index))" />
                         }
@@ -153,11 +162,10 @@
                     {
                         <div class="space-y-4">
 
-                            <RichTextEditor
-                                Placeholder="Enter complete exercise solution..."
-                                Value="@ExerciseSolution"
-                                ValueChanged="HandleExerciseSolutionChanged"
-                                MinHeight="150px" />
+                            <RichTextEditor Placeholder="Enter complete exercise solution..."
+                                            Value="@Form.Solution.Content"
+                                            ValueChanged="HandleExerciseSolutionChanged"
+                                            MinHeight="150px" />
 
                             <div class="flex gap-3">
 
@@ -177,6 +185,10 @@
 
                             </div>
 
+                            @* NOTE: "Students can view this solution" is a UI-only flag for now.
+                               The backend's ExerciseSolution / CreateExerciseSolutionRequest does
+                               not currently expose a visibility field. Wire this up once the
+                               backend supports it. *@
                             <div class="flex items-center gap-3 pt-2 border-t border-gray-200">
 
                                 <input type="checkbox"
@@ -207,23 +219,33 @@
                         Keywords
                     </h3>
 
-                    <KeywordSelector
-                        Label="School Subject"
-                        Options="@SubjectOptions"
-                        Placeholder="Search or add subjects..." />
+                    <KeywordSelector Label="School Subject"
+                                     Options="@SubjectKeywords"
+                                     Placeholder="Search subjects..."
+                                     SelectedIds="Form.SchoolSubjectKeywordIds"
+                                     SelectedIdsChanged="@(ids => Form.SchoolSubjectKeywordIds = ids)" />
 
-                    <KeywordSelector
-                        Label="Exercise Type"
-                        Options="@ExerciseTypeOptions"
-                        Placeholder="Search or add types..." />
+                    <KeywordSelector Label="Exercise Type"
+                                     Options="@TypeKeywords"
+                                     Placeholder="Search types..."
+                                     SelectedIds="Form.ExerciseTypeKeywordIds"
+                                     SelectedIdsChanged="@(ids => Form.ExerciseTypeKeywordIds = ids)" />
 
-                    <KeywordSelector
-                        Label="Subject Area"
-                        Options="@SubjectAreaOptions"
-                        Placeholder="Search or add areas..." />
+                    <KeywordSelector Label="Subject Area"
+                                     Options="@AreaKeywords"
+                                     Placeholder="Search areas..."
+                                     SelectedIds="Form.SubjectAreaKeywordIds"
+                                     SelectedIdsChanged="@(ids => Form.SubjectAreaKeywordIds = ids)" />
 
                 </div>
 
+                @* TODO: Exercise Settings (Difficulty / Estimated Time / Visibility) is hidden
+                   until the Exercise domain entity + CreateExerciseRequest DTO expose these
+                   fields. Once the backend is updated:
+                     1. Add Difficulty, EstimatedTimeMinutes, Visibility to Exercise + DTOs.
+                     2. Re-enable the block below.
+                     3. Map them from CreateExerciseForm to CreateExerciseRequest in SubmitAsync. *@
+                @*
                 <!-- Settings -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 space-y-4">
 
@@ -237,7 +259,7 @@
                             Difficulty
                         </label>
 
-                        <select value="@Difficulty"
+                        <select value="@Form.Difficulty"
                                 @onchange="HandleDifficultyChanged"
                                 class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
 
@@ -256,7 +278,7 @@
                         </label>
 
                         <input type="number"
-                               value="@EstimatedTime"
+                               value="@Form.EstimatedTimeMinutes"
                                @oninput="HandleEstimatedTimeChanged"
                                placeholder="30"
                                class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
@@ -269,7 +291,7 @@
                             Visibility
                         </label>
 
-                        <select value="@Visibility"
+                        <select value="@Form.Visibility"
                                 @onchange="HandleVisibilityChanged"
                                 class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
 
@@ -281,6 +303,7 @@
                     </div>
 
                 </div>
+                *@
 
             </div>
 
@@ -290,21 +313,28 @@
         <div class="flex items-center justify-end gap-3 mt-6 pb-8">
 
             <button type="button"
+                    @onclick="OnCancel"
                     class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
 
                 Cancel
             </button>
 
+            @* TODO: "Save Draft" is hidden because the backend only supports publishing.
+               Re-enable once an endpoint / state for drafts exists on Exercise-Api. *@
+            @*
             <button type="button"
                     class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
 
                 Save Draft
             </button>
+            *@
 
             <button type="button"
+                    @onclick="PublishExerciseAsync"
+                    disabled="@IsSubmitting"
                     class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
 
-                Publish Exercise
+                @(IsSubmitting ? "Publishing..." : "Publish Exercise")
             </button>
 
         </div>
@@ -315,63 +345,48 @@
 
 @code {
 
-    private List<int> Questions = new();
-
-    private string ExerciseTitle = string.Empty;
+    private CreateExerciseForm Form { get; set; } = new();
 
     private bool ShowExerciseSolution = false;
-
-    private string ExerciseSolution = string.Empty;
-
     private bool StudentsCanViewSolution = false;
+    private bool IsSubmitting = false;
 
-    private string Difficulty = "Medium";
+    private List<KeywordDto> AllKeywords = new();
+    private List<KeywordDto> SubjectKeywords = new();
+    private List<KeywordDto> TypeKeywords = new();
+    private List<KeywordDto> AreaKeywords = new();
 
-    private string EstimatedTime = string.Empty;
-
-    private string Visibility = "Private";
-
-    private List<string> SubjectOptions = new()
+    protected override async Task OnInitializedAsync()
     {
-        "Math",
-        "Physics",
-        "Chemistry",
-        "Biology",
-        "English",
-        "History"
-    };
+        var keywords = await KeywordApi.GetAllAsync();
+        AllKeywords = keywords.ToList();
 
-    private List<string> ExerciseTypeOptions = new()
-    {
-        "Multiple Choice",
-        "Theory",
-        "Calculation",
-        "Essay",
-        "Practical"
-    };
-
-    private List<string> SubjectAreaOptions = new()
-    {
-        "Algebra",
-        "Geometry",
-        "Thermodynamics",
-        "Mechanics",
-        "Grammar"
-    };
+SubjectKeywords = AllKeywords.Where(k => k.KeywordType == "SchoolSubject").ToList();
+TypeKeywords    = AllKeywords.Where(k => k.KeywordType == "ExerciseType").ToList();
+AreaKeywords    = AllKeywords.Where(k => k.KeywordType == "SubjectArea").ToList();
+    }
 
     private void AddQuestion()
     {
-        Questions.Add(Questions.Count + 1);
+        Form.Questions.Add(new QuestionFormItem());
     }
 
     private void DuplicateQuestion(int index)
     {
-        Questions.Insert(index + 1, Questions.Count + 1);
+        var src = Form.Questions[index];
+        Form.Questions.Insert(index + 1, new QuestionFormItem
+        {
+            Title = src.Title,
+            Content = src.Content,
+            SolutionContent = src.SolutionContent,
+            SolutionExpanded = src.SolutionExpanded,
+            Expanded = true
+        });
     }
 
     private void DeleteQuestion(int index)
     {
-        Questions.RemoveAt(index);
+        Form.Questions.RemoveAt(index);
     }
 
     private void ToggleExerciseSolution()
@@ -381,12 +396,17 @@
 
     private void HandleExerciseTitleChanged(ChangeEventArgs e)
     {
-        ExerciseTitle = e.Value?.ToString() ?? string.Empty;
+        Form.Title = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private void HandleExerciseContentChanged(string value)
+    {
+        Form.Content = value;
     }
 
     private void HandleExerciseSolutionChanged(string value)
     {
-        ExerciseSolution = value;
+        Form.Solution.Content = value;
     }
 
     private void HandleStudentsCanViewSolutionChanged(ChangeEventArgs e)
@@ -394,18 +414,57 @@
         StudentsCanViewSolution = (bool)(e.Value ?? false);
     }
 
-    private void HandleDifficultyChanged(ChangeEventArgs e)
+    private void OnCancel()
     {
-        Difficulty = e.Value?.ToString() ?? "Medium";
+        // TODO: Nav.NavigateTo("/exercises");
     }
 
-    private void HandleEstimatedTimeChanged(ChangeEventArgs e)
+    private async Task PublishExerciseAsync()
     {
-        EstimatedTime = e.Value?.ToString() ?? string.Empty;
-    }
+        if (IsSubmitting) return;
 
-    private void HandleVisibilityChanged(ChangeEventArgs e)
-    {
-        Visibility = e.Value?.ToString() ?? "Private";
+        IsSubmitting = true;
+        try
+        {
+            var request = new CreateExerciseRequest
+            {
+                Title = Form.Title,
+                Content = Form.Content,
+                // TODO: replace with the logged-in teacher's id once auth is wired up.
+                CreatedByTeacherId = new Guid("00000000-0000-0000-0000-000000000001"),
+
+
+                Questions = Form.Questions
+                    .Select(q => (CreateQuestionRequest?)new CreateQuestionRequest
+                    {
+                        Title = q.Title,
+                        Content = q.Content,
+                        Solution = string.IsNullOrWhiteSpace(q.SolutionContent)
+                            ? null
+                            : new CreateQuestionSolutionRequest { Content = q.SolutionContent }
+                    })
+                    .ToList(),
+                ExerciseKeywords = Form.SchoolSubjectKeywordIds
+                    .Concat(Form.ExerciseTypeKeywordIds)
+                    .Concat(Form.SubjectAreaKeywordIds)
+                    .Select(id => (CreateExerciseKeywordRequest?)new CreateExerciseKeywordRequest { KeywordId = id })
+                    .ToList(),
+                Solution = string.IsNullOrWhiteSpace(Form.Solution.Content)
+                    ? null
+                    : new CreateExerciseSolutionRequest
+                    {
+                        Content = Form.Solution.Content,
+                        VideoUrl = string.IsNullOrWhiteSpace(Form.Solution.VideoUrl) ? null : Form.Solution.VideoUrl
+                    }
+            };
+
+            var created = await ExerciseApi.CreateExerciseAsync(request);
+            if (created is not null) Nav.NavigateTo($"/exercises/{created.Id}");
+            Console.WriteLine($"Publishing exercise: {request.Title} with {request.Questions.Count} questions");
+        }
+        finally
+        {
+            IsSubmitting = false;
+        }
     }
 }

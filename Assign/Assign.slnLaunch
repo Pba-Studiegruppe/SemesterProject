@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Exercise-Api\\Exercise-Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Assignment-Api\\Assignment-Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Assign.Web.Teacher\\Assign.Web.Teacher.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
