@@ -1,5 +1,151 @@
-﻿<h3>CreateAssignment</h3>
+﻿@page "/assignments/create"
+@rendermode InteractiveServer
+@using Assign.Web.Teacher.Models.Assignment
+@using Assign.Web.Teacher.Services.MockData
+
+<PageTitle>Create Assignment</PageTitle>
+
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <i class="bi bi-journal-plus fs-2 text-primary"></i>
+        <div>
+            <h1 class="h3 mb-0">Create Assignment</h1>
+            <p class="text-muted mb-0">Pick exercises, tailor the questions, set the points</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left column: details + preview/selected -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header"><h5 class="mb-0">Assignment Details</h5></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input id="title" class="form-control"
+                               @bind="_builder.Title"
+                               placeholder="e.g., Math Homework — Week 5" />
+                    </div>
+                    <div class="mb-0">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" class="form-control" rows="3"
+                                  @bind="_builder.Description"
+                                  placeholder="A short description of this assignment"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">Preview</h5>
+                    <span class="badge bg-primary fs-6">@_builder.TotalPoints pts</span>
+                </div>
+                <div class="card-body">
+                    <SelectedExercisesList
+                        Exercises="_builder.Exercises"
+                        OnRemoveExercise="HandleRemoveExercise"
+                        OnRemoveQuestion="HandleRemoveQuestion"
+                        OnSetQuestionPoints="HandleSetQuestionPoints" />
+
+                    <hr />
+
+                    <button class="btn btn-primary w-100"
+                            disabled="@(_builder.Exercises.Count == 0)"
+                            @onclick="HandleGeneratePdf">
+                        <i class="bi bi-file-earmark-pdf me-2"></i>Generate PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right column: exercise catalog -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Exercise Catalog</h5>
+                    <small class="text-muted">Search and add exercises to your assignment</small>
+                </div>
+                <div class="card-body">
+                    <ExerciseCatalog
+                        Catalog="_catalog"
+                        OnAddExercise="HandleAddExercise"
+                        OnPreviewExercise="HandlePreviewExercise" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ExercisePreviewModal
+    Preview="_currentPreview"
+    IsOpen="_isPreviewOpen"
+    OnClose="ClosePreview" />
 
 @code {
+    private AssignmentBuilderModel _builder = new();
+    private ExerciseCatalogModel _catalog = new();
+    private ExercisePreviewModel? _currentPreview;
+    private bool _isPreviewOpen;
 
+    protected override void OnInitialized()
+    {
+        _builder = new AssignmentBuilderModel
+        {
+            AssignmentId = Guid.NewGuid(),
+            Title = "Math Homework — Week 5",
+            Description = "Linear equations, basic geometry, and a short reflection.",
+            Exercises = []
+        };
+
+        _catalog = AssignmentMockData.SeedCatalog();
+    }
+
+    private void HandleAddExercise(ExerciseCatalogItemModel item)
+    {
+        if (item.IsAlreadyInAssignment) return;
+
+        var snapshot = AssignmentMockData.SnapshotFor(item);
+        snapshot.Order = _builder.Exercises.Count;
+        _builder.Exercises.Add(snapshot);
+        item.IsAlreadyInAssignment = true;
+    }
+
+    private void HandlePreviewExercise(ExerciseCatalogItemModel item)
+    {
+        _currentPreview = AssignmentMockData.PreviewFor(item);
+        _isPreviewOpen = true;
+    }
+
+    private void ClosePreview() => _isPreviewOpen = false;
+
+    private void HandleRemoveExercise(Guid assignmentExerciseId)
+    {
+        var ae = _builder.Exercises.FirstOrDefault(e => e.Id == assignmentExerciseId);
+        if (ae is null) return;
+
+        _builder.Exercises.Remove(ae);
+
+        // Re-enable the "Add" button in the catalog
+        var catalogItem = _catalog.Results.FirstOrDefault(i => i.Id == ae.SourceExerciseId);
+        if (catalogItem != null) catalogItem.IsAlreadyInAssignment = false;
+    }
+
+    private void HandleRemoveQuestion(RemoveQuestionEventArgs args)
+    {
+        var ae = _builder.Exercises.FirstOrDefault(e => e.Id == args.AssignmentExerciseId);
+        var q = ae?.Questions.FirstOrDefault(qq => qq.Id == args.QuestionId);
+        if (q != null) ae!.Questions.Remove(q);
+    }
+
+    private void HandleSetQuestionPoints(SetQuestionPointsEventArgs args)
+    {
+        var ae = _builder.Exercises.FirstOrDefault(e => e.Id == args.AssignmentExerciseId);
+        var q = ae?.Questions.FirstOrDefault(qq => qq.Id == args.QuestionId);
+        if (q != null) q.Points = args.Points;
+    }
+
+    private void HandleGeneratePdf()
+    {
+        // TODO: call AssignmentApiClient.GetPdfAsync once wired
+    }
 }

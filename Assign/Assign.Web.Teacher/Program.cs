@@ -1,4 +1,5 @@
 using Assign.Web.Teacher.Components;
+using Assign.Web.Teacher.Services.ApiClients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,10 @@ builder.Services.AddHttpClient<Assign_Frontend.Services.KeywordApiClient>(c =>
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(o =>
 {
     o.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
+builder.Services.AddHttpClient<AssignmentApiClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["AssignmentApi:BaseUrl"]!);
 });
 
 var app = builder.Build();
