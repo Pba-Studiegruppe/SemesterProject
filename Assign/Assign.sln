@@ -5,8 +5,6 @@ VisualStudioVersion = 17.14.36804.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assign", "Assign\Assign.csproj", "{6375CED7-562D-49EB-ABEC-6F10D6E78DB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseModuleTest", "CourseModuleTest\CourseModuleTest.csproj", "{13C96BD5-3456-47D4-8088-DB9E030DB24C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{19EB672F-B155-47A8-B3CC-CF10DF429B56}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Exercise-Module", "Exercise-Module", "{07F0B92F-33CD-4914-A337-ADEC6A617A48}"
@@ -60,10 +58,6 @@ Global
 		{6375CED7-562D-49EB-ABEC-6F10D6E78DB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6375CED7-562D-49EB-ABEC-6F10D6E78DB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6375CED7-562D-49EB-ABEC-6F10D6E78DB7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13C96BD5-3456-47D4-8088-DB9E030DB24C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13C96BD5-3456-47D4-8088-DB9E030DB24C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13C96BD5-3456-47D4-8088-DB9E030DB24C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13C96BD5-3456-47D4-8088-DB9E030DB24C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{19EB672F-B155-47A8-B3CC-CF10DF429B56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{19EB672F-B155-47A8-B3CC-CF10DF429B56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19EB672F-B155-47A8-B3CC-CF10DF429B56}.Release|Any CPU.ActiveCfg = Release|Any CPU
