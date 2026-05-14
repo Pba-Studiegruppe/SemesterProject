@@ -12,6 +12,9 @@
     <Project Path="Exercise-Infrastructure/Exercise-Infrastructure.csproj" />
     <Project Path="Exercise-Tests/Exercise-Tests.csproj" />
   </Folder>
+  <Folder Name="/Frontend/">
+    <Project Path="Assign-Frontend/Assign-Frontend.csproj" />
+  </Folder>
   <Project Path="Assign/Assign.csproj" />
   <Project Path="CourseModuleTest/CourseModuleTest.csproj" />
   <Project Path="Shared/Shared.csproj" />

@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<RootNamespace>Assignment_AcceptanceTests</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FluentAssertions" Version="6.5.1" />
+		<PackageReference Include="itext7" Version="9.6.0" />
+		<PackageReference Include="itext7.bouncy-castle-adapter" Version="9.6.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+		<PackageReference Include="Moq" Version="4.20.72" />
+		<PackageReference Include="Reqnroll" Version="2.1.0" />
+		<PackageReference Include="Reqnroll.xUnit" Version="2.1.0" />
+		<PackageReference Include="xunit" Version="2.5.3" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Assignment-Application\Assignment-Application.csproj" />
+		<ProjectReference Include="..\Assignment-Domain\Assignment-Domain.csproj" />
+		<ProjectReference Include="..\Assignment-Infrastructure\Assignment-Infrastructure.csproj" />
+	</ItemGroup>
+
+</Project>

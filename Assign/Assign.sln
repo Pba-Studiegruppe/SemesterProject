@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36804.6
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11716.220
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assign", "Assign\Assign.csproj", "{6375CED7-562D-49EB-ABEC-6F10D6E78DB7}"
 EndProject
@@ -47,6 +47,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assignment-Api", "Assignment-Api\Assignment-Api.csproj", "{04062916-318E-445F-9984-E4924B484C7D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exercise-Api", "Exercise-Api\Exercise-Api.csproj", "{04FB7B0F-0863-CCA2-C7DE-7C304216E2E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assignment-AcceptanceTests", "Assignment-AcceptanceTests\Assignment-AcceptanceTests.csproj", "{BCAF80BD-C89F-4CFB-9A5B-708C32C0FD83}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{D1F2A3B4-5C6E-4789-90AB-CDEF12345678}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assign.Web.Teacher", "Assign.Web.Teacher\Assign.Web.Teacher.csproj", "{61DFDFBB-5FEC-41A6-98C8-94F639183914}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assign.Web.Student", "Assign.Web.Student\Assign.Web.Student.csproj", "{EFAB12D2-BD68-464B-AF7A-D616EBCFB1FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -122,6 +130,18 @@ Global
 		{04FB7B0F-0863-CCA2-C7DE-7C304216E2E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04FB7B0F-0863-CCA2-C7DE-7C304216E2E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04FB7B0F-0863-CCA2-C7DE-7C304216E2E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCAF80BD-C89F-4CFB-9A5B-708C32C0FD83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCAF80BD-C89F-4CFB-9A5B-708C32C0FD83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCAF80BD-C89F-4CFB-9A5B-708C32C0FD83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCAF80BD-C89F-4CFB-9A5B-708C32C0FD83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61DFDFBB-5FEC-41A6-98C8-94F639183914}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61DFDFBB-5FEC-41A6-98C8-94F639183914}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61DFDFBB-5FEC-41A6-98C8-94F639183914}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61DFDFBB-5FEC-41A6-98C8-94F639183914}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFAB12D2-BD68-464B-AF7A-D616EBCFB1FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFAB12D2-BD68-464B-AF7A-D616EBCFB1FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFAB12D2-BD68-464B-AF7A-D616EBCFB1FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFAB12D2-BD68-464B-AF7A-D616EBCFB1FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,6 +162,9 @@ Global
 		{BD260D6E-8087-46EB-943D-D6F46BBB9783} = {3FBA0677-4B31-4473-AB09-D76BCC52D51A}
 		{04062916-318E-445F-9984-E4924B484C7D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{04FB7B0F-0863-CCA2-C7DE-7C304216E2E2} = {07F0B92F-33CD-4914-A337-ADEC6A617A48}
+		{BCAF80BD-C89F-4CFB-9A5B-708C32C0FD83} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{61DFDFBB-5FEC-41A6-98C8-94F639183914} = {D1F2A3B4-5C6E-4789-90AB-CDEF12345678}
+		{EFAB12D2-BD68-464B-AF7A-D616EBCFB1FD} = {D1F2A3B4-5C6E-4789-90AB-CDEF12345678}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2BA985F8-1D3A-4042-8F3A-A4541ED867C8}

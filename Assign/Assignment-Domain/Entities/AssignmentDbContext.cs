@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assignment_Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Assignment_Api;
@@ -15,10 +16,12 @@ public partial class AssignmentDbContext : DbContext
     {
     }
 
+
     public virtual DbSet<Assignment> Assignments { get; set; }
 
     public virtual DbSet<AssignmentExercise> AssignmentExercises { get; set; }
 
+    public virtual DbSet<AssignmentQuestion> AssignmentQuestions { get; set; }
     public virtual DbSet<AssignmentFeedback> AssignmentFeedbacks { get; set; }
 
     public virtual DbSet<AssignmentSet> AssignmentSets { get; set; }
@@ -65,18 +68,48 @@ public partial class AssignmentDbContext : DbContext
 
         modelBuilder.Entity<AssignmentExercise>(entity =>
         {
-            entity.HasKey(e => new { e.AssignmentId, e.ExerciseId });
-
             entity.ToTable("AssignmentExercise");
+            entity.HasKey(e => e.Id);
 
-            entity.Property(e => e.RowVersion)
-                .IsRowVersion()
-                .IsConcurrencyToken();
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.AssignmentId).IsRequired();
+            entity.Property(e => e.SourceExerciseId).IsRequired();
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Content);
+            entity.Property(e => e.Order).IsRequired();
+            entity.Property(e => e.SnapshotTakenAt).IsRequired();
+            entity.Property(e => e.RowVersion).IsRowVersion().IsConcurrencyToken();
 
-            entity.HasOne(d => d.Assignment).WithMany(p => p.AssignmentExercises)
+            entity.HasOne(d => d.Assignment)
+                .WithMany(p => p.AssignmentExercises)
                 .HasForeignKey(d => d.AssignmentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_AssignmentExercise_Assignment");
+
+            entity.HasMany(ae => ae.Questions)
+                .WithOne()
+                .HasForeignKey(q => q.AssignmentExerciseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Required because Questions is exposed via a read-only IReadOnlyList
+            // backed by a private List field.
+            entity.Navigation(ae => ae.Questions)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
+        });
+
+        modelBuilder.Entity<AssignmentQuestion>(entity =>
+        {
+            entity.ToTable("AssignmentQuestion");
+            entity.HasKey(q => q.Id);
+
+            entity.Property(q => q.Id).ValueGeneratedNever();
+            entity.Property(q => q.AssignmentExerciseId).IsRequired();
+            entity.Property(q => q.SourceQuestionId).IsRequired();
+            entity.Property(q => q.Title).IsRequired().HasMaxLength(255);
+            entity.Property(q => q.Content);
+            entity.Property(q => q.Points).IsRequired();
+            entity.Property(q => q.Order).IsRequired();
+            entity.Property(q => q.RowVersion).IsRowVersion().IsConcurrencyToken();
         });
 
         modelBuilder.Entity<AssignmentFeedback>(entity =>

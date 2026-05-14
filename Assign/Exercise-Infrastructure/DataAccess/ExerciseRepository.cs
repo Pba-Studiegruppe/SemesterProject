@@ -57,5 +57,42 @@ namespace Exercise_Infrastructure.DataAccess
             await _dbContext.SaveChangesAsync();
             return exercise;
         }
+
+        public async Task<Exercise?> GetForSnapshotAsync(Guid exerciseId)
+        {
+            // Solutions deliberately not loaded — wrong tool for the job.
+            return await _dbContext.Exercises
+                .AsNoTracking()
+                .Include(e => e.Questions)
+                .FirstOrDefaultAsync(e => e.Id == exerciseId);
+        }
+
+        public async Task<Exercise?> GetForReviewAsync(Guid exerciseId)
+        {
+            return await _dbContext.Exercises
+                .AsNoTracking()
+                .Include(e => e.Solution)
+                .Include(e => e.Questions)
+                    .ThenInclude(q => q.Solution)
+                .FirstOrDefaultAsync(e => e.Id == exerciseId);
+        }
+
+        public async Task<IEnumerable<Exercise>> GetAllAsync(string? search = null)
+        {
+            var query = _dbContext.Exercises
+                .Include(e => e.Questions)
+                .Include(e => e.ExerciseKeywords)
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(e =>
+                    e.Title.Contains(search) ||
+                    e.Content.Contains(search));
+            }
+
+            return await query.ToListAsync();
+        }
     }
 }

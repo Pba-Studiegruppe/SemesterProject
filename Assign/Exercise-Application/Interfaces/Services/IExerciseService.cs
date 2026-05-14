@@ -14,5 +14,6 @@ namespace Exercise_Application.Interfaces.Services
         Task<IEnumerable<ExerciseDTO?>> GetExerciseByExerciseKeywords(List<Guid> keywordIds);
         Task<ExerciseDTO> CreateExerciseAsync(CreateExerciseRequest dto);
         Task<ExerciseDTO?> UpdateExerciseAsync(UpdateExerciseRequest dto);
+        Task<IEnumerable<ExerciseDTO>> GetAllExercisesAsync(string? search = null);
     }
 }
