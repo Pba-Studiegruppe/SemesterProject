@@ -118,5 +118,18 @@ namespace Exercise_Application.Implementations
                 throw new Exception("An error occurred while updating the exercise.", ex);
             }
         }
+
+        public async Task<IEnumerable<ExerciseDTO>> GetAllExercisesAsync(string? search = null)
+        {
+            try
+            {
+                var exercises = await _repository.GetAllAsync(search);
+                return exercises.Select(Mapper.MapToDTO);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving exercises.", ex);
+            }
+        }
     }
 }

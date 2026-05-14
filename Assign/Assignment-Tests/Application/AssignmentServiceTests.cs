@@ -404,5 +404,192 @@ namespace Assignment_Tests.Application
             // Assert
             await act.Should().ThrowAsync<ArgumentException>();
         }
+
+        public class AssignmentServiceTests_SetQuestionPointsAsync_Tests
+        {
+            private static (AssignmentService service, Assignment assignment, AssignmentExercise ae, Mock<IAssignmentRepository> repo)
+                BuildWithQuestion(int initialPoints = 0)
+            {
+                var assignment = new Assignment("title", "desc");
+                var ae = assignment.AddExerciseFromSnapshot(TestData.Snapshot(questionCount: 1));
+                ae.SetQuestionPoints(ae.Questions[0].Id, initialPoints);
+
+                var repoMock = new Mock<IAssignmentRepository>();
+                repoMock.Setup(r => r.GetByIdAsync(assignment.Id)).ReturnsAsync(assignment);
+
+                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+                return (service, assignment, ae, repoMock);
+            }
+
+            [Fact]
+            public async Task SetQuestionPointsAsync_Should_Update_Points_And_Save()
+            {
+                // Arrange
+                var (service, _, ae, repo) = BuildWithQuestion(initialPoints: 0);
+                var q = ae.Questions[0];
+
+                // Act
+                await service.SetQuestionPointsAsync(
+                    ae.AssignmentId, ae.Id, q.Id,
+                    new SetQuestionPointsRequest { Points = 10 });
+
+                // Assert
+                q.Points.Should().Be(10);
+                repo.Verify(r => r.SaveChangesAsync(), Times.Once);
+            }
+
+            [Fact]
+            public async Task SetQuestionPointsAsync_Should_Throw_When_Assignment_Not_Found()
+            {
+                // Arrange
+                var repoMock = new Mock<IAssignmentRepository>();
+                repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Assignment?)null);
+                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+
+                // Act
+                Func<Task> act = () => service.SetQuestionPointsAsync(
+                    Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(),
+                    new SetQuestionPointsRequest { Points = 5 });
+
+                // Assert
+                await act.Should().ThrowAsync<KeyNotFoundException>();
+                repoMock.Verify(r => r.SaveChangesAsync(), Times.Never);
+            }
+
+            [Fact]
+            public async Task SetQuestionPointsAsync_Should_Throw_When_AssignmentExercise_Not_Found()
+            {
+                // Arrange
+                var assignment = new Assignment("title", "desc");
+                // no exercises added
+                var repoMock = new Mock<IAssignmentRepository>();
+                repoMock.Setup(r => r.GetByIdAsync(assignment.Id)).ReturnsAsync(assignment);
+                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+
+                // Act
+                Func<Task> act = () => service.SetQuestionPointsAsync(
+                    assignment.Id, Guid.NewGuid(), Guid.NewGuid(),
+                    new SetQuestionPointsRequest { Points = 5 });
+
+                // Assert
+                await act.Should().ThrowAsync<KeyNotFoundException>();
+                repoMock.Verify(r => r.SaveChangesAsync(), Times.Never);
+            }
+
+            [Fact]
+            public async Task SetQuestionPointsAsync_Should_Throw_When_Question_Not_Found()
+            {
+                // Arrange
+                var (service, _, ae, repo) = BuildWithQuestion();
+
+                // Act — valid assignment + exercise but unknown question id
+                Func<Task> act = () => service.SetQuestionPointsAsync(
+                    ae.AssignmentId, ae.Id, Guid.NewGuid(),
+                    new SetQuestionPointsRequest { Points = 5 });
+
+                // Assert
+                await act.Should().ThrowAsync<KeyNotFoundException>();
+                repo.Verify(r => r.SaveChangesAsync(), Times.Never);
+            }
+
+            [Fact]
+            public async Task SetQuestionPointsAsync_Should_Throw_When_Points_Negative()
+            {
+                // Arrange
+                var (service, _, ae, repo) = BuildWithQuestion();
+                var q = ae.Questions[0];
+
+                // Act
+                Func<Task> act = () => service.SetQuestionPointsAsync(
+                    ae.AssignmentId, ae.Id, q.Id,
+                    new SetQuestionPointsRequest { Points = -1 });
+
+                // Assert
+                await act.Should().ThrowAsync<ArgumentOutOfRangeException>();
+                repo.Verify(r => r.SaveChangesAsync(), Times.Never);
+            }
+        }
+
+        public class AssignmentServiceTests_RemoveQuestionAsync_Tests
+        {
+            private static (AssignmentService service, Assignment assignment, AssignmentExercise ae, Mock<IAssignmentRepository> repo)
+                BuildWithQuestion()
+            {
+                var assignment = new Assignment("title", "desc");
+                var ae = assignment.AddExerciseFromSnapshot(TestData.Snapshot(questionCount: 2));
+
+                var repoMock = new Mock<IAssignmentRepository>();
+                repoMock.Setup(r => r.GetByIdAsync(assignment.Id)).ReturnsAsync(assignment);
+
+                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+                return (service, assignment, ae, repoMock);
+            }
+
+            [Fact]
+            public async Task RemoveQuestionAsync_Should_Remove_Question_And_Save()
+            {
+                // Arrange
+                var (service, _, ae, repo) = BuildWithQuestion();
+                var toRemove = ae.Questions[0].Id;
+
+                // Act
+                await service.RemoveQuestionAsync(ae.AssignmentId, ae.Id, toRemove);
+
+                // Assert
+                ae.Questions.Should().ContainSingle();
+                ae.Questions.Should().NotContain(q => q.Id == toRemove);
+                repo.Verify(r => r.SaveChangesAsync(), Times.Once);
+            }
+
+            [Fact]
+            public async Task RemoveQuestionAsync_Should_Throw_When_Assignment_Not_Found()
+            {
+                // Arrange
+                var repoMock = new Mock<IAssignmentRepository>();
+                repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Assignment?)null);
+                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+
+                // Act
+                Func<Task> act = () =>
+                    service.RemoveQuestionAsync(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+
+                // Assert
+                await act.Should().ThrowAsync<KeyNotFoundException>();
+                repoMock.Verify(r => r.SaveChangesAsync(), Times.Never);
+            }
+
+            [Fact]
+            public async Task RemoveQuestionAsync_Should_Throw_When_AssignmentExercise_Not_Found()
+            {
+                // Arrange
+                var assignment = new Assignment("title", "desc");
+                var repoMock = new Mock<IAssignmentRepository>();
+                repoMock.Setup(r => r.GetByIdAsync(assignment.Id)).ReturnsAsync(assignment);
+                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+
+                // Act
+                Func<Task> act = () =>
+                    service.RemoveQuestionAsync(assignment.Id, Guid.NewGuid(), Guid.NewGuid());
+
+                // Assert
+                await act.Should().ThrowAsync<KeyNotFoundException>();
+                repoMock.Verify(r => r.SaveChangesAsync(), Times.Never);
+            }
+
+            [Fact]
+            public async Task RemoveQuestionAsync_Should_Throw_When_Question_Not_Found()
+            {
+                // Arrange
+                var (service, _, ae, repo) = BuildWithQuestion();
+
+                // Act — exercise exists but question id doesn't
+                Func<Task> act = () =>
+                    service.RemoveQuestionAsync(ae.AssignmentId, ae.Id, Guid.NewGuid());
+
+                // Assert
+                await act.Should().ThrowAsync<KeyNotFoundException>();
+                repo.Verify(r => r.SaveChangesAsync(), Times.Never);
+            }
+        }
     }
 }

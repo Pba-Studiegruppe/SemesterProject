@@ -76,5 +76,23 @@ namespace Exercise_Infrastructure.DataAccess
                     .ThenInclude(q => q.Solution)
                 .FirstOrDefaultAsync(e => e.Id == exerciseId);
         }
+
+        public async Task<IEnumerable<Exercise>> GetAllAsync(string? search = null)
+        {
+            var query = _dbContext.Exercises
+                .Include(e => e.Questions)
+                .Include(e => e.ExerciseKeywords)
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(e =>
+                    e.Title.Contains(search) ||
+                    e.Content.Contains(search));
+            }
+
+            return await query.ToListAsync();
+        }
     }
 }

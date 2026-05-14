@@ -9,4 +9,9 @@
         public int Points { get; set; }
         public int Order { get; set; }
     }
+
+    public class SetQuestionPointsRequest
+    {
+        public int Points { get; set; }
+    }
 }

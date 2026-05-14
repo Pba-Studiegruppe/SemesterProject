@@ -47,7 +47,8 @@ namespace Assignment_Application.Implementations
         public async Task<AssignmentDTO> GetAssignmentAsync(Guid id)
         {
             var assignment = await _repository.GetByIdAsync(id);
-            if (assignment is null) throw new KeyNotFoundException($"Assignment with id '{id}' not found.");
+            if (assignment is null)
+                throw new KeyNotFoundException($"Assignment with id '{id}' not found.");
 
             return new AssignmentDTO
             {
@@ -56,7 +57,9 @@ namespace Assignment_Application.Implementations
                 Description = assignment.Description,
                 TotalPoints = assignment.TotalPoints,
                 CreatedAt = assignment.CreatedAt,
-
+                Exercises = assignment.AssignmentExercises
+                    .Select(ToDto)
+                    .ToList()
             };
         }
 
@@ -116,6 +119,47 @@ namespace Assignment_Application.Implementations
 
             // domain throws KeyNotFoundException if AE not in this assignment
             assignment.RemoveExercise(request.AssignmentExerciseId);
+
+            await _repository.SaveChangesAsync();
+        }
+
+        public async Task SetQuestionPointsAsync(
+    Guid assignmentId,
+    Guid assignmentExerciseId,
+    Guid questionId,
+    SetQuestionPointsRequest request)
+        {
+            if (request is null) throw new ArgumentNullException(nameof(request));
+
+            var assignment = await _repository.GetByIdAsync(assignmentId);
+            if (assignment is null)
+                throw new KeyNotFoundException($"Assignment with id '{assignmentId}' not found.");
+
+            var ae = assignment.AssignmentExercises.FirstOrDefault(e => e.Id == assignmentExerciseId);
+            if (ae is null)
+                throw new KeyNotFoundException($"AssignmentExercise '{assignmentExerciseId}' not found.");
+
+            // domain: KeyNotFoundException if question missing, ArgumentOutOfRangeException if negative
+            ae.SetQuestionPoints(questionId, request.Points);
+
+            await _repository.SaveChangesAsync();
+        }
+
+        public async Task RemoveQuestionAsync(
+            Guid assignmentId,
+            Guid assignmentExerciseId,
+            Guid questionId)
+        {
+            var assignment = await _repository.GetByIdAsync(assignmentId);
+            if (assignment is null)
+                throw new KeyNotFoundException($"Assignment with id '{assignmentId}' not found.");
+
+            var ae = assignment.AssignmentExercises.FirstOrDefault(e => e.Id == assignmentExerciseId);
+            if (ae is null)
+                throw new KeyNotFoundException($"AssignmentExercise '{assignmentExerciseId}' not found.");
+
+            // domain: KeyNotFoundException if question missing
+            ae.RemoveQuestion(questionId);
 
             await _repository.SaveChangesAsync();
         }

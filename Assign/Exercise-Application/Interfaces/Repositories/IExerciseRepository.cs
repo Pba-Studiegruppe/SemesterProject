@@ -17,5 +17,6 @@ namespace Exercise_Application.Interfaces.Repositories
         Task<Exercise> UpdateAsync(Exercise exercise, byte[] rowVersion);
         Task<Exercise?> GetForSnapshotAsync(Guid exerciseId);
         Task<Exercise?> GetForReviewAsync(Guid exerciseId);
+        Task<IEnumerable<Exercise>> GetAllAsync(string? search = null);
     }
 }

@@ -485,5 +485,16 @@ namespace Exercise_Infrastructure.DataAccess.Fakes
             var exercise = _exercises.FirstOrDefault(e => e.Id == exerciseId);
             return Task.FromResult(exercise);
         }
+
+        public Task<IEnumerable<Exercise>> GetAllAsync(string? search = null)
+        {
+            var result = _exercises.Any()
+                ? _exercises.Where(e =>
+                    string.IsNullOrEmpty(search) ||
+                    e.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    e.Content.Contains(search, StringComparison.OrdinalIgnoreCase))
+                : _exercises.AsEnumerable();
+            return Task.FromResult(result);
+        }
     }
 }

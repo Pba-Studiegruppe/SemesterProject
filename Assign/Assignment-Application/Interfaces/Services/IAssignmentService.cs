@@ -13,6 +13,8 @@ namespace Assignment_Application.Interfaces.Services
         Task<AssignmentDTO> CreateAssignmentAsync(CreateAssignmentRequest request);
         Task<AssignmentDTO> UpdateAssignmentAsync(Guid assignmentId, UpdateAssignmentRequest request);
         Task<AssignmentExerciseDTO> AddExerciseAsync(Guid assignmentId, CreateAssignmentExerciseRequest request);
-        Task RemoveExerciseAsync(Guid assignmentId,RemoveAssignmentExerciseRequest request);
+        Task RemoveExerciseAsync(Guid assignmentId, RemoveAssignmentExerciseRequest request);
+        Task SetQuestionPointsAsync(Guid assignmentId, Guid assignmentExerciseId, Guid questionId, SetQuestionPointsRequest request);
+        Task RemoveQuestionAsync(Guid assignmentId, Guid assignmentExerciseId, Guid questionId);
     }
 }

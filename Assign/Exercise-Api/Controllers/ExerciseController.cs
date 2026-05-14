@@ -22,8 +22,6 @@ namespace Exercise_Api.Controllers
             _reviewQuery = reviewQuery;
         }
 
-
-
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -77,6 +75,14 @@ namespace Exercise_Api.Controllers
             var projection = await _reviewQuery.GetForReviewAsync(id);
             if (projection is null) return NotFound();
             return Ok(projection);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllExercises([FromQuery] string? search = null)
+        {
+            var exercises = await _exerciseService.GetAllExercisesAsync(search);
+            return Ok(exercises);
         }
     }
 }
