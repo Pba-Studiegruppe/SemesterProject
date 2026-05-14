@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore Assign.sln
+      run: dotnet restore SemesterProject/Assign/Assign.sln
     - name: Build
-      run: dotnet build Assign.sln --no-restore
+      run: dotnet build SemesterProject/Assign/Assign.sln --no-restore
     - name: Test
-      run: dotnet test Assign.sln --no-build --verbosity detailed
+      run: dotnet test SemesterProject/Assign/Assign.sln --no-build --verbosity detailed
