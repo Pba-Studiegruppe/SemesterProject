@@ -1,16 +1,20 @@
 ﻿using System;
 
-public class ExerciseKeyword
+namespace Exercise_Domain.Entities
 {
-    public Guid ExerciseId { get; private set; }
 
-    public Guid KeywordId { get; private set; }
-
-    private ExerciseKeyword() { }
-
-    public ExerciseKeyword(Guid exerciseId, Guid keywordId)
+    public class ExerciseKeyword
     {
-        ExerciseId = exerciseId;
-        KeywordId = keywordId;
+        public Guid ExerciseId { get; private set; }
+
+        public Guid KeywordId { get; private set; }
+
+        private ExerciseKeyword() { }
+
+        public ExerciseKeyword(Guid exerciseId, Guid keywordId)
+        {
+            ExerciseId = exerciseId;
+            KeywordId = keywordId;
+        }
     }
 }

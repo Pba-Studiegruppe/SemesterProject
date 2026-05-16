@@ -22,7 +22,7 @@ namespace Exercise_Application.DTO
     public class CreateExerciseRequest
     {
         public string Title { get; set; } = string.Empty;
-        public string Content { get; set; } = string.Empty;
+        public string? Content { get; set; } = string.Empty;
         public Guid CreatedByTeacherId { get; set; }
         public List<CreateQuestionRequest?> Questions { get; set; } = new();
         public List<CreateExerciseKeywordRequest?> ExerciseKeywords { get; set; } = new();

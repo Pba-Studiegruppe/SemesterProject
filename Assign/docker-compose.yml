@@ -19,6 +19,69 @@ services:
       timeout: 5s
       retries: 10
   
+  exercise-api:
+    build:
+      context: .
+      dockerfile: Exercise-Api/Dockerfile
+    container_name: exercise-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development   
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__DefaultConnectionGateway: "Server=sqlserver,1433;Database=AssignDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true"
+    ports:
+      - "5199:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  assignment-api:
+    build:
+      context: .
+      dockerfile: Assignment-Api/Dockerfile
+    container_name: assignment-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=AssignDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true"
+      ExerciseApi__BaseUrl: "http://exercise-api:8080"
+    ports:
+      - "5158:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      exercise-api:
+        condition: service_started
+
+  course-api:
+    build:
+      context: .
+      dockerfile: Course-Api/Dockerfile
+    container_name: course-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=AssignDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true"
+    ports:
+      - "5160:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  assign-blazor:
+    build:
+      context: .
+      dockerfile: Assign/Dockerfile
+    container_name: assign-blazor
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+    ports:
+      - "5161:8080"
+    depends_on:
+      assignment-api:
+        condition: service_started
+      exercise-api:
+        condition: service_started
 
 volumes:
   sqlserver_data:

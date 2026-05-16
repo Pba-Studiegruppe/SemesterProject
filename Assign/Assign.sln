@@ -39,11 +39,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Course-Infrastructure", "Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Course-Tests", "Course-Tests\Course-Tests.csproj", "{BD260D6E-8087-46EB-943D-D6F46BBB9783}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database-Module", "Database-Module", "{FDE19340-E9E7-4D3D-AC00-287C6A5FAC35}"
-	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assignment-Api", "Assignment-Api\Assignment-Api.csproj", "{04062916-318E-445F-9984-E4924B484C7D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Exercise-Api", "Exercise-Api\Exercise-Api.csproj", "{04FB7B0F-0863-CCA2-C7DE-7C304216E2E2}"
@@ -55,6 +50,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assign.Web.Teacher", "Assign.Web.Teacher\Assign.Web.Teacher.csproj", "{61DFDFBB-5FEC-41A6-98C8-94F639183914}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assign.Web.Student", "Assign.Web.Student\Assign.Web.Student.csproj", "{EFAB12D2-BD68-464B-AF7A-D616EBCFB1FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{577C443B-1107-480A-AEB0-60421ED11F44}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -122,7 +122,6 @@ namespace Exercise_Tests.Application
             // Assert
             Assert.NotEmpty(result.Questions);
             Assert.True(result.Questions.Any());
-            Assert.True(result.Questions.Count() > 0);
         }
         [Fact]
         public async Task AddQuestionAsync_Should_Not_Add_Question_With_Empty_Title()
@@ -130,10 +129,9 @@ namespace Exercise_Tests.Application
             // Arrange
             var mockRepo = new Mock<IExerciseRepository>();
             var expectedExercise = new Exercise("title", "content", Guid.NewGuid());
-            var expectedQuestion = new Question(null, "QuestionContent");
             var addQuestionRequests = new List<CreateQuestionRequest>
             {
-                new CreateQuestionRequest {Title = expectedQuestion.Title, Content = expectedQuestion.Content}
+                new CreateQuestionRequest {Content = "QuestionContent"}
             };
 
             mockRepo.Setup(r => r.GetByIdAsync(expectedExercise.Id))
@@ -357,7 +355,7 @@ namespace Exercise_Tests.Application
             // Assert
             mockRepo.Verify(r => r.GetByIdAsync(It.IsAny<Guid>()), Times.Once);
         }
-        
+
         [Fact]
         public async Task RemoveQuestionAsync_Should_Call_ExerciseRepository_UpdateAsync()
         {

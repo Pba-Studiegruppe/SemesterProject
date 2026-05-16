@@ -73,7 +73,7 @@ namespace Exercise_Tests.Application
             var exerciseDto = new CreateExerciseRequest
             {
                 Title = "Title1",
-                Content = "Content1",
+                Content = null,
                 CreatedByTeacherId = Guid.NewGuid(),
             };
             var expectedExercise = new Exercise(exerciseDto.Title, exerciseDto.Content, exerciseDto.CreatedByTeacherId);
@@ -197,7 +197,7 @@ namespace Exercise_Tests.Application
                 Title = "Title1",
                 Content = "Content1",
                 CreatedByTeacherId = Guid.NewGuid(),
-                ExerciseKeywords = { new CreateExerciseKeywordRequest { KeywordId = keyword} }
+                ExerciseKeywords = { new CreateExerciseKeywordRequest { KeywordId = keyword } }
             };
             var expectedExercise = new Exercise(exerciseDto.Title, exerciseDto.Content, exerciseDto.CreatedByTeacherId);
             expectedExercise.AddKeyword(keyword);

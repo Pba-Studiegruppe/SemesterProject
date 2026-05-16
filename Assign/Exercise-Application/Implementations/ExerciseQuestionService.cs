@@ -24,7 +24,7 @@ namespace Exercise_Application.Implementations
                 foreach (var q in questions.Where(q => q != null))
                 {
                     exercise.AddQuestion(q!.Title, q.Content);
-
+                    
                     if (q.Solution != null)
                     {
                         exercise.Questions.Last().SetSolution(q.Solution.Content);

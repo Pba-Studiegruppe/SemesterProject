@@ -20,4 +20,9 @@ public partial class Course
     public virtual ICollection<CourseTeacher> CourseTeachers { get; set; } = new List<CourseTeacher>();
 
     public virtual Subject? Subject { get; set; }
+
+
+    private Exercise() : base(Guid.NewGuid()) { } // Required by EF Core
+
+
 }
