@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/Assignment-Module/">
+    <Project Path="Assignment-Application/Assignment-Application.csproj" />
+    <Project Path="Assignment-Domain/Assignment-Domain.csproj" />
+    <Project Path="Assignment-Infrastructure/Assignment-Infrastructure.csproj" />
+    <Project Path="Assignment-Tests/Assignment-Tests.csproj" />
+  </Folder>
+  <Folder Name="/Exercise-Module/">
+    <Project Path="Exercise-Api/Exercise-Api.csproj" />
+    <Project Path="Exercise-Application/Exercise-Application.csproj" />
+    <Project Path="Exercise-Domain/Exercise-Domain.csproj" />
+    <Project Path="Exercise-Infrastructure/Exercise-Infrastructure.csproj" />
+    <Project Path="Exercise-Tests/Exercise-Tests.csproj" />
+  </Folder>
+  <Folder Name="/Frontend/">
+    <Project Path="Assign-Frontend/Assign-Frontend.csproj" />
+  </Folder>
+  <Project Path="Assign/Assign.csproj" />
+  <Project Path="CourseModuleTest/CourseModuleTest.csproj" />
+  <Project Path="Shared/Shared.csproj" />
+</Solution>

@@ -1,0 +1,24 @@
+﻿version: "3.9"
+
+services:
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      ACCEPT_EULA: ${ACCEPT_EULA}
+      SA_PASSWORD: ${SA_PASSWORD}
+    ports:
+      - "${SQL_PORT}:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./docker/sqlserver:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  
+
+volumes:
+  sqlserver_data:

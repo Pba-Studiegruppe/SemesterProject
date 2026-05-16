@@ -1,0 +1,78 @@
+﻿@using Assign.Web.Teacher.Models.Assignment
+
+@if (IsOpen && Preview != null)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1" role="dialog" @onclick="HandleBackdropClick">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable" @onclick:stopPropagation="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Preview.Title</h5>
+                    <button type="button" class="btn-close" @onclick="OnClose"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrWhiteSpace(Preview.Content))
+                    {
+                        <div class="mb-3">
+                            <h6 class="small text-muted text-uppercase">Exercise</h6>
+                            <div class="p-3 bg-light rounded">@Preview.Content</div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Preview.SolutionContent))
+                    {
+                        <div class="mb-3">
+                            <h6 class="small text-muted text-uppercase">Solution</h6>
+                            <div class="p-3 rounded" style="background-color: #fff8e1;">
+                                @Preview.SolutionContent
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(Preview.SolutionVideoUrl))
+                            {
+                                <a href="@Preview.SolutionVideoUrl" target="_blank" class="small d-inline-block mt-1">
+                                    <i class="bi bi-camera-video me-1"></i>Solution video
+                                </a>
+                            }
+                        </div>
+                    }
+
+                    @if (Preview.Questions.Count > 0)
+                    {
+                        <h6 class="small text-muted text-uppercase">Questions</h6>
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var (q, idx) in Preview.Questions.Select((qq, i) => (qq, i)))
+                            {
+                                <div class="border rounded p-2">
+                                    <div class="fw-medium">@(idx + 1). @q.Title</div>
+                                    @if (!string.IsNullOrWhiteSpace(q.Content))
+                                    {
+                                        <p class="small mb-1">@q.Content</p>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(q.SolutionContent))
+                                    {
+                                        <details>
+                                            <summary class="small text-muted">Show solution</summary>
+                                            <div class="p-2 mt-1 rounded small" style="background-color: #fff8e1;">
+                                                @q.SolutionContent
+                                            </div>
+                                        </details>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="OnClose">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public ExercisePreviewModel? Preview { get; set; }
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private async Task HandleBackdropClick() => await OnClose.InvokeAsync();
+}
