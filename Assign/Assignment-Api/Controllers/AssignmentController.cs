@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Assignment_Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/assignments")]
     public class AssignmentController : ControllerBase
     {
         private readonly IAssignmentService _service;

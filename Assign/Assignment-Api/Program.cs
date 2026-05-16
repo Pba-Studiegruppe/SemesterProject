@@ -4,6 +4,7 @@ using Assignment_Application.Interfaces;
 using Assignment_Application.Interfaces.Repositories;
 using Assignment_Application.Interfaces.Services;
 using Assignment_Infrastructure.DataAccess;
+using Assignment_Infrastructure.DataAccess.Fakes;
 using Assignment_Infrastructure.Exercise;
 using Assignment_Infrastructure.Pdf;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AssignmentDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+// Fake Repositories
+builder.Services.AddSingleton<IAssignmentRepository, FakeAssignmentRepository>();
+builder.Services.AddSingleton<IAssignmentSetRepository, FakeAssignmentSetRepository>();
+
+// Real Repositories
+//builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IAssignmentPdfService, AssignmentPdfGenerator>();
 

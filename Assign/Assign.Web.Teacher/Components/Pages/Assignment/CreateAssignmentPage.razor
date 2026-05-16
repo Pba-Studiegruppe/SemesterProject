@@ -1,7 +1,11 @@
 ﻿@page "/assignments/create"
 @rendermode InteractiveServer
 @using Assign.Web.Teacher.Models.Assignment
+@using Assign.Web.Teacher.Services.ApiClients
 @using Assign.Web.Teacher.Services.MockData
+@using Microsoft.JSInterop
+@inject AssignmentApiClient AssignmentApi
+@inject IJSRuntime JS
 
 <PageTitle>Create Assignment</PageTitle>
 
@@ -23,15 +27,37 @@
                     <div class="mb-3">
                         <label for="title" class="form-label">Title</label>
                         <input id="title" class="form-control"
-                               @bind="_builder.Title"
+                               value="@_builder.Title"
+                               @onchange="HandleTitleChanged"
                                placeholder="e.g., Math Homework — Week 5" />
                     </div>
-                    <div class="mb-0">
+                    @if (!string.IsNullOrEmpty(_errorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            @_errorMessage
+                            <button type="button" class="btn-close" @onclick="() => _errorMessage = null"></button>
+                        </div>
+                    }
+
+                    <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
                         <textarea id="description" class="form-control" rows="3"
-                                  @bind="_builder.Description"
+                                  value="@_builder.Description"
+                                  @onchange="HandleDescriptionChanged"
                                   placeholder="A short description of this assignment"></textarea>
                     </div>
+                    <button class="btn btn-success w-100"
+                            disabled="@(IsCreated || _isBusy || string.IsNullOrWhiteSpace(_builder.Title))"
+                            @onclick="HandleCreateAssignment">
+                        @if (IsCreated)
+                        {
+                            <i class="bi bi-check-lg me-2"></i> <text>Assignment Created</text>
+                        }
+                        else
+                        {
+                            <i class="bi bi-plus-circle me-2"></i> <text>Create Assignment</text>
+                        }
+                    </button>
                 </div>
             </div>
 
@@ -41,16 +67,15 @@
                     <span class="badge bg-primary fs-6">@_builder.TotalPoints pts</span>
                 </div>
                 <div class="card-body">
-                    <SelectedExercisesList
-                        Exercises="_builder.Exercises"
-                        OnRemoveExercise="HandleRemoveExercise"
-                        OnRemoveQuestion="HandleRemoveQuestion"
-                        OnSetQuestionPoints="HandleSetQuestionPoints" />
+                    <SelectedExercisesList Exercises="_builder.Exercises"
+                                           OnRemoveExercise="HandleRemoveExercise"
+                                           OnRemoveQuestion="HandleRemoveQuestion"
+                                           OnSetQuestionPoints="HandleSetQuestionPoints" />
 
                     <hr />
 
                     <button class="btn btn-primary w-100"
-                            disabled="@(_builder.Exercises.Count == 0)"
+                            disabled="@(!IsCreated || _builder.Exercises.Count == 0 || _isBusy)"
                             @onclick="HandleGeneratePdf">
                         <i class="bi bi-file-earmark-pdf me-2"></i>Generate PDF
                     </button>
@@ -66,32 +91,32 @@
                     <small class="text-muted">Search and add exercises to your assignment</small>
                 </div>
                 <div class="card-body">
-                    <ExerciseCatalog
-                        Catalog="_catalog"
-                        OnAddExercise="HandleAddExercise"
-                        OnPreviewExercise="HandlePreviewExercise" />
+                    <ExerciseCatalog Catalog="_catalog"
+                                     OnAddExercise="HandleAddExercise"
+                                     OnPreviewExercise="HandlePreviewExercise" />
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<ExercisePreviewModal
-    Preview="_currentPreview"
-    IsOpen="_isPreviewOpen"
-    OnClose="ClosePreview" />
+<ExercisePreviewModal Preview="_currentPreview"
+                      IsOpen="_isPreviewOpen"
+                      OnClose="ClosePreview" />
 
 @code {
     private AssignmentBuilderModel _builder = new();
     private ExerciseCatalogModel _catalog = new();
     private ExercisePreviewModel? _currentPreview;
     private bool _isPreviewOpen;
+    private bool _isBusy;
+    private string? _errorMessage;
 
     protected override void OnInitialized()
     {
         _builder = new AssignmentBuilderModel
         {
-            AssignmentId = Guid.NewGuid(),
+            AssignmentId = Guid.Empty,
             Title = "Math Homework — Week 5",
             Description = "Linear equations, basic geometry, and a short reflection.",
             Exercises = []
@@ -100,52 +125,260 @@
         _catalog = AssignmentMockData.SeedCatalog();
     }
 
-    private void HandleAddExercise(ExerciseCatalogItemModel item)
+    private async Task HandleCreateAssignment()
+    {
+        if (IsCreated || _isBusy) return;
+
+        if (string.IsNullOrWhiteSpace(_builder.Title))
+        {
+            _errorMessage = "Please enter a title before creating the assignment.";
+            return;
+        }
+
+        // Snapshot whatever the user built locally before we overwrite _builder.
+        var localTitle = _builder.Title;
+        var localDescription = _builder.Description;
+        var localExercises = _builder.Exercises.ToList();
+
+        _isBusy = true;
+        try
+        {
+            // 1. Create the assignment shell.
+            var created = await AssignmentApi.CreateAssignmentAsync(localTitle, localDescription);
+            if (created is null)
+            {
+                _errorMessage = "Server returned an empty response when creating the assignment.";
+                return;
+            }
+
+            // The server may not echo title/description; keep the user's input.
+            created.Title = localTitle;
+            created.Description = localDescription;
+            created.Exercises = new();
+
+            // 2. Replay each local exercise against the server.
+            foreach (var localEx in localExercises)
+            {
+                var serverEx = await AssignmentApi.AddExerciseAsync(
+                    created.AssignmentId, localEx.SourceExerciseId);
+                if (serverEx is null) continue;
+
+                serverEx.Order = created.Exercises.Count;
+
+                // 3. Reconcile question-level edits by Order:
+                //    - Questions the user removed locally → delete on the server.
+                //    - Questions where the user set points locally → patch on the server.
+                var localByOrder = localEx.Questions.ToDictionary(qq => qq.Order);
+
+                foreach (var serverQ in serverEx.Questions.ToList())
+                {
+                    if (!localByOrder.TryGetValue(serverQ.Order, out var localQ))
+                    {
+                        await AssignmentApi.RemoveQuestionAsync(
+                            created.AssignmentId, serverEx.Id, serverQ.Id);
+                        serverEx.Questions.Remove(serverQ);
+                        continue;
+                    }
+
+                    if (localQ.Points != serverQ.Points)
+                    {
+                        await AssignmentApi.SetQuestionPointsAsync(
+                            created.AssignmentId, serverEx.Id, serverQ.Id, localQ.Points);
+                        serverQ.Points = localQ.Points;
+                    }
+                }
+
+                created.Exercises.Add(serverEx);
+            }
+
+            _builder = created;
+            _errorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to create assignment: {ex.Message}";
+        }
+        finally
+        {
+            _isBusy = false;
+        }
+    }
+
+    private bool IsCreated => _builder.AssignmentId != Guid.Empty;
+
+    private async Task HandleTitleChanged(ChangeEventArgs e)
+    {
+        _builder.Title = e.Value?.ToString() ?? string.Empty;
+        await PersistDetailsAsync();
+    }
+
+    private async Task HandleDescriptionChanged(ChangeEventArgs e)
+    {
+        _builder.Description = e.Value?.ToString() ?? string.Empty;
+        await PersistDetailsAsync();
+    }
+
+    private async Task PersistDetailsAsync()
+    {
+        if (!IsCreated)
+        {
+            _errorMessage = "Click 'Create Assignment' before making changes.";
+            return;
+        }
+
+        try
+        {
+            var updated = await AssignmentApi.UpdateAssignmentAsync(
+                _builder.AssignmentId, _builder.Title, _builder.Description);
+
+            if (updated is not null)
+            {
+                // Keep server as source of truth, but preserve local exercise list ordering
+                _builder.Title = updated.Title;
+                _builder.Description = updated.Description;
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to save details: {ex.Message}";
+        }
+    }
+
+    private async Task HandleAddExercise(ExerciseCatalogItemModel item)
     {
         if (item.IsAlreadyInAssignment) return;
 
-        var snapshot = AssignmentMockData.SnapshotFor(item);
-        snapshot.Order = _builder.Exercises.Count;
-        _builder.Exercises.Add(snapshot);
-        item.IsAlreadyInAssignment = true;
+        if (!IsCreated)
+        {
+            // Local build — use a mock snapshot until Create Assignment is clicked.
+            var snapshot = AssignmentMockData.SnapshotFor(item);
+            snapshot.Order = _builder.Exercises.Count;
+            _builder.Exercises.Add(snapshot);
+            item.IsAlreadyInAssignment = true;
+            return;
+        }
+
+        try
+        {
+            var added = await AssignmentApi.AddExerciseAsync(_builder.AssignmentId, item.Id);
+            if (added is not null)
+            {
+                added.Order = _builder.Exercises.Count;
+                _builder.Exercises.Add(added);
+                item.IsAlreadyInAssignment = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to add exercise: {ex.Message}";
+        }
     }
 
     private void HandlePreviewExercise(ExerciseCatalogItemModel item)
     {
+        // Preview still mocked in pass 1 — pass 2 will fetch from ExerciseApiClient.
         _currentPreview = AssignmentMockData.PreviewFor(item);
         _isPreviewOpen = true;
     }
 
     private void ClosePreview() => _isPreviewOpen = false;
 
-    private void HandleRemoveExercise(Guid assignmentExerciseId)
+    private async Task HandleRemoveExercise(Guid assignmentExerciseId)
     {
         var ae = _builder.Exercises.FirstOrDefault(e => e.Id == assignmentExerciseId);
         if (ae is null) return;
 
-        _builder.Exercises.Remove(ae);
+        if (!IsCreated)
+        {
+            _builder.Exercises.Remove(ae);
+            var localCatalogItem = _catalog.Results.FirstOrDefault(i => i.Id == ae.SourceExerciseId);
+            if (localCatalogItem != null) localCatalogItem.IsAlreadyInAssignment = false;
+            return;
+        }
 
-        // Re-enable the "Add" button in the catalog
-        var catalogItem = _catalog.Results.FirstOrDefault(i => i.Id == ae.SourceExerciseId);
-        if (catalogItem != null) catalogItem.IsAlreadyInAssignment = false;
+        try
+        {
+            await AssignmentApi.RemoveExerciseAsync(_builder.AssignmentId, assignmentExerciseId);
+
+            _builder.Exercises.Remove(ae);
+            var catalogItem = _catalog.Results.FirstOrDefault(i => i.Id == ae.SourceExerciseId);
+            if (catalogItem != null) catalogItem.IsAlreadyInAssignment = false;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to remove exercise: {ex.Message}";
+        }
     }
 
-    private void HandleRemoveQuestion(RemoveQuestionEventArgs args)
+    private async Task HandleRemoveQuestion(RemoveQuestionEventArgs args)
     {
         var ae = _builder.Exercises.FirstOrDefault(e => e.Id == args.AssignmentExerciseId);
         var q = ae?.Questions.FirstOrDefault(qq => qq.Id == args.QuestionId);
-        if (q != null) ae!.Questions.Remove(q);
+        if (ae is null || q is null) return;
+
+        if (!IsCreated)
+        {
+            ae.Questions.Remove(q);
+            return;
+        }
+
+        try
+        {
+            await AssignmentApi.RemoveQuestionAsync(_builder.AssignmentId, ae.Id, q.Id);
+            ae.Questions.Remove(q);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to remove question: {ex.Message}";
+        }
     }
 
-    private void HandleSetQuestionPoints(SetQuestionPointsEventArgs args)
+    private async Task HandleSetQuestionPoints(SetQuestionPointsEventArgs args)
     {
         var ae = _builder.Exercises.FirstOrDefault(e => e.Id == args.AssignmentExerciseId);
         var q = ae?.Questions.FirstOrDefault(qq => qq.Id == args.QuestionId);
-        if (q != null) q.Points = args.Points;
+        if (ae is null || q is null) return;
+
+        if (!IsCreated)
+        {
+            q.Points = args.Points;
+            return;
+        }
+
+        try
+        {
+            await AssignmentApi.SetQuestionPointsAsync(_builder.AssignmentId, ae.Id, q.Id, args.Points);
+            q.Points = args.Points;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to set points: {ex.Message}";
+        }
     }
 
-    private void HandleGeneratePdf()
+    private async Task HandleGeneratePdf()
     {
-        // TODO: call AssignmentApiClient.GetPdfAsync once wired
+        if (_builder.AssignmentId == Guid.Empty || _isBusy) return;
+
+        _isBusy = true;
+        try
+        {
+            var bytes = await AssignmentApi.GetPdfAsync(_builder.AssignmentId);
+
+            using var stream = new MemoryStream(bytes);
+            using var streamRef = new DotNetStreamReference(stream);
+            await JS.InvokeVoidAsync(
+                "downloadFileFromStream",
+                $"assignment-{_builder.AssignmentId:D}.pdf",
+                streamRef);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to generate PDF: {ex.Message}";
+        }
+        finally
+        {
+            _isBusy = false;
+        }
     }
 }

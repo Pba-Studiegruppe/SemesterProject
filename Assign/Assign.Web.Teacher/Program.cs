@@ -9,19 +9,25 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddHttpClient<Assign_Frontend.Services.ExerciseApiClient>(c =>
 {
-    c.BaseAddress = new Uri(builder.Configuration["ExerciseApi:BaseUrl"]!);
+    c.BaseAddress = new Uri(
+        builder.Configuration["ExerciseApi:BaseUrl"]
+        ?? throw new InvalidOperationException("ExerciseApi:BaseUrl is not configured."));
 });
 builder.Services.AddHttpClient<Assign_Frontend.Services.KeywordApiClient>(c =>
 {
-    c.BaseAddress = new Uri(builder.Configuration["ExerciseApi:BaseUrl"]!);
+    c.BaseAddress = new Uri(
+        builder.Configuration["ExerciseApi:BaseUrl"]
+        ?? throw new InvalidOperationException("ExerciseApi:BaseUrl is not configured."));
 });
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(o =>
 {
     o.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
-builder.Services.AddHttpClient<AssignmentApiClient>(client =>
+builder.Services.AddHttpClient<AssignmentApiClient>(c =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["AssignmentApi:BaseUrl"]!);
+    c.BaseAddress = new Uri(
+        builder.Configuration["AssignmentApi:BaseUrl"] 
+        ?? throw new InvalidOperationException("ExerciseApi:BaseUrl is not configured.")); 
 });
 
 var app = builder.Build();

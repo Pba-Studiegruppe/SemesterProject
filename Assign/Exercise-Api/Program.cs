@@ -20,12 +20,12 @@ builder.Services.AddDbContext<ExerciseDbContext>(options =>
 //TODO: Hardcoded connectionstring, fix for later
 
 // Real (when the DB is up):
-builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
-builder.Services.AddScoped<IKeywordRepository, KeywordRepository>();
+//builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
+//builder.Services.AddScoped<IKeywordRepository, KeywordRepository>();
 
 // Fake (while waiting for the DB):
-//builder.Services.AddSingleton<IExerciseRepository, FakeExerciseRepository>();
-//builder.Services.AddSingleton<IKeywordRepository, FakeKeywordRepository>();
+builder.Services.AddSingleton<IExerciseRepository, FakeExerciseRepository>();
+builder.Services.AddSingleton<IKeywordRepository, FakeKeywordRepository>();
 
 // Services
 builder.Services.AddScoped<IExerciseService, ExerciseService>();

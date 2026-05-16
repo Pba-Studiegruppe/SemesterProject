@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Exercise_Api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class KeywordController : ControllerBase
     {
         private readonly IKeywordService _keywordService;
