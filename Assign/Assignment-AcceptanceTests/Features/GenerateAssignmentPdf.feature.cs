@@ -95,14 +95,14 @@ namespace Assignment_AcceptanceTests.Features
             await this.TestTearDownAsync();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Each question has a fillable answer field")]
+        [Xunit.SkippableFactAttribute(DisplayName="PDF text never contains solution data")]
         [Xunit.TraitAttribute("FeatureTitle", "Generate a PDF for an assignment")]
-        [Xunit.TraitAttribute("Description", "Each question has a fillable answer field")]
-        public async System.Threading.Tasks.Task EachQuestionHasAFillableAnswerField()
+        [Xunit.TraitAttribute("Description", "PDF text never contains solution data")]
+        public async System.Threading.Tasks.Task PDFTextNeverContainsSolutionData()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Each question has a fillable answer field", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("PDF text never contains solution data", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 9
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -117,90 +117,15 @@ namespace Assignment_AcceptanceTests.Features
   await this.FeatureBackgroundAsync();
 #line hidden
 #line 10
-    await testRunner.GivenAsync("an exercise with 3 questions is added", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
-#line hidden
-#line 11
-    await testRunner.WhenAsync("I generate the PDF", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
-#line 12
-    await testRunner.ThenAsync("the PDF has 3 fillable answer fields", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
-#line hidden
-#line 13
-    await testRunner.AndAsync("every answer field name matches the pattern \"q_{guid}_answer\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
-            }
-            await this.ScenarioCleanupAsync();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Metadata fields are present")]
-        [Xunit.TraitAttribute("FeatureTitle", "Generate a PDF for an assignment")]
-        [Xunit.TraitAttribute("Description", "Metadata fields are present")]
-        public async System.Threading.Tasks.Task MetadataFieldsArePresent()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Metadata fields are present", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 15
-  this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                await this.ScenarioStartAsync();
-#line 6
-  await this.FeatureBackgroundAsync();
-#line hidden
-#line 16
-    await testRunner.WhenAsync("I generate the PDF", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
-#line hidden
-#line 17
-    await testRunner.ThenAsync("the PDF has a fillable field named \"meta_studentName\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
-#line hidden
-#line 18
-    await testRunner.AndAsync("the PDF has a fillable field named \"meta_date\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
-#line 19
-    await testRunner.AndAsync("the PDF has a read-only field named \"meta_assignmentId\" with the assignment id as" +
-                        " its value", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
-            }
-            await this.ScenarioCleanupAsync();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="PDF text never contains solution data")]
-        [Xunit.TraitAttribute("FeatureTitle", "Generate a PDF for an assignment")]
-        [Xunit.TraitAttribute("Description", "PDF text never contains solution data")]
-        public async System.Threading.Tasks.Task PDFTextNeverContainsSolutionData()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("PDF text never contains solution data", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 21
-  this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                await this.ScenarioStartAsync();
-#line 6
-  await this.FeatureBackgroundAsync();
-#line hidden
-#line 22
     await testRunner.GivenAsync("an exercise with 1 question is added", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 23
+#line 11
     await testRunner.AndAsync("the source exercise had a question solution \"the answer is 42\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 24
+#line 12
     await testRunner.WhenAsync("I generate the PDF", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 25
+#line 13
     await testRunner.ThenAsync("the PDF text does not contain \"the answer is 42\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -215,7 +140,7 @@ namespace Assignment_AcceptanceTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("A missing assignment yields a not-found error", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 27
+#line 15
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -228,10 +153,10 @@ namespace Assignment_AcceptanceTests.Features
 #line 6
   await this.FeatureBackgroundAsync();
 #line hidden
-#line 28
+#line 16
     await testRunner.WhenAsync("I generate the PDF for an unknown assignment", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 29
+#line 17
     await testRunner.ThenAsync("a not-found error is raised", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

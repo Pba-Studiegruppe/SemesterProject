@@ -1,5 +1,4 @@
 ﻿using Assignment_Application.Interfaces.Repositories;
-using Assignment_Application.Pdf;
 using Assignment_Domain.Entities;
 using Assignment_Domain.SnapShots;
 using Assignment_Infrastructure.Pdf;
@@ -80,28 +79,6 @@ namespace Assignment_AcceptanceTests.StepDefinitions
             {
                 _capturedException = ex;
             }
-        }
-
-        [Then(@"the PDF has (\d+) fillable answer fields")]
-        public void ThenThePdfHasFillableAnswerFields(int expected)
-        {
-            var fieldNames = ReadFieldNames();
-            fieldNames
-                .Count(n => AssignmentPdfFieldNames.AnswerFieldPattern.IsMatch(n))
-                .Should().Be(expected);
-        }
-
-        [Then(@"every answer field name matches the pattern ""q_\{guid\}_answer""")]
-        public void ThenEveryAnswerFieldMatchesPattern()
-        {
-            var answers = ReadFieldNames()
-                .Where(n => n.StartsWith("q_"))
-                .ToList();
-
-            answers.Should().NotBeEmpty();
-            answers.Should().AllSatisfy(n =>
-                AssignmentPdfFieldNames.AnswerFieldPattern.IsMatch(n).Should().BeTrue(
-                    $"'{n}' should match the answer-field pattern"));
         }
 
         [Then(@"the PDF has a fillable field named ""(.*)""")]

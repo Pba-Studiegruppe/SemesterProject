@@ -151,24 +151,22 @@
 
 @code {
 
-    [Parameter]
-    public int QuestionNumber { get; set; }
+    [Parameter] public int QuestionNumber { get; set; }
 
-    [Parameter]
-    public EventCallback OnDuplicate { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> TitleChanged { get; set; }
 
-    [Parameter]
-    public EventCallback OnDelete { get; set; }
+    [Parameter] public string Content { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ContentChanged { get; set; }
+
+    [Parameter] public string Solution { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> SolutionChanged { get; set; }
+
+    [Parameter] public EventCallback OnDuplicate { get; set; }
+    [Parameter] public EventCallback OnDelete { get; set; }
 
     private bool IsExpanded = true;
-
     private bool ShowSolution = false;
-
-    private string Title = string.Empty;
-
-    private string Content = string.Empty;
-
-    private string Solution = string.Empty;
 
     private void ToggleExpanded()
     {
@@ -180,18 +178,21 @@
         ShowSolution = !ShowSolution;
     }
 
-    private void HandleTitleChanged(ChangeEventArgs e)
+    private async Task HandleTitleChanged(ChangeEventArgs e)
     {
         Title = e.Value?.ToString() ?? string.Empty;
+        await TitleChanged.InvokeAsync(Title);
     }
 
-    private void HandleContentChanged(string value)
+    private async Task HandleContentChanged(string value)
     {
         Content = value;
+        await ContentChanged.InvokeAsync(Content);
     }
 
-    private void HandleSolutionChanged(string value)
+    private async Task HandleSolutionChanged(string value)
     {
         Solution = value;
+        await SolutionChanged.InvokeAsync(Solution);
     }
 }

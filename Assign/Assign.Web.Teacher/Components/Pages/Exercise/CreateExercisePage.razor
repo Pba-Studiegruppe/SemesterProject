@@ -117,6 +117,9 @@
 
                             <QuestionCard @key="question.LocalId"
                                           QuestionNumber="@(index + 1)"
+                                          @bind-Title="question.Title"
+                                          @bind-Content="question.Content"
+                                          @bind-Solution="question.SolutionContent"
                                           OnDuplicate="@(() => DuplicateQuestion(index))"
                                           OnDelete="@(() => DeleteQuestion(index))" />
                         }

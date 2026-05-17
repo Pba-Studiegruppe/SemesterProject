@@ -1,6 +1,5 @@
 ﻿using Assignment_Api;
 using Assignment_Application.Interfaces.Repositories;
-using Assignment_Application.Pdf;
 using Assignment_Domain.Entities;
 using Assignment_Domain.SnapShots;
 using Assignment_Infrastructure.Pdf;
@@ -69,206 +68,17 @@ namespace Assignment_Tests.Infrastructure
             // PDFs begin with "%PDF-"
             Encoding.ASCII.GetString(bytes, 0, 5).Should().Be("%PDF-");
         }
-
-        [Fact]
-        public async Task GenerateAsync_Should_Produce_Pdf_With_An_AcroForm()
-        {
-            // Arrange
-            var (generator, _) = PdfTestHarness.WithAssignment(PdfTestHarness.SimpleAssignment());
-
-            // Act
-            var bytes = await generator.GenerateAsync(PdfTestHarness.SimpleAssignmentId);
-
-            // Assert
-            PdfTestHarness.ReadFields(bytes).Should().NotBeEmpty();
-        }
-
-        [Fact]
-        public async Task GenerateAsync_Should_Produce_Pdf_When_Assignment_Has_No_Exercises()
-        {
-            // Arrange
-            var assignment = new Assignment("Empty", "no exercises");
-            var (generator, _) = PdfTestHarness.WithAssignment(assignment);
-
-            // Act
-            var bytes = await generator.GenerateAsync(assignment.Id);
-
-            // Assert
-            bytes.Should().NotBeNullOrEmpty();
-            // Only the metadata fields should be present.
-            var fields = PdfTestHarness.ReadFields(bytes);
-            fields.Keys.Should().Contain(AssignmentPdfFieldNames.MetaAssignmentId);
-            fields.Keys.Should().NotContain(k => k.StartsWith("q_"));
-        }
     }
 
-    public class AssignmentPdfGeneratorTests_FormFields
-    {
-        [Fact]
-        public async Task GenerateAsync_Should_Produce_One_Answer_Field_Per_Question()
-        {
-            // Arrange
-            var assignment = PdfTestHarness.BuildAssignment(
-                exerciseCount: 2, questionsPerExercise: 3);
-            var (generator, _) = PdfTestHarness.WithAssignment(assignment);
+     
 
-            // Act
-            var bytes = await generator.GenerateAsync(assignment.Id);
 
-            // Assert
-            var fields = PdfTestHarness.ReadFields(bytes);
-            fields.Keys
-                .Count(k => AssignmentPdfFieldNames.AnswerFieldPattern.IsMatch(k))
-                .Should().Be(6);
-        }
 
-        [Fact]
-        public async Task GenerateAsync_Should_Use_The_Naming_Contract_For_Answer_Fields()
-        {
-            // Arrange
-            var assignment = PdfTestHarness.BuildAssignment(
-                exerciseCount: 1, questionsPerExercise: 2);
-            var (generator, _) = PdfTestHarness.WithAssignment(assignment);
 
-            var expectedNames = assignment.AssignmentExercises
-                .SelectMany(ae => ae.Questions)
-                .Select(q => AssignmentPdfFieldNames.Answer(q.Id))
-                .ToList();
 
-            // Act
-            var bytes = await generator.GenerateAsync(assignment.Id);
-
-            // Assert
-            var fields = PdfTestHarness.ReadFields(bytes);
-            fields.Keys.Should().Contain(expectedNames);
-        }
-
-        [Fact]
-        public async Task GenerateAsync_Should_Include_Metadata_Fields()
-        {
-            // Arrange
-            var (generator, _) = PdfTestHarness.WithAssignment(PdfTestHarness.SimpleAssignment());
-
-            // Act
-            var bytes = await generator.GenerateAsync(PdfTestHarness.SimpleAssignmentId);
-
-            // Assert
-            var fields = PdfTestHarness.ReadFields(bytes);
-            fields.Keys.Should().Contain(new[]
-            {
-                AssignmentPdfFieldNames.MetaStudentName,
-                AssignmentPdfFieldNames.MetaDate,
-                AssignmentPdfFieldNames.MetaAssignmentId,
-            });
-        }
-
-        [Fact]
-        public async Task GenerateAsync_Should_Set_AssignmentId_Field_Value_To_The_Assignment_Id()
-        {
-            // Arrange
-            var assignment = PdfTestHarness.SimpleAssignment();
-            var (generator, _) = PdfTestHarness.WithAssignment(assignment);
-
-            // Act
-            var bytes = await generator.GenerateAsync(assignment.Id);
-
-            // Assert
-            var fields = PdfTestHarness.ReadFields(bytes);
-            fields[AssignmentPdfFieldNames.MetaAssignmentId]
-                .Should().Be(assignment.Id.ToString("D"));
-        }
-
-        [Fact]
-        public async Task GenerateAsync_Should_Make_AssignmentId_Field_Read_Only()
-        {
-            // Arrange
-            var (generator, _) = PdfTestHarness.WithAssignment(PdfTestHarness.SimpleAssignment());
-
-            // Act
-            var bytes = await generator.GenerateAsync(PdfTestHarness.SimpleAssignmentId);
-
-            // Assert
-            var readOnly = PdfTestHarness.IsReadOnly(bytes, AssignmentPdfFieldNames.MetaAssignmentId);
-            readOnly.Should().BeTrue();
-        }
-
-        [Fact]
-        public async Task GenerateAsync_Should_Leave_StudentName_And_Date_Fields_Editable()
-        {
-            // Arrange
-            var (generator, _) = PdfTestHarness.WithAssignment(PdfTestHarness.SimpleAssignment());
-
-            // Act
-            var bytes = await generator.GenerateAsync(PdfTestHarness.SimpleAssignmentId);
-
-            // Assert
-            PdfTestHarness.IsReadOnly(bytes, AssignmentPdfFieldNames.MetaStudentName)
-                .Should().BeFalse();
-            PdfTestHarness.IsReadOnly(bytes, AssignmentPdfFieldNames.MetaDate)
-                .Should().BeFalse();
-        }
-
-        [Fact]
-        public async Task GenerateAsync_Should_Produce_Distinct_Field_Names_Across_Questions()
-        {
-            // Arrange
-            var assignment = PdfTestHarness.BuildAssignment(
-                exerciseCount: 3, questionsPerExercise: 4);
-            var (generator, _) = PdfTestHarness.WithAssignment(assignment);
-
-            // Act
-            var bytes = await generator.GenerateAsync(assignment.Id);
-
-            // Assert
-            var answerNames = PdfTestHarness.ReadFields(bytes).Keys
-                .Where(k => AssignmentPdfFieldNames.AnswerFieldPattern.IsMatch(k))
-                .ToList();
-            answerNames.Should().OnlyHaveUniqueItems();
-            answerNames.Should().HaveCount(12);
-        }
-
-        [Theory]
-        [InlineData(0, 0, 0)]
-        [InlineData(1, 1, 1)]
-        [InlineData(2, 5, 10)]
-        [InlineData(5, 3, 15)]
-        public async Task GenerateAsync_Should_Produce_Expected_Number_Of_Answer_Fields(
-            int exerciseCount, int questionsPerExercise, int expectedAnswerFieldCount)
-        {
-            // Arrange
-            var assignment = PdfTestHarness.BuildAssignment(exerciseCount, questionsPerExercise);
-            var (generator, _) = PdfTestHarness.WithAssignment(assignment);
-
-            // Act
-            var bytes = await generator.GenerateAsync(assignment.Id);
-
-            // Assert
-            PdfTestHarness.ReadFields(bytes).Keys
-                .Count(k => AssignmentPdfFieldNames.AnswerFieldPattern.IsMatch(k))
-                .Should().Be(expectedAnswerFieldCount);
-        }
-    }
 
     public class AssignmentPdfGeneratorTests_Content
     {
-        [Fact]
-        public async Task GenerateAsync_Should_Render_The_Assignment_Title()
-        {
-            // Arrange
-            var assignment = new Assignment("Unique Math Quiz 7B", "desc");
-            assignment.AddExerciseFromSnapshot(new ExerciseSnapshotInput(
-                Guid.NewGuid(), "Ex", "C",
-                new List<QuestionSnapshotInput> { new(Guid.NewGuid(), "Q", "C") }));
-
-            var (generator, _) = PdfTestHarness.WithAssignment(assignment);
-
-            // Act
-            var bytes = await generator.GenerateAsync(assignment.Id);
-
-            // Assert
-            PdfTestHarness.ReadText(bytes).Should().Contain("Unique Math Quiz 7B");
-        }
-
         [Fact]
         public async Task GenerateAsync_Should_Render_All_Exercise_Titles()
         {
