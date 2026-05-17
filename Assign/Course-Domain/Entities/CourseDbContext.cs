@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace Course_Api;
+namespace Course_Domain.Entities;
 
 public partial class CourseDbContext : DbContext
 {

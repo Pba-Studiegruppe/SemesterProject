@@ -8,6 +8,7 @@ namespace Assign_Frontend.Services;
 /// </summary>
 public class KeywordApiClient
 {
+    //TODO: This could probably be changed to IHttpClientFactory and then we can have a single HttpClient for all API clients, but for now this is fine.
     private readonly HttpClient _http;
     private readonly ILogger<KeywordApiClient> _logger;
 
