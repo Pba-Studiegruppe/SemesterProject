@@ -1,10 +1,12 @@
 ﻿@page "/assignments/create"
 @rendermode InteractiveServer
 @using Assign.Web.Teacher.Models.Assignment
+@using Assign.Web.Teacher.Models.Exercise
 @using Assign.Web.Teacher.Services.ApiClients
-@using Assign.Web.Teacher.Services.MockData
+@using Assign_Frontend.Services
 @using Microsoft.JSInterop
 @inject AssignmentApiClient AssignmentApi
+@inject ExerciseApiClient ExerciseApi
 @inject IJSRuntime JS
 
 <PageTitle>Create Assignment</PageTitle>
@@ -112,7 +114,7 @@
     private bool _isBusy;
     private string? _errorMessage;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _builder = new AssignmentBuilderModel
         {
@@ -122,7 +124,33 @@
             Exercises = []
         };
 
-        _catalog = AssignmentMockData.SeedCatalog();
+        await LoadCatalogAsync();
+    }
+
+    private async Task LoadCatalogAsync()
+    {
+        try
+        {
+            var exercises = await ExerciseApi.GetAllAsync();
+
+            _catalog = new ExerciseCatalogModel
+            {
+                SearchQuery = string.Empty,
+                Results = exercises.Select(e => new ExerciseCatalogItemModel
+                {
+                    Id = e.Id,
+                    Title = e.Title,
+                    Content = string.Empty,   // ExerciseResponse doesn't carry a description
+                    QuestionCount = 0,         // ExerciseResponse doesn't carry a count
+                    IsAlreadyInAssignment = false
+                }).ToList()
+            };
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to load exercise catalog: {ex.Message}";
+            _catalog = new ExerciseCatalogModel();
+        }
     }
 
     private async Task HandleCreateAssignment()
@@ -156,7 +184,9 @@
             created.Description = localDescription;
             created.Exercises = new();
 
-            // 2. Replay each local exercise against the server.
+            // 2. Persist each picked exercise. Question-level edits made before Create
+            //    aren't replayed — the user can adjust points / remove questions in
+            //    saved mode where edits sync immediately.
             foreach (var localEx in localExercises)
             {
                 var serverEx = await AssignmentApi.AddExerciseAsync(
@@ -164,30 +194,6 @@
                 if (serverEx is null) continue;
 
                 serverEx.Order = created.Exercises.Count;
-
-                // 3. Reconcile question-level edits by Order:
-                //    - Questions the user removed locally → delete on the server.
-                //    - Questions where the user set points locally → patch on the server.
-                var localByOrder = localEx.Questions.ToDictionary(qq => qq.Order);
-
-                foreach (var serverQ in serverEx.Questions.ToList())
-                {
-                    if (!localByOrder.TryGetValue(serverQ.Order, out var localQ))
-                    {
-                        await AssignmentApi.RemoveQuestionAsync(
-                            created.AssignmentId, serverEx.Id, serverQ.Id);
-                        serverEx.Questions.Remove(serverQ);
-                        continue;
-                    }
-
-                    if (localQ.Points != serverQ.Points)
-                    {
-                        await AssignmentApi.SetQuestionPointsAsync(
-                            created.AssignmentId, serverEx.Id, serverQ.Id, localQ.Points);
-                        serverQ.Points = localQ.Points;
-                    }
-                }
-
                 created.Exercises.Add(serverEx);
             }
 
@@ -250,11 +256,42 @@
 
         if (!IsCreated)
         {
-            // Local build — use a mock snapshot until Create Assignment is clicked.
-            var snapshot = AssignmentMockData.SnapshotFor(item);
-            snapshot.Order = _builder.Exercises.Count;
-            _builder.Exercises.Add(snapshot);
-            item.IsAlreadyInAssignment = true;
+            try
+            {
+                var snapshot = await ExerciseApi.GetSnapshotAsync(item.Id);
+                if (snapshot is null)
+                {
+                    _errorMessage = "Exercise is no longer available.";
+                    return;
+                }
+
+                var localExercise = new AssignmentExerciseModel
+                {
+                    Id = Guid.NewGuid(),                       // local placeholder; server issues a real id on Create
+                    SourceExerciseId = snapshot.Id,
+                    Title = snapshot.Title,
+                    Content = snapshot.Description ?? string.Empty,
+                    Order = _builder.Exercises.Count,
+                    SnapshotTakenAt = DateTime.UtcNow,
+                    Questions = snapshot.Questions
+    .Select((q, i) => new AssignmentQuestionModel
+    {
+        Id = Guid.NewGuid(),               // local placeholder
+        Title = string.IsNullOrWhiteSpace(q.Title) ? $"Question {i + 1}" : q.Title,
+        Content = q.Content,
+        Points = 0,
+        Order = i
+    })
+    .ToList()
+                };
+
+                _builder.Exercises.Add(localExercise);
+                item.IsAlreadyInAssignment = true;
+            }
+            catch (Exception ex)
+            {
+                _errorMessage = $"Failed to load exercise: {ex.Message}";
+            }
             return;
         }
 
@@ -274,11 +311,40 @@
         }
     }
 
-    private void HandlePreviewExercise(ExerciseCatalogItemModel item)
+    private async Task HandlePreviewExercise(ExerciseCatalogItemModel item)
     {
-        // Preview still mocked in pass 1 — pass 2 will fetch from ExerciseApiClient.
-        _currentPreview = AssignmentMockData.PreviewFor(item);
-        _isPreviewOpen = true;
+        try
+        {
+            var review = await ExerciseApi.GetReviewAsync(item.Id);
+            if (review is null)
+            {
+                _errorMessage = "Exercise is no longer available.";
+                return;
+            }
+
+            _currentPreview = new ExercisePreviewModel
+            {
+                Id = review.Id,
+                Title = review.Title,
+                Content = review.Description ?? string.Empty,
+                SolutionContent = null,        // ExerciseReviewResponse has no exercise-level solution field
+                SolutionVideoUrl = null,
+                Questions = review.Questions
+    .Select((q, i) => new ExercisePreviewQuestionModel
+    {
+        Id = q.Id,
+        Title = string.IsNullOrWhiteSpace(q.Title) ? $"Question {i + 1}" : q.Title,
+        Content = q.Content,
+        SolutionContent = q.Solution
+    })
+    .ToList()
+            };
+            _isPreviewOpen = true;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to load preview: {ex.Message}";
+        }
     }
 
     private void ClosePreview() => _isPreviewOpen = false;

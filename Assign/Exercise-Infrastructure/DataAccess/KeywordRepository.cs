@@ -28,7 +28,9 @@ namespace Exercise_Infrastructure.DataAccess
 
         public async Task<Keyword> GetKeywordByIdAsync(Guid keywordId)
         {
-            return await _dbContext.Keywords.FirstOrDefaultAsync(k => k.Id == keywordId);
+            var keywords = await _dbContext.Keywords.FirstOrDefaultAsync(k => k.Id == keywordId);
+            if (keywords == null) {throw new Exception("Keyword not found");}
+            return keywords;
         }
     }
 }

@@ -109,7 +109,8 @@ public class ExerciseReviewResponse
 public class ExerciseQuestionReviewDto
 {
     public Guid Id { get; set; }
-    public string Text { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
     public int Order { get; set; }
     public string? Solution { get; set; }
 }
@@ -126,6 +127,7 @@ public class ExerciseSnapshotResponse
 public class ExerciseQuestionSnapshotDto
 {
     public Guid Id { get; set; }
-    public string Text { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
     public int Order { get; set; }
 }
