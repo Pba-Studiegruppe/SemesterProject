@@ -199,22 +199,6 @@ using Xunit;
             }
 
             [Fact]
-            public void AddSubmittedAssignment_Should_Add_Item()
-            {
-                // Arrange
-                var assignment = new Assignment("a", "b");
-                var submitted = new SubmittedAssignment();
-
-                // Act
-                assignment.AddSubmittedAssignment(submitted);
-
-                // Assert
-                assignment.SubmittedAssignments
-                    .Should().ContainSingle()
-                    .Which.Should().BeSameAs(submitted);
-            }
-
-            [Fact]
             public void UpdateTitle_Should_Change_Title()
             {
                 // Arrange

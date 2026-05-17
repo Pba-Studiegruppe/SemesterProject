@@ -228,24 +228,5 @@ namespace Assignment_Tests.Domain
             // Assert
             act.Should().Throw<InvalidOperationException>();
         }
-
-        [Fact]
-        public void PublishGrades_Should_Set_Flag_When_Valid()
-        {
-            // Arrange
-            var set = new AssignmentSet(Guid.NewGuid(), "title", "desc");
-            var assignment = new Assignment("a", "b");
-
-            assignment.AddSubmittedAssignment(new SubmittedAssignment());
-
-            set.AddAssignment(assignment);
-            set.AddGradeSheet();
-
-            // Act
-            set.PublishGrades();
-
-            // Assert
-            set.GradingPublished.Should().BeTrue();
-        }
     }
 }

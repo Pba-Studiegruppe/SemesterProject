@@ -22,13 +22,10 @@ public partial class AssignmentDbContext : DbContext
     public virtual DbSet<AssignmentExercise> AssignmentExercises { get; set; }
 
     public virtual DbSet<AssignmentQuestion> AssignmentQuestions { get; set; }
-    public virtual DbSet<AssignmentFeedback> AssignmentFeedbacks { get; set; }
 
     public virtual DbSet<AssignmentSet> AssignmentSets { get; set; }
 
     public virtual DbSet<ErrorType> ErrorTypes { get; set; }
-
-    public virtual DbSet<ExerciseFeedback> ExerciseFeedbacks { get; set; }
 
     public virtual DbSet<GradeSheet> GradeSheets { get; set; }
 
@@ -112,19 +109,6 @@ public partial class AssignmentDbContext : DbContext
             entity.Property(q => q.RowVersion).IsRowVersion().IsConcurrencyToken();
         });
 
-        modelBuilder.Entity<AssignmentFeedback>(entity =>
-        {
-            entity.ToTable("AssignmentFeedback");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.RowVersion)
-                .IsRowVersion()
-                .IsConcurrencyToken();
-
-            entity.HasOne(d => d.SubmittedAssignment).WithMany(p => p.AssignmentFeedbacks)
-                .HasForeignKey(d => d.SubmittedAssignmentId)
-                .HasConstraintName("FK_AssignmentFeedback_SubmittedAssignment");
-        });
 
         modelBuilder.Entity<AssignmentSet>(entity =>
         {
@@ -142,43 +126,6 @@ public partial class AssignmentDbContext : DbContext
                 .IsFixedLength();
         });
 
-        modelBuilder.Entity<ErrorType>(entity =>
-        {
-            entity.ToTable("ErrorType");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.ErrorDescription)
-                .HasMaxLength(1000)
-                .IsFixedLength();
-            entity.Property(e => e.ErrorName)
-                .HasMaxLength(50)
-                .IsFixedLength();
-            entity.Property(e => e.RowVersion)
-                .IsRowVersion()
-                .IsConcurrencyToken();
-        });
-
-        modelBuilder.Entity<ExerciseFeedback>(entity =>
-        {
-            entity.ToTable("ExerciseFeedback");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Feedbacktext)
-                .HasMaxLength(1000)
-                .IsFixedLength();
-            entity.Property(e => e.RowVersion)
-                .IsRowVersion()
-                .IsConcurrencyToken();
-
-            entity.HasOne(d => d.ErrorTypeNavigation).WithMany(p => p.ExerciseFeedbacks)
-                .HasForeignKey(d => d.ErrorType)
-                .HasConstraintName("FK_ExerciseFeedback_ErrorType");
-
-            entity.HasOne(d => d.SubmittedExercise).WithMany(p => p.ExerciseFeedbacks)
-                .HasForeignKey(d => d.SubmittedExerciseId)
-                .HasConstraintName("FK_ExerciseFeedback_SubmittedExercise");
-        });
-
         modelBuilder.Entity<GradeSheet>(entity =>
         {
             entity.ToTable("GradeSheet");
@@ -191,20 +138,6 @@ public partial class AssignmentDbContext : DbContext
             entity.HasOne(d => d.AssignmentSet).WithMany(p => p.GradeSheets)
                 .HasForeignKey(d => d.AssignmentSetId)
                 .HasConstraintName("FK_GradeSheet_AssignmentSet");
-        });
-
-        modelBuilder.Entity<SelfEvaluation>(entity =>
-        {
-            entity.ToTable("SelfEvaluation");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.RowVersion)
-                .IsRowVersion()
-                .IsConcurrencyToken();
-
-            entity.HasOne(d => d.SubmittedExercise).WithMany(p => p.SelfEvaluations)
-                .HasForeignKey(d => d.SubmittedExerciseId)
-                .HasConstraintName("FK_SelfEvaluation_SubmittedExercise");
         });
 
         modelBuilder.Entity<SubmittedAssignment>(entity =>
