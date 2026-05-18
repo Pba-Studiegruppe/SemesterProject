@@ -5,18 +5,14 @@ using Assignment_Domain.SnapShots;
 namespace Assignment_Infrastructure.DataAccess.Fakes
 {
     /// <summary>
-    /// In-memory fake repository for SubmittedAssignment. Use this while the real
-    /// database isn't available.
+    /// In-memory fake repository for SubmittedAssignment. Use this while the
+    /// real database isn't available.
     ///
-    /// Takes IAssignmentRepository in its constructor so it can register a demo
-    /// Assignment with the assignment fake during seeding. This means the
-    /// "list submissions by assignment" endpoint actually works end-to-end —
-    /// the service can look up the parent assignment and produce a fully-
-    /// populated DTO with denormalized source fields.
-    ///
-    /// Pre-seeded with three submissions in different statuses (Pending,
-    /// InProgress, Completed) against the same demo assignment so the
-    /// teacher's evaluation UI has something realistic to render.
+    /// Takes both IAssignmentRepository and IAssignmentSetRepository so the
+    /// seeded demo assignment is reachable through normal UI navigation:
+    /// AssignmentSets list → set detail → demo assignment → submissions.
+    /// Without that, the demo assignment would be orphaned from the
+    /// AssignmentSet branch and only reachable by typing its id into the URL.
     /// </summary>
     public class FakeSubmittedAssignmentRepository : ISubmittedAssignmentRepository
     {
@@ -24,26 +20,67 @@ namespace Assignment_Infrastructure.DataAccess.Fakes
         public static readonly Guid DemoAssignmentId =
             new("33333333-0000-0000-0000-000000000001");
 
+        // Stable host-set ID — only used if no draft set exists at seed time.
+        public static readonly Guid DemoSetId =
+            new("33333333-0000-0000-0000-000000000099");
+
+        /// <summary>
+        /// The set the demo assignment was attached to during seeding.
+        /// Read after construction for convenience (e.g. for demo URLs).
+        /// </summary>
+        public Guid HostSetId { get; private set; }
+
         private readonly IAssignmentRepository _assignmentRepository;
         private readonly List<SubmittedAssignment> _submissions = new();
 
-        public FakeSubmittedAssignmentRepository(IAssignmentRepository assignmentRepository)
+        public FakeSubmittedAssignmentRepository(
+            IAssignmentRepository assignmentRepository,
+            IAssignmentSetRepository assignmentSetRepository)
         {
             _assignmentRepository = assignmentRepository;
-            Seed();
+            Seed(assignmentSetRepository);
         }
 
         // -----------------------------------------------------------------------
         // Seed
         // -----------------------------------------------------------------------
-        private void Seed()
+        private void Seed(IAssignmentSetRepository assignmentSetRepository)
         {
             var demoAssignment = BuildDemoAssignment();
 
-            // Register with the assignment fake so the service can look it up
-            // through IAssignmentRepository.GetByIdAsync during the flow.
-            // (.GetAwaiter().GetResult() is acceptable here — the fake is fully
-            // synchronous under the hood and this only runs once at startup.)
+            // Find a draft, active set to host the demo assignment so the
+            // UI navigation flow (list → set → assignment → submissions) works.
+            var sets = assignmentSetRepository.GetAllAsync()
+                .GetAwaiter().GetResult()
+                .ToList();
+
+            var hostSet = sets.FirstOrDefault(s =>
+                s.IsPublihsed != true && s.Inactive != true);
+
+            if (hostSet is not null)
+            {
+                hostSet.AddAssignment(demoAssignment);
+                HostSetId = hostSet.Id;
+            }
+            else
+            {
+                // No existing set worked — fall back to creating a dedicated one.
+                var fallback = new AssignmentSet(
+                    courseId: Guid.NewGuid(),
+                    title: "Demo (auto-created)",
+                    description: "Auto-created so the demo submission flow is reachable.");
+
+                // Force a stable id so demo URLs are predictable.
+                typeof(AssignmentSet).GetProperty(nameof(AssignmentSet.Id))!
+                    .SetValue(fallback, DemoSetId);
+
+                fallback.AddAssignment(demoAssignment);
+                assignmentSetRepository.CreateAsync(fallback).GetAwaiter().GetResult();
+                assignmentSetRepository.SaveChangesAsync().GetAwaiter().GetResult();
+                HostSetId = fallback.Id;
+            }
+
+            // Register with the assignment fake so the assignment endpoints work too.
             _assignmentRepository.CreateAsync(demoAssignment).GetAwaiter().GetResult();
             _assignmentRepository.SaveChangesAsync().GetAwaiter().GetResult();
 
@@ -84,7 +121,6 @@ namespace Assignment_Infrastructure.DataAccess.Fakes
                 "Demo evaluation target",
                 "Pre-seeded assignment used by the submission fake.");
 
-            // Reflect the well-known demo ID so callers can navigate to it directly.
             typeof(Assignment).GetProperty(nameof(Assignment.Id))!
                 .SetValue(assignment, DemoAssignmentId);
 

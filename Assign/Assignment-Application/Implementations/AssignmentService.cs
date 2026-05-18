@@ -54,7 +54,7 @@ namespace Assignment_Application.Implementations
             return new AssignmentDTO
             {
                 Id = assignment.Id,
-                AssignmentSetId = assignment.AssignmentSetId,  // was missing before
+                AssignmentSetId = assignment.AssignmentSetId,
                 Title = assignment.Title,
                 Description = assignment.Description,
                 TotalPoints = assignment.TotalPoints,
@@ -71,6 +71,7 @@ namespace Assignment_Application.Implementations
             return new AssignmentDTO
             {
                 Id = assignment.Id,
+                AssignmentSetId = assignment.AssignmentSetId, 
                 Title = assignment.Title,
                 Description = assignment.Description,
                 TotalPoints = assignment.TotalPoints,

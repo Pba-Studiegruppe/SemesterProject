@@ -24,12 +24,14 @@ builder.Services.AddDbContext<AssignmentDbContext>(options =>
 // Fake Repositories
 builder.Services.AddSingleton<IAssignmentRepository, FakeAssignmentRepository>();
 builder.Services.AddSingleton<IAssignmentSetRepository, FakeAssignmentSetRepository>();
+builder.Services.AddSingleton<ISubmittedAssignmentRepository, FakeSubmittedAssignmentRepository>();
+builder.Services.AddSingleton<IErrorTypeRepository, FakeErrorTypeRepository>();
 
 // Real Repositories
-builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+//builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
 //builder.Services.AddScoped<IAssignmentSetRepository, AssignmentSetRepository>();
-builder.Services.AddScoped<ISubmittedAssignmentRepository, SubmittedAssignmentRepository>();
-builder.Services.AddScoped<IErrorTypeRepository, ErrorTypeRepository>();
+//builder.Services.AddScoped<ISubmittedAssignmentRepository, SubmittedAssignmentRepository>();
+//builder.Services.AddScoped<IErrorTypeRepository, ErrorTypeRepository>();
 
 // Services
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
