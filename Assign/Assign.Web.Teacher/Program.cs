@@ -29,6 +29,12 @@ builder.Services.AddHttpClient<AssignmentApiClient>(c =>
         builder.Configuration["AssignmentApi:BaseUrl"] 
         ?? throw new InvalidOperationException("ExerciseApi:BaseUrl is not configured.")); 
 });
+builder.Services.AddHttpClient<AssignmentSetApiClient>(c =>
+{
+    c.BaseAddress = new Uri(
+        builder.Configuration["AssignmentApi:BaseUrl"]
+        ?? throw new InvalidOperationException("AssignmentApi:BaseUrl is not configured."));
+});
 
 var app = builder.Build();
 

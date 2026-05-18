@@ -26,9 +26,17 @@ builder.Services.AddSingleton<IAssignmentRepository, FakeAssignmentRepository>()
 builder.Services.AddSingleton<IAssignmentSetRepository, FakeAssignmentSetRepository>();
 
 // Real Repositories
-//builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+builder.Services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+//builder.Services.AddScoped<IAssignmentSetRepository, AssignmentSetRepository>();
+builder.Services.AddScoped<ISubmittedAssignmentRepository, SubmittedAssignmentRepository>();
+builder.Services.AddScoped<IErrorTypeRepository, ErrorTypeRepository>();
+
+// Services
 builder.Services.AddScoped<IAssignmentService, AssignmentService>();
 builder.Services.AddScoped<IAssignmentPdfService, AssignmentPdfGenerator>();
+builder.Services.AddScoped<ISubmittedAssignmentService, SubmittedAssignmentService>();
+builder.Services.AddScoped<IErrorTypeService, ErrorTypeService>();
+builder.Services.AddScoped<IAssignmentSetService, AssignmentSetService>();
 
 builder.Services.AddHttpClient<IExerciseProvider, HttpExerciseProvider>(client =>
 {

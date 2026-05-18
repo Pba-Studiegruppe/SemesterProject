@@ -352,6 +352,12 @@ namespace Assignment_Infrastructure.DataAccess.Fakes
             return Task.FromResult(result);
         }
 
+        public Task<IEnumerable<AssignmentSet>> GetAllAsync()
+        {
+            IEnumerable<AssignmentSet> result = _sets.ToList();
+            return Task.FromResult(result);
+        }
+
         public Task SaveChangesAsync() => Task.CompletedTask;
     }
 }

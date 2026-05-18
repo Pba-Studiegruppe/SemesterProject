@@ -43,6 +43,12 @@ namespace Assignment_Application.Implementations
             return ToDto(assignmentSet);
         }
 
+        public async Task<IEnumerable<AssignmentSetDTO>> GetAllAssignmentSetsAsync()
+        {
+            var sets = await _repository.GetAllAsync();
+            return sets.Select(ToDto).ToList();
+        }
+
         public async Task<IEnumerable<AssignmentSetDTO>> GetAssignmentSetsByCourseIdAsync(Guid courseId)
         {
             var sets = await _repository.GetByCourseIdAsync(courseId);
@@ -67,6 +73,20 @@ namespace Assignment_Application.Implementations
             return ToDto(assignmentSet);
         }
 
+        public async Task<AssignmentSetDTO> PublishAssignmentSetAsync(Guid id)
+        {
+            var assignmentSet = await _repository.GetByIdAsync(id);
+            if (assignmentSet is null)
+                throw new KeyNotFoundException("AssignmentSet not found.");
+
+            // Domain throws InvalidOperationException if conditions aren't met
+            // (no course, no assignments, or any assignment with no exercises).
+            assignmentSet.Publish();
+            await _repository.SaveChangesAsync();
+
+            return ToDto(assignmentSet);
+        }
+
         private static AssignmentSetDTO ToDto(AssignmentSet model)
         {
             return new AssignmentSetDTO
@@ -75,6 +95,10 @@ namespace Assignment_Application.Implementations
                 CourseId = model.CourseId,
                 Title = model.Title,
                 Description = model.Description,
+                IsPublished = model.IsPublihsed == true,        // bridges the typo
+                GradingPublished = model.GradingPublished == true,
+                Inactive = model.Inactive == true,
+                CreatedAt = model.CreatedAt,
                 Assignments = (model.Assignments ?? new List<Assignment>())
                     .Select(a => new AssignmentDTO
                     {

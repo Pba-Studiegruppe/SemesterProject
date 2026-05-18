@@ -14,6 +14,6 @@ namespace Assignment_Application.Interfaces.Repositories
         Task<IEnumerable<AssignmentSet>> GetByCourseIdAsync(Guid courseId);
         Task CreateAsync(AssignmentSet assignmentSet);
         Task SaveChangesAsync();
-
+        Task<IEnumerable<AssignmentSet>> GetAllAsync();
     }
 }
