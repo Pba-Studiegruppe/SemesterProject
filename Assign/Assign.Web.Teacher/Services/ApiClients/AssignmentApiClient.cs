@@ -24,9 +24,12 @@ namespace Assign.Web.Teacher.Services.ApiClients
             return await _http.GetFromJsonAsync<AssignmentBuilderModel>($"api/assignments/{assignmentId}");
         }
 
-        public async Task<AssignmentBuilderModel?> CreateAssignmentAsync(string title, string description)
+        public async Task<AssignmentBuilderModel?> CreateAssignmentAsync(
+            string title, string description, Guid? assignmentSetId = null)
         {
-            var resp = await _http.PostAsJsonAsync("api/assignments", new { title, description });
+            var resp = await _http.PostAsJsonAsync(
+                "api/assignments",
+                new { title, description, assignmentSetId });
             resp.EnsureSuccessStatusCode();
             return await resp.Content.ReadFromJsonAsync<AssignmentBuilderModel>();
         }

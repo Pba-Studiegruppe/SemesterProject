@@ -35,11 +35,12 @@ namespace Assignment_Tests.Application
         {
             // Arrange
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.CreateAsync(It.IsAny<Assignment>()))
                 .Returns(Task.CompletedTask);
             var providerMock = new Mock<IExerciseProvider>();
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new CreateAssignmentRequest
             {
                 AssignmentSetId = Guid.NewGuid(),
@@ -67,8 +68,9 @@ namespace Assignment_Tests.Application
         {
             // Arrange
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             var providerMock = new Mock<IExerciseProvider>();
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new CreateAssignmentRequest
             {
                 AssignmentSetId = Guid.NewGuid(),
@@ -96,10 +98,11 @@ namespace Assignment_Tests.Application
             var assignment = new Assignment("title", "desc");
 
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(assignmentId)).ReturnsAsync(assignment);
             var providerMock = new Mock<IExerciseProvider>();
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
 
             // Act
             var result = await service.GetAssignmentAsync(assignmentId);
@@ -114,11 +117,12 @@ namespace Assignment_Tests.Application
         {
             // Arrange
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((Assignment?)null);
             var providerMock = new Mock<IExerciseProvider>();
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
 
             // Act
             Func<Task> act = () => service.GetAssignmentAsync(Guid.NewGuid());
@@ -139,10 +143,11 @@ namespace Assignment_Tests.Application
             ae.SetQuestionPoints(ae.Questions[1].Id, 7);
 
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(assignmentId)).ReturnsAsync(assignment);
             var providerMock = new Mock<IExerciseProvider>();
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
 
             // Act
             var result = await service.GetAssignmentAsync(assignmentId);
@@ -168,13 +173,14 @@ namespace Assignment_Tests.Application
             var snapshot = TestData.Snapshot(sourceExerciseId, questionCount: 2);
 
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(assignmentId)).ReturnsAsync(assignment);
 
             var providerMock = new Mock<IExerciseProvider>();
             providerMock.Setup(p => p.GetExerciseSnapshotAsync(sourceExerciseId))
                 .ReturnsAsync(snapshot);
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new CreateAssignmentExerciseRequest { ExerciseId = sourceExerciseId };
 
             // Act
@@ -198,11 +204,12 @@ namespace Assignment_Tests.Application
         {
             // Arrange
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((Assignment?)null);
             var providerMock = new Mock<IExerciseProvider>();
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new CreateAssignmentExerciseRequest { ExerciseId = Guid.NewGuid() };
 
             // Act
@@ -222,13 +229,14 @@ namespace Assignment_Tests.Application
             var assignment = new Assignment("title", "desc");
 
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(assignmentId)).ReturnsAsync(assignment);
 
             var providerMock = new Mock<IExerciseProvider>();
             providerMock.Setup(p => p.GetExerciseSnapshotAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((ExerciseSnapshotInput?)null);
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new CreateAssignmentExerciseRequest { ExerciseId = Guid.NewGuid() };
 
             // Act
@@ -251,13 +259,14 @@ namespace Assignment_Tests.Application
             assignment.AddExerciseFromSnapshot(TestData.Snapshot(sourceExerciseId));
 
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(assignmentId)).ReturnsAsync(assignment);
 
             var providerMock = new Mock<IExerciseProvider>();
             providerMock.Setup(p => p.GetExerciseSnapshotAsync(sourceExerciseId))
                 .ReturnsAsync(TestData.Snapshot(sourceExerciseId));
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new CreateAssignmentExerciseRequest { ExerciseId = sourceExerciseId };
 
             // Act
@@ -280,10 +289,11 @@ namespace Assignment_Tests.Application
             var ae = assignment.AddExerciseFromSnapshot(TestData.Snapshot());
 
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(assignmentId)).ReturnsAsync(assignment);
             var providerMock = new Mock<IExerciseProvider>();
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new RemoveAssignmentExerciseRequest
             {
                 AssignmentExerciseId = ae.Id
@@ -302,11 +312,12 @@ namespace Assignment_Tests.Application
         {
             // Arrange
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((Assignment?)null);
             var providerMock = new Mock<IExerciseProvider>();
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new RemoveAssignmentExerciseRequest
             {
                 AssignmentExerciseId = Guid.NewGuid()
@@ -329,10 +340,11 @@ namespace Assignment_Tests.Application
             var assignment = new Assignment("a", "b");
 
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(assignmentId)).ReturnsAsync(assignment);
             var providerMock = new Mock<IExerciseProvider>();
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new RemoveAssignmentExerciseRequest
             {
                 AssignmentExerciseId = Guid.NewGuid()
@@ -360,10 +372,11 @@ namespace Assignment_Tests.Application
             var assignment = new Assignment("Old Title", "Old Description");
 
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(assignmentId)).ReturnsAsync(assignment);
             var providerMock = new Mock<IExerciseProvider>();
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new UpdateAssignmentRequest
             {
                 Title = title,
@@ -387,10 +400,11 @@ namespace Assignment_Tests.Application
             // Arrange
             var assignment = new Assignment("old", "desc");
             var repoMock = new Mock<IAssignmentRepository>();
+            var setRepoMock = new Mock<IAssignmentSetRepository>();
             repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(assignment);
             var providerMock = new Mock<IExerciseProvider>();
 
-            var service = new AssignmentService(repoMock.Object, providerMock.Object);
+            var service = new AssignmentService(repoMock.Object, setRepoMock.Object, providerMock.Object);
             var request = new UpdateAssignmentRequest
             {
                 Title = title,
@@ -415,9 +429,10 @@ namespace Assignment_Tests.Application
                 ae.SetQuestionPoints(ae.Questions[0].Id, initialPoints);
 
                 var repoMock = new Mock<IAssignmentRepository>();
+                var setRepoMock = new Mock<IAssignmentSetRepository>();
                 repoMock.Setup(r => r.GetByIdAsync(assignment.Id)).ReturnsAsync(assignment);
 
-                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+                var service = new AssignmentService(repoMock.Object, setRepoMock.Object, new Mock<IExerciseProvider>().Object);
                 return (service, assignment, ae, repoMock);
             }
 
@@ -443,8 +458,9 @@ namespace Assignment_Tests.Application
             {
                 // Arrange
                 var repoMock = new Mock<IAssignmentRepository>();
+                var setRepoMock = new Mock<IAssignmentSetRepository>();
                 repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Assignment?)null);
-                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+                var service = new AssignmentService(repoMock.Object, setRepoMock.Object, new Mock<IExerciseProvider>().Object);
 
                 // Act
                 Func<Task> act = () => service.SetQuestionPointsAsync(
@@ -463,8 +479,9 @@ namespace Assignment_Tests.Application
                 var assignment = new Assignment("title", "desc");
                 // no exercises added
                 var repoMock = new Mock<IAssignmentRepository>();
+                var setRepoMock = new Mock<IAssignmentSetRepository>();
                 repoMock.Setup(r => r.GetByIdAsync(assignment.Id)).ReturnsAsync(assignment);
-                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+                var service = new AssignmentService(repoMock.Object, setRepoMock.Object, new Mock<IExerciseProvider>().Object);
 
                 // Act
                 Func<Task> act = () => service.SetQuestionPointsAsync(
@@ -519,9 +536,10 @@ namespace Assignment_Tests.Application
                 var ae = assignment.AddExerciseFromSnapshot(TestData.Snapshot(questionCount: 2));
 
                 var repoMock = new Mock<IAssignmentRepository>();
+                var setRepoMock = new Mock<IAssignmentSetRepository>();
                 repoMock.Setup(r => r.GetByIdAsync(assignment.Id)).ReturnsAsync(assignment);
 
-                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+                var service = new AssignmentService(repoMock.Object, setRepoMock.Object, new Mock<IExerciseProvider>().Object);
                 return (service, assignment, ae, repoMock);
             }
 
@@ -546,8 +564,9 @@ namespace Assignment_Tests.Application
             {
                 // Arrange
                 var repoMock = new Mock<IAssignmentRepository>();
+                var setRepoMock = new Mock<IAssignmentSetRepository>();
                 repoMock.Setup(r => r.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync((Assignment?)null);
-                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+                var service = new AssignmentService(repoMock.Object, setRepoMock.Object, new Mock<IExerciseProvider>().Object);
 
                 // Act
                 Func<Task> act = () =>
@@ -564,8 +583,9 @@ namespace Assignment_Tests.Application
                 // Arrange
                 var assignment = new Assignment("title", "desc");
                 var repoMock = new Mock<IAssignmentRepository>();
+                var setRepoMock = new Mock<IAssignmentSetRepository>();
                 repoMock.Setup(r => r.GetByIdAsync(assignment.Id)).ReturnsAsync(assignment);
-                var service = new AssignmentService(repoMock.Object, new Mock<IExerciseProvider>().Object);
+                var service = new AssignmentService(repoMock.Object, setRepoMock.Object, new Mock<IExerciseProvider>().Object);
 
                 // Act
                 Func<Task> act = () =>

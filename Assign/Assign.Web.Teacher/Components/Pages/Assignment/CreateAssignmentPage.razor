@@ -5,11 +5,25 @@
 @using Assign.Web.Teacher.Services.ApiClients
 @using Assign_Frontend.Services
 @using Microsoft.JSInterop
+@using Assign.Web.Teacher.Models.AssignmentSet
+@inject AssignmentSetApiClient AssignmentSetApi
 @inject AssignmentApiClient AssignmentApi
 @inject ExerciseApiClient ExerciseApi
 @inject IJSRuntime JS
 
 <PageTitle>Create Assignment</PageTitle>
+
+<nav class="text-sm text-gray-500 mb-4">
+    <a href="/" class="hover:text-gray-700">Dashboard</a>
+    <span class="mx-1">/</span>
+    <a href="/assignment-sets" class="hover:text-gray-700">Assignment Sets</a>
+    <span class="mx-1">/</span>
+    @if (_parentSet is not null)
+    {
+        <a href="/assignment-sets/@_parentSet.Id" class="hover:text-gray-700">@_parentSet.Title</a>            
+    }
+    <span class="mx-1">/</span>
+</nav>
 
 <div class="container-fluid py-4">
     <div class="d-flex align-items-center gap-3 mb-4">
@@ -19,6 +33,36 @@
             <p class="text-muted mb-0">Pick exercises, tailor the questions, set the points</p>
         </div>
     </div>
+
+    @if (_parentSet is not null && _parentSet.IsPublished)
+    {
+        <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-lock-fill"></i>
+            <div>
+                <strong>@_parentSet.Title</strong> is already published — you can't add more assignments to it.
+                <a href="/assignment-sets/@_parentSet.Id" class="ms-2">Back to set</a>
+            </div>
+        </div>
+    }
+    else if (_parentSet is not null)
+    {
+        <div class="alert alert-info d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-folder-fill"></i>
+            <div>
+                <strong>Creating in:</strong> @(string.IsNullOrWhiteSpace(_parentSet.Title) ? "(Untitled set)" : _parentSet.Title)
+                <a href="/assignment-sets/@_parentSet.Id" class="ms-2 small">View set</a>
+            </div>
+        </div>
+    }
+    else if (SetId is not null && SetId != Guid.Empty)
+    {
+        <div class="alert alert-warning d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-exclamation-triangle"></i>
+            <div>
+                The assignment set you specified couldn't be loaded. The assignment will be created standalone.
+            </div>
+        </div>
+    }
 
     <div class="row g-4">
         <!-- Left column: details + preview/selected -->
@@ -113,16 +157,35 @@
     private bool _isPreviewOpen;
     private bool _isBusy;
     private string? _errorMessage;
+    [SupplyParameterFromQuery(Name = "setId")]
+    public Guid? SetId { get; set; }
+
+    private AssignmentSetSummary? _parentSet;
 
     protected override async Task OnInitializedAsync()
     {
         _builder = new AssignmentBuilderModel
         {
             AssignmentId = Guid.Empty,
+            AssignmentSetId = SetId,                                   // new
             Title = "Math Homework — Week 5",
             Description = "Linear equations, basic geometry, and a short reflection.",
             Exercises = []
         };
+
+        if (SetId is not null && SetId != Guid.Empty)
+        {
+            try
+            {
+                _parentSet = await AssignmentSetApi.GetAsync(SetId.Value);
+            }
+            catch
+            {
+                // Set load failed — the warning banner will surface that to the user;
+                // creation can still proceed standalone if they choose to push through.
+                _parentSet = null;
+            }
+        }
 
         await LoadCatalogAsync();
     }
@@ -163,7 +226,14 @@
             return;
         }
 
-        // Snapshot whatever the user built locally before we overwrite _builder.
+        // Block submission if the parent set is published — server would reject
+        // with 409 anyway, but failing fast is friendlier UX.
+        if (_parentSet is not null && _parentSet.IsPublished)
+        {
+            _errorMessage = $"Cannot add assignments to '{_parentSet.Title}' — the set is already published.";
+            return;
+        }
+
         var localTitle = _builder.Title;
         var localDescription = _builder.Description;
         var localExercises = _builder.Exercises.ToList();
@@ -171,8 +241,8 @@
         _isBusy = true;
         try
         {
-            // 1. Create the assignment shell.
-            var created = await AssignmentApi.CreateAssignmentAsync(localTitle, localDescription);
+            var created = await AssignmentApi.CreateAssignmentAsync(
+                localTitle, localDescription, SetId);
             if (created is null)
             {
                 _errorMessage = "Server returned an empty response when creating the assignment.";

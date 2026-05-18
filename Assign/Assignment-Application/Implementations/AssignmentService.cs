@@ -15,28 +15,46 @@ namespace Assignment_Application.Implementations
     public class AssignmentService : IAssignmentService
     {
         private readonly IAssignmentRepository _repository;
+        private readonly IAssignmentSetRepository _assignmentSetRepository;
         private readonly IExerciseProvider _exerciseProvider;
 
-        public AssignmentService(IAssignmentRepository repository, IExerciseProvider exerciseProvider)
+        public AssignmentService(
+            IAssignmentRepository repository,
+            IAssignmentSetRepository assignmentSetRepository,
+            IExerciseProvider exerciseProvider)
         {
             _repository = repository;
+            _assignmentSetRepository = assignmentSetRepository;
             _exerciseProvider = exerciseProvider;
         }
 
         public async Task<AssignmentDTO> CreateAssignmentAsync(CreateAssignmentRequest request)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
-            if (string.IsNullOrWhiteSpace(request.Title)) throw new ArgumentException("Title is required", nameof(request.Title));
+            if (string.IsNullOrWhiteSpace(request.Title))
+                throw new ArgumentException("Title is required", nameof(request.Title));
 
             var assignment = new Assignment(request.Title, request.Description);
 
-            // persist
+            // If a parent set is specified, go through the aggregate so the domain
+            // enforces its invariants: can't add to a published set, no duplicates.
+            if (request.AssignmentSetId is not null && request.AssignmentSetId != Guid.Empty)
+            {
+                var set = await _assignmentSetRepository.GetByIdAsync(request.AssignmentSetId.Value);
+                if (set is null)
+                    throw new KeyNotFoundException(
+                        $"AssignmentSet with id '{request.AssignmentSetId}' not found.");
+
+                set.AddAssignment(assignment);
+            }
+
             await _repository.CreateAsync(assignment);
             await _repository.SaveChangesAsync();
 
             return new AssignmentDTO
             {
                 Id = assignment.Id,
+                AssignmentSetId = assignment.AssignmentSetId,  // was missing before
                 Title = assignment.Title,
                 Description = assignment.Description,
                 TotalPoints = assignment.TotalPoints,

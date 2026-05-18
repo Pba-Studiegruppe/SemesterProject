@@ -38,6 +38,8 @@ namespace Assignment_Api.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateAssignment([FromBody] CreateAssignmentRequest request)
         {
             try
@@ -45,9 +47,17 @@ namespace Assignment_Api.Controllers
                 var result = await _service.CreateAssignmentAsync(request);
                 return CreatedAtAction(nameof(GetAssignment), new { id = result.Id }, result);
             }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);   // AssignmentSetId pointed to a non-existent set
+            }
             catch (ArgumentException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(ex.Message);   // Set is published, can't add to it
             }
         }
 
