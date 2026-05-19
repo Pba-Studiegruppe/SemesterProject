@@ -1,0 +1,524 @@
+﻿@page "/submissions/{Id:guid}/evaluate"
+@rendermode InteractiveServer
+@using Assign.Web.Teacher.Models.Assignment
+@using Assign.Web.Teacher.Services.ApiClients
+@inject SubmittedAssignmentApiClient SubmittedApi
+@inject ErrorTypeApiClient ErrorTypeApi
+@inject NavigationManager Nav
+@inject IConfiguration Config
+
+<PageTitle>Evaluate Submission</PageTitle>
+
+@if (_isLoading)
+{
+    <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p class="text-gray-500">Loading submission…</p>
+    </div>
+}
+else if (_loadError is not null)
+{
+    <div class="min-h-screen bg-gray-50 p-6">
+        <div class="max-w-2xl mx-auto bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+            @_loadError
+        </div>
+    </div>
+}
+else if (_submission is null)
+{
+    <div class="min-h-screen bg-gray-50 p-6">
+        <div class="max-w-2xl mx-auto bg-white rounded-lg p-8 text-center">
+            <p class="text-gray-700 mb-4">Submission not found.</p>
+            <a href="/assignment-sets" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                Back to Assignment Sets
+            </a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="h-screen flex flex-col bg-gray-50 overflow-hidden">
+
+        <!-- ─── Sticky top status bar ───────────────────────────────────── -->
+        <div class="bg-white border-b border-gray-200 px-6 py-3 shrink-0">
+            <div class="flex items-center justify-between gap-4 flex-wrap">
+                <nav class="text-sm text-gray-500 flex items-center gap-1 min-w-0">
+                    <a href="/assignment-sets" class="hover:text-gray-700">Sets</a>
+                    <span>/</span>
+                    <a href="/assignments/@_submission.AssignmentId" class="hover:text-gray-700">Assignment</a>
+                    <span>/</span>
+                    <span class="text-gray-900">Evaluate</span>
+                </nav>
+
+                <div class="flex items-center gap-4 flex-wrap">
+                    <div class="text-sm">
+                        <span class="text-gray-500">Student:</span>
+                        <span class="font-mono text-gray-700 ml-1">@FormatStudentId(_submission.StudentId)</span>
+                    </div>
+
+                    <span class="@SubmissionStatusBadgeClass(_submission.Status) inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium">
+                        @SubmissionStatusLabel(_submission.Status)
+                    </span>
+
+                    <div class="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                        @_submission.TotalScore <span class="text-gray-400">/</span> @_submission.MaxPossibleScore
+                    </div>
+
+                    <div class="text-xs min-w-[120px] text-right @SaveStatusColor()">
+                        @SaveStatusText()
+                    </div>
+
+                    @if (!IsReadOnly)
+                    {
+                        @if (_submission.Status == EvaluationStatus.Completed)
+                        {
+                            <button @onclick="RequestReturn"
+                                    disabled="@_isActionBusy"
+                                    class="px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-blue-300">
+                                Return to Student
+                            </button>
+                        }
+                        else if (CanMarkEvaluated)
+                        {
+                            <button @onclick="MarkEvaluatedAsync"
+                                    disabled="@_isActionBusy"
+                                    class="px-4 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:bg-green-300">
+                                @(_isActionBusy ? "Marking…" : "Mark Evaluated")
+                            </button>
+                        }
+                        else
+                        {
+                            <button disabled
+                                    title="@MarkEvaluatedDisabledReason"
+                                    class="px-4 py-1.5 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg cursor-not-allowed">
+                                Mark Evaluated
+                            </button>
+                        }
+                    }
+                </div>
+            </div>
+
+            @if (_actionError is not null)
+            {
+                <div class="mt-2 text-sm text-red-700">@_actionError</div>
+            }
+        </div>
+
+        @if (IsReadOnly)
+        {
+            <div class="bg-gray-100 border-b border-gray-200 px-6 py-2 text-sm text-gray-700 shrink-0">
+                This submission has been returned to the student — read-only.
+            </div>
+        }
+
+        <!-- ─── Main split: left evaluation panel + right PDF viewer ─────── -->
+        <div class="flex-1 flex overflow-hidden">
+
+            <!-- LEFT: evaluation panel -->
+            <div class="w-2/5 overflow-y-auto p-6 border-r border-gray-200">
+
+                @foreach (var ex in _submission.SubmittedExercises.OrderBy(e => e.SourceOrder))
+                {
+                    <div class="mb-8">
+                        <!-- Exercise header -->
+                        <div class="flex items-baseline justify-between mb-2">
+                            <h2 class="text-lg font-semibold text-gray-900">
+                                @ex.SourceTitle
+                            </h2>
+                            <span class="text-sm text-gray-500">
+                                @ex.TotalScore / @ex.SubmittedQuestions.Sum(q => q.MaxPoints) pts
+                            </span>
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(ex.SourceContent))
+                        {
+                            <p class="text-sm text-gray-600 mb-3">@ex.SourceContent</p>
+                        }
+
+                        <!-- Question cards -->
+                        <div class="space-y-3 mb-3">
+                            @foreach (var q in ex.SubmittedQuestions.OrderBy(qx => qx.SourceOrder))
+                            {
+                                <div class="bg-white border rounded-lg p-4 @(q.IsScored ? "border-green-300" : "border-gray-200")">
+                                    <div class="flex items-start justify-between gap-3 mb-3">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-sm font-medium text-gray-900">@q.SourceTitle</div>
+                                            @if (!string.IsNullOrWhiteSpace(q.SourceContent))
+                                            {
+                                                <div class="text-sm text-gray-600 mt-1">@q.SourceContent</div>
+                                            }
+                                        </div>
+
+                                        <div class="flex items-center gap-1 shrink-0">
+                                            <input type="number"
+                                                   min="0"
+                                                   max="@q.MaxPoints"
+                                                   value="@(q.PointsAwarded?.ToString() ?? "")"
+                                                   disabled="@IsReadOnly"
+                                                   @onchange="(e) => OnPointsChangedAsync(q, e.Value?.ToString())"
+                                                   class="w-16 px-2 py-1 border border-gray-300 rounded text-right text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50" />
+                                            <span class="text-sm text-gray-500 whitespace-nowrap">/ @q.MaxPoints</span>
+                                        </div>
+                                    </div>
+
+                                    <textarea placeholder="Comment (optional)"
+                                              value="@q.Comment"
+                                              disabled="@IsReadOnly"
+                                              @onchange="(e) => OnCommentChangedAsync(q, e.Value?.ToString())"
+                                              rows="2"
+                                              class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"></textarea>
+
+                                    <div class="mt-2">
+                                        <select value="@(q.ErrorTypeId?.ToString() ?? "")"
+                                                disabled="@IsReadOnly"
+                                                @onchange="(e) => OnErrorTypeChangedAsync(q, e.Value?.ToString())"
+                                                class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50">
+                                            <option value="">No error type</option>
+                                            @foreach (var et in _errorTypes)
+                                            {
+                                                <option value="@et.Id">@et.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    @if (q.PointsAwarded is null && (!string.IsNullOrWhiteSpace(q.Comment) || q.ErrorTypeId is not null))
+                                    {
+                                        <p class="mt-2 text-xs text-yellow-700">
+                                            Enter a score to save the comment and error type.
+                                        </p>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Per-exercise overall comment -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-3">
+                            <label class="block text-xs text-gray-500 uppercase tracking-wide mb-1">
+                                Notes on this exercise
+                            </label>
+                            <textarea placeholder="Overall comment for this exercise (optional)"
+                                      value="@ex.OverallComment"
+                                      disabled="@IsReadOnly"
+                                      @onchange="(e) => OnExerciseCommentChangedAsync(ex, e.Value?.ToString())"
+                                      rows="2"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"></textarea>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Return confirmation modal -->
+@if (_showReturnConfirm && _submission is not null)
+{
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Return to student?</h3>
+            <p class="text-sm text-gray-600 mb-4">
+                Once returned, scores and comments on this submission can no longer be edited.
+            </p>
+            <div class="flex justify-end gap-2">
+                <button @onclick="() => _showReturnConfirm = false"
+                        disabled="@_isActionBusy"
+                        class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button @onclick="ReturnSubmissionAsync"
+                        disabled="@_isActionBusy"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300">
+                    @(_isActionBusy ? "Returning…" : "Return")
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private SubmittedAssignmentDetail? _submission;
+    private List<ErrorTypeModel> _errorTypes = new();
+
+    private bool _isLoading = true;
+    private string? _loadError;
+
+    private SaveStatus _saveStatus = SaveStatus.Idle;
+    private string? _saveError;
+
+    private bool _isActionBusy;
+    private string? _actionError;
+    private bool _showReturnConfirm;
+
+    // Mock evaluator id — when auth lands this comes from HttpContext.User.
+    private static readonly Guid MockEvaluatorId = new("aaaaaaaa-0000-0000-0000-000000000001");
+
+    private string PdfUrl =>
+        _submission is null
+            ? ""
+            : $"{(Config["AssignmentApi:BaseUrl"] ?? "").TrimEnd('/')}/api/assignments/{_submission.AssignmentId}/pdf";
+
+    private bool IsReadOnly => _submission?.Status == EvaluationStatus.Returned;
+
+    private bool CanMarkEvaluated =>
+        _submission is not null
+        && (_submission.Status == EvaluationStatus.Pending
+            || _submission.Status == EvaluationStatus.InProgress)
+        && _submission.SubmittedExercises
+            .SelectMany(e => e.SubmittedQuestions)
+            .All(q => q.IsScored);
+
+    private string MarkEvaluatedDisabledReason
+    {
+        get
+        {
+            if (_submission is null) return "";
+            var unscored = _submission.SubmittedExercises
+                .SelectMany(e => e.SubmittedQuestions)
+                .Count(q => !q.IsScored);
+            return unscored > 0
+                ? $"{unscored} question{(unscored == 1 ? "" : "s")} still unscored"
+                : "Cannot mark from this status";
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            var submissionTask = SubmittedApi.GetByIdAsync(Id);
+            var errorTypesTask = ErrorTypeApi.GetAllAsync();
+            await Task.WhenAll(submissionTask, errorTypesTask);
+            _submission = await submissionTask;
+            _errorTypes = (await errorTypesTask).ToList();
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            _submission = null;
+        }
+        catch (Exception ex)
+        {
+            _loadError = ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    // ── per-question handlers ──────────────────────────────────────────
+
+    private async Task OnPointsChangedAsync(SubmittedQuestionDetail q, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            // The current API doesn't support clearing a score — leave the
+            // local model alone and skip the save.
+            return;
+        }
+
+        if (!int.TryParse(value, out var pts)) return;
+        if (pts < 0 || pts > q.MaxPoints)
+        {
+            _saveStatus = SaveStatus.Error;
+            _saveError = $"Score must be between 0 and {q.MaxPoints}.";
+            return;
+        }
+
+        q.PointsAwarded = pts;
+        await SaveQuestionAsync(q);
+    }
+
+    private async Task OnCommentChangedAsync(SubmittedQuestionDetail q, string? value)
+    {
+        q.Comment = value;
+        if (q.PointsAwarded is null) return; // can't persist without a score
+        await SaveQuestionAsync(q);
+    }
+
+    private async Task OnErrorTypeChangedAsync(SubmittedQuestionDetail q, string? value)
+    {
+        q.ErrorTypeId = Guid.TryParse(value, out var g) ? g : null;
+        if (q.PointsAwarded is null) return;
+        await SaveQuestionAsync(q);
+    }
+
+    private async Task SaveQuestionAsync(SubmittedQuestionDetail q)
+    {
+        _saveStatus = SaveStatus.Saving;
+        _saveError = null;
+        StateHasChanged();
+
+        try
+        {
+            var updated = await SubmittedApi.ScoreQuestionAsync(
+                _submission!.Id, q.Id,
+                new ScoreQuestionRequest
+                {
+                    Points = q.PointsAwarded!.Value,
+                    Comment = q.Comment,
+                    ErrorTypeId = q.ErrorTypeId
+                });
+
+            if (updated is not null)
+            {
+                q.IsScored = updated.IsScored;
+                q.PointsAwarded = updated.PointsAwarded;
+                q.Comment = updated.Comment;
+                q.ErrorTypeId = updated.ErrorTypeId;
+            }
+
+            RecomputeLocalTotals(q);
+            _saveStatus = SaveStatus.Saved;
+        }
+        catch (Exception ex)
+        {
+            _saveStatus = SaveStatus.Error;
+            _saveError = ex.Message;
+        }
+    }
+
+    private void RecomputeLocalTotals(SubmittedQuestionDetail justScored)
+    {
+        if (_submission is null) return;
+
+        var parentEx = _submission.SubmittedExercises
+            .FirstOrDefault(e => e.Id == justScored.SubmittedExerciseId);
+        if (parentEx is not null)
+        {
+            parentEx.TotalScore = parentEx.SubmittedQuestions.Sum(qx => qx.PointsAwarded ?? 0);
+        }
+
+        _submission.TotalScore = _submission.SubmittedExercises
+            .SelectMany(e => e.SubmittedQuestions)
+            .Sum(qx => qx.PointsAwarded ?? 0);
+
+        // The server auto-transitions Pending → InProgress on first edit;
+        // mirror that locally so the badge updates without re-fetching.
+        if (_submission.Status == EvaluationStatus.Pending)
+            _submission.Status = EvaluationStatus.InProgress;
+    }
+
+    // ── per-exercise comment ───────────────────────────────────────────
+
+    private async Task OnExerciseCommentChangedAsync(SubmittedExerciseDetail ex, string? value)
+    {
+        ex.OverallComment = value;
+
+        _saveStatus = SaveStatus.Saving;
+        _saveError = null;
+        StateHasChanged();
+
+        try
+        {
+            await SubmittedApi.SetExerciseCommentAsync(
+                _submission!.Id, ex.Id,
+                new SetExerciseCommentRequest { Comment = value });
+
+            if (_submission.Status == EvaluationStatus.Pending)
+                _submission.Status = EvaluationStatus.InProgress;
+
+            _saveStatus = SaveStatus.Saved;
+        }
+        catch (Exception exc)
+        {
+            _saveStatus = SaveStatus.Error;
+            _saveError = exc.Message;
+        }
+    }
+
+    // ── mark evaluated / return ────────────────────────────────────────
+
+    private async Task MarkEvaluatedAsync()
+    {
+        _isActionBusy = true;
+        _actionError = null;
+        try
+        {
+            var updated = await SubmittedApi.MarkEvaluatedAsync(
+                _submission!.Id,
+                new MarkEvaluatedRequest { EvaluatorId = MockEvaluatorId });
+            if (updated is not null) _submission = updated;
+        }
+        catch (Exception ex)
+        {
+            _actionError = $"Could not mark evaluated: {ex.Message}";
+        }
+        finally
+        {
+            _isActionBusy = false;
+        }
+    }
+
+    private void RequestReturn()
+    {
+        _actionError = null;
+        _showReturnConfirm = true;
+    }
+
+    private async Task ReturnSubmissionAsync()
+    {
+        _isActionBusy = true;
+        _actionError = null;
+        try
+        {
+            var updated = await SubmittedApi.ReturnSubmissionAsync(_submission!.Id);
+            if (updated is not null) _submission = updated;
+            _showReturnConfirm = false;
+        }
+        catch (Exception ex)
+        {
+            _actionError = $"Could not return: {ex.Message}";
+        }
+        finally
+        {
+            _isActionBusy = false;
+        }
+    }
+
+    // ── presentation helpers ───────────────────────────────────────────
+
+    private static string FormatStudentId(Guid id)
+    {
+        // Show first 8 chars, ellipsis. Full ID is still visible on hover-title elsewhere if needed.
+        var s = id.ToString();
+        return s.Length > 8 ? $"{s[..8]}…" : s;
+    }
+
+    private string SaveStatusText() => _saveStatus switch
+    {
+        SaveStatus.Saving => "Saving…",
+        SaveStatus.Saved => "All changes saved",
+        SaveStatus.Error => _saveError is null ? "Save failed" : $"Error: {_saveError}",
+        _ => ""
+    };
+
+    private string SaveStatusColor() => _saveStatus switch
+    {
+        SaveStatus.Saving => "text-blue-600",
+        SaveStatus.Saved => "text-green-600",
+        SaveStatus.Error => "text-red-600",
+        _ => "text-gray-400"
+    };
+
+    private static string SubmissionStatusLabel(EvaluationStatus status) => status switch
+    {
+        EvaluationStatus.Pending => "Pending",
+        EvaluationStatus.InProgress => "In Progress",
+        EvaluationStatus.Completed => "Completed",
+        EvaluationStatus.Returned => "Returned",
+        _ => "Unknown",
+    };
+
+    private static string SubmissionStatusBadgeClass(EvaluationStatus status) => status switch
+    {
+        EvaluationStatus.Pending => "bg-yellow-100 text-yellow-700",
+        EvaluationStatus.InProgress => "bg-blue-100 text-blue-700",
+        EvaluationStatus.Completed => "bg-green-100 text-green-700",
+        EvaluationStatus.Returned => "bg-gray-200 text-gray-700",
+        _ => "bg-gray-100 text-gray-600",
+    };
+
+    private enum SaveStatus { Idle, Saving, Saved, Error }
+}

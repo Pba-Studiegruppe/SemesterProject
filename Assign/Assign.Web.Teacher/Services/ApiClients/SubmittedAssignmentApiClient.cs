@@ -39,5 +39,59 @@ namespace Assign.Web.Teacher.Services.ApiClients
                 throw;
             }
         }
+
+        public async Task<SubmittedAssignmentDetail?> GetByIdAsync(
+    Guid id, CancellationToken cancellationToken = default)
+        {
+            return await _http.GetFromJsonAsync<SubmittedAssignmentDetail>(
+                $"api/submitted-assignments/{id}", cancellationToken);
+        }
+
+        public async Task<SubmittedQuestionDetail?> ScoreQuestionAsync(
+            Guid submissionId, Guid questionId, ScoreQuestionRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var resp = await _http.PatchAsJsonAsync(
+                $"api/submitted-assignments/{submissionId}/questions/{questionId}/score",
+                request, cancellationToken);
+            resp.EnsureSuccessStatusCode();
+            return await resp.Content.ReadFromJsonAsync<SubmittedQuestionDetail>(
+                cancellationToken: cancellationToken);
+        }
+
+        public async Task<SubmittedExerciseDetail?> SetExerciseCommentAsync(
+            Guid submissionId, Guid exerciseId, SetExerciseCommentRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var resp = await _http.PatchAsJsonAsync(
+                $"api/submitted-assignments/{submissionId}/exercises/{exerciseId}/comment",
+                request, cancellationToken);
+            resp.EnsureSuccessStatusCode();
+            return await resp.Content.ReadFromJsonAsync<SubmittedExerciseDetail>(
+                cancellationToken: cancellationToken);
+        }
+
+        public async Task<SubmittedAssignmentDetail?> MarkEvaluatedAsync(
+            Guid submissionId, MarkEvaluatedRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var resp = await _http.PostAsJsonAsync(
+                $"api/submitted-assignments/{submissionId}/evaluate",
+                request, cancellationToken);
+            resp.EnsureSuccessStatusCode();
+            return await resp.Content.ReadFromJsonAsync<SubmittedAssignmentDetail>(
+                cancellationToken: cancellationToken);
+        }
+
+        public async Task<SubmittedAssignmentDetail?> ReturnSubmissionAsync(
+            Guid submissionId, CancellationToken cancellationToken = default)
+        {
+            var resp = await _http.PostAsync(
+                $"api/submitted-assignments/{submissionId}/return",
+                content: null, cancellationToken);
+            resp.EnsureSuccessStatusCode();
+            return await resp.Content.ReadFromJsonAsync<SubmittedAssignmentDetail>(
+                cancellationToken: cancellationToken);
+        }
     }
 }
