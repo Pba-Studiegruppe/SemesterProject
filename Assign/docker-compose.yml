@@ -10,16 +10,12 @@
 services:
 
   # ---------------------------------------------------------------------------
-  # SQL Server med automatisk restore af AssignDB.bak.
-  # Har sin egen build-context (./docker/sqlserver-context oprettes implicit
-  # ved at pege context på roden men bruge sqlserver-Dockerfilen), så .bak'en
-  # kan kopieres ind.
+  # SQL Server 2022 — officielt image, ingen custom build.
+  # Starter en TOM database-server. AssignDB findes ikke automatisk; den skal
+  # oprettes/migreres af applikationen eller manuelt (se note nederst).
   # ---------------------------------------------------------------------------
   sqlserver:
-    build:
-      context: .
-      dockerfile: docker/sqlserver/Dockerfile
-    image: assign-sqlserver
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
     environment:
       ACCEPT_EULA: ${ACCEPT_EULA}
