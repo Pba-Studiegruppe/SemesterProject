@@ -1,28 +1,50 @@
-﻿version: "3.9"
+﻿# =============================================================================
+# docker-compose.yml
+#
+# Kør med:  docker compose up --build
+#
+# Bemærk: 'version'-feltet er fjernet bevidst — det er forældet (deprecated)
+# i moderne Docker Compose og giver advarsler.
+# =============================================================================
 
 services:
 
+  # ---------------------------------------------------------------------------
+  # SQL Server 2022 — officielt image, ingen custom build.
+  # Starter en TOM database-server. AssignDB findes ikke automatisk; den skal
+  # oprettes/migreres af applikationen eller manuelt (se note nederst).
+  # ---------------------------------------------------------------------------
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
     environment:
       ACCEPT_EULA: ${ACCEPT_EULA}
-      SA_PASSWORD: ${SA_PASSWORD}
+      # 2022-imaget bruger MSSQL_SA_PASSWORD (SA_PASSWORD er deprecated).
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD}
     ports:
       - "${SQL_PORT}:1433"
     volumes:
+      # Navngivet volume = data overlever container-genstart/genbygning.
       - sqlserver_data:/var/opt/mssql
-      - ./docker/sqlserver:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${SA_PASSWORD} -Q 'SELECT 1'"]
+      # Korrekt sti i 2022-imaget er mssql-tools18, og -C kræves for at
+      # truste self-signed certifikatet.
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"${SA_PASSWORD}\" -C -Q 'SELECT 1' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
+      start_period: 30s
 
+  # ---------------------------------------------------------------------------
+  # Exercise-API
+  # VIGTIGT: læser connection string-nøglen "DefaultConnectionGateway"
+  # (jf. Exercise-Api/Program.cs), IKKE "DefaultConnection".
+  # ---------------------------------------------------------------------------
   exercise-api:
     build:
       context: .
       dockerfile: Exercise-Api/Dockerfile
+    image: assign-exercise-api
     container_name: exercise-api
     environment:
       ASPNETCORE_ENVIRONMENT: Development
@@ -34,10 +56,16 @@ services:
       sqlserver:
         condition: service_healthy
 
+  # ---------------------------------------------------------------------------
+  # Assignment-API
+  # Læser "DefaultConnection" (jf. Assignment-Api/Program.cs) og kalder
+  # Exercise-API via ExerciseApi__BaseUrl over det interne netværk (HTTP).
+  # ---------------------------------------------------------------------------
   assignment-api:
     build:
       context: .
       dockerfile: Assignment-Api/Dockerfile
+    image: assign-assignment-api
     container_name: assignment-api
     environment:
       ASPNETCORE_ENVIRONMENT: Development
@@ -51,30 +79,23 @@ services:
         condition: service_healthy
       exercise-api:
         condition: service_started
-            
-  course-api:
-    build:
-      context: .
-      dockerfile: Course-Api/Dockerfile
-    container_name: course-api
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_HTTP_PORTS: 8080
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=AssignDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true"
-    ports:
-      - "5160:8080"
-    depends_on:
-      sqlserver:
-        condition: service_healthy
 
+  # ---------------------------------------------------------------------------
+  # Blazor frontend (Assign.Web.Teacher)
+  # Peger på API'erne via interne HTTP-adresser. Den tidligere appsettings
+  # brugte https://localhost:7158 hvilket ikke virker container-til-container.
+  # ---------------------------------------------------------------------------
   assign-blazor:
     build:
       context: .
-      dockerfile: Assign/Dockerfile
+      dockerfile: Assign.Web.Teacher/Dockerfile
+    image: assign-blazor
     container_name: assign-blazor
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: 8080
+      ExerciseApi__BaseUrl: "http://exercise-api:8080"
+      AssignmentApi__BaseUrl: "http://assignment-api:8080"
     ports:
       - "5161:8080"
     depends_on:
@@ -84,4 +105,4 @@ services:
         condition: service_started
 
 volumes:
-  sqlserver_data:  
+  sqlserver_data:
