@@ -22,7 +22,7 @@ public partial class Course
     public virtual Subject? Subject { get; set; }
 
 
-    private Exercise() : base(Guid.NewGuid()) { } // Required by EF Core
+
 
 
 }

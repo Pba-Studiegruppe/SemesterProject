@@ -27,7 +27,6 @@ namespace Assignment_Application.Implementations
             _assignmentSetRepository = assignmentSetRepository;
             _exerciseProvider = exerciseProvider;
         }
-
         public async Task<AssignmentDTO> CreateAssignmentAsync(CreateAssignmentRequest request)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
@@ -61,7 +60,6 @@ namespace Assignment_Application.Implementations
                 CreatedAt = assignment.CreatedAt,
             };
         }
-
         public async Task<AssignmentDTO> GetAssignmentAsync(Guid id)
         {
             var assignment = await _repository.GetByIdAsync(id);
@@ -81,7 +79,6 @@ namespace Assignment_Application.Implementations
                     .ToList()
             };
         }
-
         public async Task<AssignmentDTO> UpdateAssignmentAsync(Guid assignmentId, UpdateAssignmentRequest request)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
@@ -102,10 +99,7 @@ namespace Assignment_Application.Implementations
                 Description = assignment.Description
             };
         }
-
-        public async Task<AssignmentExerciseDTO> AddExerciseAsync(
-            Guid assignmentId,
-            CreateAssignmentExerciseRequest request)
+        public async Task<AssignmentExerciseDTO> AddExerciseAsync(Guid assignmentId, CreateAssignmentExerciseRequest request)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -125,10 +119,7 @@ namespace Assignment_Application.Implementations
 
             return ToDto(assignmentExercise);
         }
-
-        public async Task RemoveExerciseAsync(
-            Guid assignmentId,
-            RemoveAssignmentExerciseRequest request)
+        public async Task RemoveExerciseAsync(Guid assignmentId, RemoveAssignmentExerciseRequest request)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -141,12 +132,7 @@ namespace Assignment_Application.Implementations
 
             await _repository.SaveChangesAsync();
         }
-
-        public async Task SetQuestionPointsAsync(
-    Guid assignmentId,
-    Guid assignmentExerciseId,
-    Guid questionId,
-    SetQuestionPointsRequest request)
+        public async Task SetQuestionPointsAsync(Guid assignmentId, Guid assignmentExerciseId, Guid questionId, SetQuestionPointsRequest request)
         {
             if (request is null) throw new ArgumentNullException(nameof(request));
 
@@ -163,11 +149,7 @@ namespace Assignment_Application.Implementations
 
             await _repository.SaveChangesAsync();
         }
-
-        public async Task RemoveQuestionAsync(
-            Guid assignmentId,
-            Guid assignmentExerciseId,
-            Guid questionId)
+        public async Task RemoveQuestionAsync(Guid assignmentId, Guid assignmentExerciseId, Guid questionId)
         {
             var assignment = await _repository.GetByIdAsync(assignmentId);
             if (assignment is null)

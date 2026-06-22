@@ -272,7 +272,6 @@ namespace Assignment_Tests.Application
         {
             // Arrange
             var assignmentSetId = Guid.NewGuid();
-
             var assignmentSet = new AssignmentSet(
                 Guid.NewGuid(),
                 "Old Title",
@@ -284,7 +283,6 @@ namespace Assignment_Tests.Application
                 .ReturnsAsync(assignmentSet);
 
             var service = new AssignmentSetService(repoMock.Object);
-
             var request = new UpdateAssignmentSetRequest
             {
                 Title = "New Title",
@@ -298,7 +296,6 @@ namespace Assignment_Tests.Application
 
             // Assert
             result.Title.Should().Be(request.Title);
-
             result.Description.Should().Be(request.Description);
 
             repoMock.Verify(

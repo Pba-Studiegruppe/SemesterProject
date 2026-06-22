@@ -53,7 +53,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assign.Web.Student", "Assig
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{577C443B-1107-480A-AEB0-60421ED11F44}"
 	ProjectSection(SolutionItems) = preProject
+		C:\Users\Niklas\Downloads\docker\.dockerignore = C:\Users\Niklas\Downloads\docker\.dockerignore
 		.editorconfig = .editorconfig
+		C:\Users\Niklas\Downloads\docker\.env = C:\Users\Niklas\Downloads\docker\.env
+		C:\Users\Niklas\Downloads\docker\docker-compose.yml = C:\Users\Niklas\Downloads\docker\docker-compose.yml
 	EndProjectSection
 EndProject
 Global
